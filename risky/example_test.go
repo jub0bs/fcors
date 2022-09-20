@@ -1,0 +1,44 @@
+package risky_test
+
+import (
+	"io"
+	"log"
+	"net/http"
+
+	"github.com/jub0bs/fcors"
+	"github.com/jub0bs/fcors/risky"
+)
+
+func ExampleSkipPublicSuffixCheck() {
+	cors, err := fcors.AllowAccessWithCredentials(
+		fcors.FromOrigins("https://*.com"),
+		risky.SkipPublicSuffixCheck(),
+	)
+	if err != nil {
+		// This branch would get executed if the call to
+		// risky.SkipPublicSuffixCheck were missing above.
+		log.Fatal(err)
+	}
+	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		io.WriteString(w, "Hello, world!\n")
+	})
+
+	http.Handle("/hello_public_suffix", cors(helloHandler))
+}
+
+func ExampleTolerateInsecureOrigins() {
+	cors, err := fcors.AllowAccessWithCredentials(
+		fcors.FromOrigins("http://example.com"),
+		risky.TolerateInsecureOrigins(),
+	)
+	if err != nil {
+		// This branch would get executed if the call to
+		// risky.TolerateInsecureOrigins were missing above.
+		log.Fatal(err)
+	}
+	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		io.WriteString(w, "Hello, world!\n")
+	})
+
+	http.Handle("/hello_insecure_origin", cors(helloHandler))
+}
