@@ -136,6 +136,13 @@ func AllowAccessWithCredentials(options ...OptionCred) (Middleware, error) {
 //	http://[0:0:0:0:0:0:0:0001]:9090                      // illegal
 //	http://[0000:0000:0000:0000:0000:0000:0000:0001]:9090 // illegal
 //
+// Default ports (80 for http, 443 for https) must be elided:
+//
+//	http://example.com      // legal
+//	http://example.com:80   // illegal
+//	https://example.com     // legal
+//	https://example.com:443 // illegal
+//
 // In addition to support for exact origins,
 // this option provides limited support for origin patterns
 // that encompass multiple origins.
