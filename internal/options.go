@@ -285,7 +285,7 @@ func WithAnyRequestHeaders() Option {
 func MaxAgeInSeconds(delta uint) Option {
 	// Current upper bounds:
 	//  - Firefox:         86400 (24h)
-	// 	- Chromium:         7200 (2h)
+	//  - Chromium:         7200 (2h)
 	//  - WebKit/Safari:     600 (10m)
 	//     see https://github.com/WebKit/WebKit/blob/6c4c981002fe98d371b03ab862b589120661a63d/Source/WebCore/loader/CrossOriginPreflightResultCache.cpp#L42
 	const upperBound = 86400
