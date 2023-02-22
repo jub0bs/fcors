@@ -3,19 +3,22 @@ Package fcors provides [net/http] middleware for
 [Cross-Origin Resource Sharing (CORS)].
 
 For things to work properly, fcors users must follow certain rules;
-the key words "MUST", "MUST NOT", and "SHOULD" below
+the key words "MUST", "MUST NOT", "SHOULD", and "MAY" below
 are to be interpreted as described in [RFC 2119]:
 
   - Because [CORS-preflight requests] use [OPTIONS] as their method,
     the resources to which you apply a CORS middleware
     SHOULD accept OPTIONS requests.
   - Because CORS-preflight requests are not authenticated,
-    a CORS middleware MUST be stacked on top of any authentication middleware.
+    a CORS middleware SHOULD be stacked on top of any authentication middleware.
   - Multiple CORS middleware MUST NOT be stacked; in other words,
     no more than one CORS middleware MUST be used per resource.
-  - Other middleware (if any) in the chain MUST preserve all headers
-    (i.e. [CORS response headers] and the [Vary header]) that are set by
-    this library's middleware.
+  - Other middleware (if any) in the chain MUST NOT alter any
+    [CORS response headers] that are set by this library's middleware
+    and MUST NOT add more [CORS response headers].
+  - Other middleware (if any) in the chain MUST NOT alter any
+    [Vary header] that is set by this library's middleware,
+    but it MAY add more Vary headers.
 
 The package provides basic options for configuring a CORS middleware,
 but more advanced (and potentially dangerous) options can be found in the
