@@ -25,7 +25,7 @@ enforced by the [Same-Origin Policy (SOP)][mdn-sop]
 on cross-origin network access.
 
 fcors allows you to configure and build [net/http][net-http] middleware
-that implements CORS.
+that implement CORS.
 
 ## Design philosophy
 
