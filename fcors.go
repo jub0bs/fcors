@@ -150,19 +150,41 @@ func AllowAccessWithCredentials(options ...OptionCred) (Middleware, error) {
 // this option provides limited support for origin patterns
 // that encompass multiple origins.
 // A leading asterisk (followed by a full stop) in a host pattern
-// denotes exactly one arbitrary DNS label:
+// denotes exactly one arbitrary DNS label. For instance,
 //
-//	https://*.example.com // encompasses https://foo.example.com, https://bar.example.com, etc. but not https://bar.foo.example.com
+//	https://*.example.com
+//
+// encompasses the following origins (among others),
+//
+//	https://foo.example.com
+//	https://bar.example.com
+//
+// but not
+//
+//	https://bar.foo.example.com
 //
 // Two leading asterisks (followed by a full stop) in a host pattern
-// denote one or more arbitrary DNS label(s):
+// denote one or more arbitrary DNS label(s). For instance,
 //
-//	https://**.example.com // encompasses https://foo.example.com, https://bar.foo.example.com, https://baz.bar.foo.example.com, etc.
+//	https://**.example.com
+//
+// encompasses the following origins (among others),
+//
+//	https://foo.example.com
+//	https://bar.example.com
+//	https://bar.foo.example.com
+//	https://baz.bar.foo.example.com
 //
 // An asterisk in place of a port denotes an arbitrary (possibly implicit)
-// port:
+// port. For instance,
 //
-//	http://localhost:* // encompasses http://localhost, http://localhost:80, http://localhost:9090, etc.
+//	http://localhost:*
+//
+// encompasses the following origins (among others),
+//
+//	http://localhost
+//	http://localhost:80
+//	http://localhost:9090
 //
 // Specifying both arbitrary subdomains and arbitrary ports
 // in a given origin pattern is illegal:
