@@ -24,6 +24,9 @@ The package provides basic options for configuring a CORS middleware,
 but more advanced (and potentially dangerous) options can be found in the
 [github.com/jub0bs/fcors/risky] package.
 
+CORS middleware provided by this package are, of course, safe for concurrent
+use by multiple goroutines.
+
 [CORS response headers]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#the_http_response_headers
 [CORS-preflight requests]: https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 [Cross-Origin Resource Sharing (CORS)]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
