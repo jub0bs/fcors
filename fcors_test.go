@@ -36,14 +36,11 @@ const (
 	headerACAH  = "Access-Control-Allow-Headers"
 	headerACALN = "Access-Control-Allow-Local-Network"
 	headerACAPN = "Access-Control-Allow-Private-Network"
-	headerVary  = "Vary"
 	headerACEH  = "Access-Control-Expose-Headers"
+	headerVary  = "Vary"
 
-	varyPreflightValue = "Access-Control-Request-Headers, " +
-		"Access-Control-Request-Method, " +
-		"Access-Control-Request-Local-Network, " +
-		"Access-Control-Request-Private-Network, " +
-		"Origin"
+	varyPreflightValue = headerACRH + ", " + headerACRM + ", " +
+		headerACRLN + ", " + headerACRPN + ", " + headerOrigin
 
 	wildcard                      = "*"
 	headerValueTrue               = "true"
