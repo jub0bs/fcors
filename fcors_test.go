@@ -25,6 +25,7 @@ const (
 	headerOrigin = "Origin"
 	headerACRM   = "Access-Control-Request-Method"
 	headerACRH   = "Access-Control-Request-Headers"
+	headerACRLN  = "Access-Control-Request-Local-Network"
 	headerACRPN  = "Access-Control-Request-Private-Network"
 
 	headerACAO = "Access-Control-Allow-Origin"
@@ -33,12 +34,14 @@ const (
 	headerACMA  = "Access-Control-Max-Age"
 	headerACAM  = "Access-Control-Allow-Methods"
 	headerACAH  = "Access-Control-Allow-Headers"
+	headerACALN = "Access-Control-Allow-Local-Network"
 	headerACAPN = "Access-Control-Allow-Private-Network"
 	headerVary  = "Vary"
 	headerACEH  = "Access-Control-Expose-Headers"
 
 	varyPreflightValue = "Access-Control-Request-Headers, " +
 		"Access-Control-Request-Method, " +
+		"Access-Control-Request-Local-Network, " +
 		"Access-Control-Request-Private-Network, " +
 		"Origin"
 

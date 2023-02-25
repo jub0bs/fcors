@@ -13,6 +13,7 @@ var discreteForbiddenHeaderNames = util.NewSet(
 	byteLowercase(headerRequestHeaders),
 	byteLowercase(headerRequestMethod),
 	// see https://wicg.github.io/local-network-access/#forbidden-header-names
+	byteLowercase(headerRequestLocalNetwork),
 	byteLowercase(headerRequestPrivateNetwork),
 	"connection",
 	"content-length",

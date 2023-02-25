@@ -156,6 +156,19 @@ func Test_AllowAccess_From_Any_Origin(t *testing.T) {
 				headerACAO: []string{wildcard},
 				headerVary: []string{varyPreflightValue},
 			},
+		}, {
+			name:      "CORS preflight request with GET with ACRLN from a valid origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: dummyPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
 		},
 	}
 	process(t, cors(dummyHandler), cases)
@@ -283,6 +296,19 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoEx
 				headerOrigin: []string{dummyValidOrigin},
 				headerACRM:   []string{http.MethodGet},
 				headerACRPN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with GET with ACRLN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRLN:  []string{headerValueTrue},
 			},
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{

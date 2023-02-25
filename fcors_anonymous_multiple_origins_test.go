@@ -473,6 +473,33 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkA
 			expectedRespHeaders: http.Header{
 				headerVary: []string{varyPreflightValue},
 			},
+		}, {
+			name:      "CORS preflight request with GET with ACRLN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{allowedOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: dummyPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO:  []string{allowedOrigin},
+				headerACALN: []string{headerValueTrue},
+				headerACMA:  []string{stringFromUint(30)},
+				headerVary:  []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with GET with ACRLN from a valid but disallowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{disallowedBaseOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: http.StatusForbidden,
+			expectedRespHeaders: http.Header{
+				headerVary: []string{varyPreflightValue},
+			},
 		},
 	}
 	process(t, cors(dummyHandler), cases)

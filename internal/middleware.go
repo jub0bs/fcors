@@ -13,11 +13,13 @@ const (
 
 	headerRequestMethod         = "Access-Control-Request-Method"
 	headerRequestHeaders        = "Access-Control-Request-Headers"
+	headerRequestLocalNetwork   = "Access-Control-Request-Local-Network"
 	headerRequestPrivateNetwork = "Access-Control-Request-Private-Network"
 
 	headerAllowMethods        = "Access-Control-Allow-Methods"
 	headerAllowHeaders        = "Access-Control-Allow-Headers"
 	headerMageAge             = "Access-Control-Max-Age"
+	headerAllowLocalNetwork   = "Access-Control-Allow-Local-Network"
 	headerAllowPrivateNetwork = "Access-Control-Allow-Private-Network"
 
 	headerAllowOrigin      = "Access-Control-Allow-Origin"
@@ -47,6 +49,8 @@ func init() {
 	b.WriteString(headerRequestHeaders)
 	b.WriteString(commaSpace)
 	b.WriteString(headerRequestMethod)
+	b.WriteString(commaSpace)
+	b.WriteString(headerRequestLocalNetwork)
 	b.WriteString(commaSpace)
 	b.WriteString(headerRequestPrivateNetwork)
 	b.WriteString(commaSpace)
@@ -363,14 +367,21 @@ func (cfg *Config) processOriginForPreflight(respHeaders http.Header, origins []
 // About this specific check, see
 // https://wicg.github.io/local-network-access/#cors-preflight, item 4.2.
 func (cfg *Config) processACRPN(respHeaders, reqHeaders http.Header) bool {
-	acrpn, found := first(reqHeaders, headerRequestPrivateNetwork)
-	if !found || acrpn[0] != headerValueTrue {
+	acrpn, acrpnFound := first(reqHeaders, headerRequestPrivateNetwork)
+	rpn := acrpnFound && acrpn[0] == headerValueTrue
+	acrln, acrlnFound := first(reqHeaders, headerRequestLocalNetwork)
+	rln := acrlnFound && acrln[0] == headerValueTrue
+	if !rpn && !rln { // no request for local network access
 		return true
 	}
 	if !cfg.LocalNetworkAccess && !cfg.LocalNetworkAccessInNoCorsModeOnly {
 		return false
 	}
-	respHeaders[headerAllowPrivateNetwork] = precomputedTrue
+	if rpn {
+		respHeaders[headerAllowPrivateNetwork] = precomputedTrue
+	} else {
+		respHeaders[headerAllowLocalNetwork] = precomputedTrue
+	}
 	return true
 }
 
