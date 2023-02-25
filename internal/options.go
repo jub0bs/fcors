@@ -15,8 +15,8 @@ const (
 	optERH     = "ExposeResponseHeaders"
 	optFAO     = "FromAnyOrigin"
 	optFO      = "FromOrigins"
-	optPNA     = "PrivateNetworkAccess"
-	optPNANC   = "PrivateNetworkAccessInNoCorsModeOnly"
+	optLNA     = "LocalNetworkAccess"
+	optLNANC   = "LocalNetworkAccessInNoCorsModeOnly"
 	optSIOC    = "TolerateInsecureOrigins"
 	optSPSC    = "SkipPublicSuffixCheck"
 	optWAM     = "WithAnyMethod"
@@ -398,25 +398,25 @@ func AssumeNoWebCachingOfPreflightResponses() Option {
 	return option(f)
 }
 
-func PrivateNetworkAccess() Option {
+func LocalNetworkAccess() Option {
 	// blanket policy that applies to all origins
-	// see https://github.com/WICG/private-network-access/issues/84
+	// see https://github.com/WICG/local-network-access/issues/84
 	f := func(cfg *Config) error {
-		if cfg.PrivateNetworkAccess {
-			return util.NewErrorRisky("option " + optPNA + " used multiple times")
+		if cfg.LocalNetworkAccess {
+			return util.NewErrorRisky("option " + optLNA + " used multiple times")
 		}
-		cfg.PrivateNetworkAccess = true
+		cfg.LocalNetworkAccess = true
 		return nil
 	}
 	return option(f)
 }
 
-func PrivateNetworkAccessInNoCorsModeOnly() Option {
+func LocalNetworkAccessInNoCorsModeOnly() Option {
 	f := func(cfg *Config) error {
-		if cfg.PrivateNetworkAccessInNoCorsModeOnly {
-			return util.NewErrorRisky("option " + optPNANC + " used multiple times")
+		if cfg.LocalNetworkAccessInNoCorsModeOnly {
+			return util.NewErrorRisky("option " + optLNANC + " used multiple times")
 		}
-		cfg.PrivateNetworkAccessInNoCorsModeOnly = true
+		cfg.LocalNetworkAccessInNoCorsModeOnly = true
 		return nil
 	}
 	return option(f)

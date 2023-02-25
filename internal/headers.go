@@ -12,7 +12,7 @@ var discreteForbiddenHeaderNames = util.NewSet(
 	"accept-encoding",
 	byteLowercase(headerRequestHeaders),
 	byteLowercase(headerRequestMethod),
-	// see https://wicg.github.io/private-network-access/#forbidden-header-names
+	// see https://wicg.github.io/local-network-access/#forbidden-header-names
 	byteLowercase(headerRequestPrivateNetwork),
 	"connection",
 	"content-length",

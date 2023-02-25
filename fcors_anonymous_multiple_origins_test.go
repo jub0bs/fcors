@@ -242,7 +242,7 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header(t *testing.T) {
 	process(t, cors(dummyHandler), cases)
 }
 
-func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_PrivateNetworkAccess(t *testing.T) {
+func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkAccess(t *testing.T) {
 	const (
 		dummyVaryValue  = "whatever"
 		dummyStatusCode = 299
@@ -263,7 +263,7 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_PrivateNetwor
 		fcors.PreflightSuccessStatus(dummyPreflightSuccessStatus),
 		fcors.MaxAgeInSeconds(dummyMaxAge),
 		fcors.ExposeResponseHeaders(exposedResponseHeader),
-		risky.PrivateNetworkAccess(),
+		risky.LocalNetworkAccess(),
 	)
 	if err != nil {
 		t.Errorf("got error with message %q; want nil error", err.Error())
@@ -478,7 +478,7 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_PrivateNetwor
 	process(t, cors(dummyHandler), cases)
 }
 
-func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_PrivateNetworkAccessInNoCorsModeOnly(t *testing.T) {
+func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkAccessInNoCorsModeOnly(t *testing.T) {
 	const (
 		dummyVaryValue  = "whatever"
 		dummyStatusCode = 299
@@ -499,7 +499,7 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_PrivateNetwor
 		fcors.PreflightSuccessStatus(dummyPreflightSuccessStatus),
 		fcors.MaxAgeInSeconds(dummyMaxAge),
 		fcors.ExposeResponseHeaders(exposedResponseHeader),
-		risky.PrivateNetworkAccessInNoCorsModeOnly(),
+		risky.LocalNetworkAccessInNoCorsModeOnly(),
 	)
 	if err != nil {
 		t.Errorf("got error with message %q; want nil error", err.Error())

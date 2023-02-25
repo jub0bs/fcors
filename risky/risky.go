@@ -9,11 +9,11 @@ import (
 	"github.com/jub0bs/fcors/internal"
 )
 
-// PrivateNetworkAccess configures a CORS middleware to enable
-// [Private Network Access], which is a W3C initiative that
+// LocalNetworkAccess configures a CORS middleware to enable
+// [Local Network Access], which is a W3C initiative that
 // strengthens the [Same-Origin Policy] by denying clients
 // in more public networks (e.g. the public Internet) access
-// to more private networks (e.g. localhost)
+// to more local networks (e.g. localhost)
 // and provides a server-side opt-in mechanism for such access.
 //
 // This option applies to all the origins allowed in the configuration
@@ -24,25 +24,21 @@ import (
 // [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
 // Using this option in conjunction with option
-// [PrivateNetworkAccessInNoCorsModeOnly] in a call to
+// [LocalNetworkAccessInNoCorsModeOnly] in a call to
 // [github.com/jub0bs/fcors.AllowAccess] or
 // [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
 //
-// Warning: this option may get [renamed]
-// in a future v0.x version of this library.
-//
-// [Private Network Access]: https://wicg.github.io/private-network-access/
+// [Local Network Access]: https://wicg.github.io/local-network-access/
 // [Same-Origin Policy]: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
-// [renamed]: https://github.com/WICG/local-network-access/issues/91
-func PrivateNetworkAccess() fcors.Option {
-	return internal.PrivateNetworkAccess()
+func LocalNetworkAccess() fcors.Option {
+	return internal.LocalNetworkAccess()
 }
 
-// PrivateNetworkAccessInNoCorsModeOnly configures a CORS middleware to
-// enable [Private Network Access] but in [no-cors mode] only.
+// LocalNetworkAccessInNoCorsModeOnly configures a CORS middleware to
+// enable [Local Network Access] but in [no-cors mode] only.
 // One use case for this option is given by the
-// [link-shortening-service example] in the Private Network Access draft.
+// [link-shortening-service example] in the Local Network Access draft.
 //
 // This option applies to all the origins allowed in the configuration
 // of the corresponding middleware.
@@ -52,19 +48,15 @@ func PrivateNetworkAccess() fcors.Option {
 // [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
 // Using this option in conjunction with option
-// [PrivateNetworkAccess] in a call to [github.com/jub0bs/fcors.AllowAccess]
+// [LocalNetworkAccess] in a call to [github.com/jub0bs/fcors.AllowAccess]
 // or [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
 //
-// Warning: this option may get [renamed]
-// in a future v0.x version of this library.
-//
-// [Private Network Access]: https://wicg.github.io/private-network-access/
-// [link-shortening-service example]: https://wicg.github.io/private-network-access/#shortlinks
+// [Local Network Access]: https://wicg.github.io/local-network-access/
+// [link-shortening-service example]: https://wicg.github.io/local-network-access/#shortlinks
 // [no-cors mode]: https://fetch.spec.whatwg.org/#concept-request-mode
-// [renamed]: https://github.com/WICG/local-network-access/issues/91
-func PrivateNetworkAccessInNoCorsModeOnly() fcors.Option {
-	return internal.PrivateNetworkAccessInNoCorsModeOnly()
+func LocalNetworkAccessInNoCorsModeOnly() fcors.Option {
+	return internal.LocalNetworkAccessInNoCorsModeOnly()
 }
 
 // AssumeNoExtendedWildcardSupport configures a CORS middleware to
