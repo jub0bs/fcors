@@ -78,8 +78,8 @@ type (
 // a functioning [Middleware] and a nil error.
 //
 // Any occurrence of a nil option results in a panic.
-func AllowAccess(options ...OptionAnon) (Middleware, error) {
-	return internal.AllowAccess(options...)
+func AllowAccess(option OptionAnon, otherOptions ...OptionAnon) (Middleware, error) {
+	return internal.AllowAccess(option, otherOptions...)
 }
 
 // AllowAccessWithCredentials configures a CORS middleware that allows
@@ -98,8 +98,8 @@ func AllowAccess(options ...OptionAnon) (Middleware, error) {
 // Any occurrence of a nil option results in a panic.
 //
 // [cookies]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
-func AllowAccessWithCredentials(options ...OptionCred) (Middleware, error) {
-	return internal.AllowAccessWithCredentials(options...)
+func AllowAccessWithCredentials(option OptionCred, otherOptions ...OptionCred) (Middleware, error) {
+	return internal.AllowAccessWithCredentials(option, otherOptions...)
 }
 
 // FromOrigins configures a CORS middleware to allow access from any of the

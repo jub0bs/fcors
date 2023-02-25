@@ -172,6 +172,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				`subdomains of public suffix "github.io" are by default prohibited`,
 		}, {
 			desc:     "missing call to FromOrigins or FromAnyOrigin",
+			options:  []fcors.OptionAnon{fcors.WithAnyMethod()},
 			errorMsg: `fcors: zero origins allowed: missing call to FromOrigins or FromAnyOrigin in AllowAccess`,
 		}, {
 			desc: "empty method name",
@@ -546,7 +547,10 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 	}
 	for _, p := range policies {
 		f := func(t *testing.T) {
-			_, err := fcors.AllowAccess(p.options...)
+			if len(p.options) == 0 {
+				t.Skip("skipping test because zero options")
+			}
+			_, err := fcors.AllowAccess(p.options[0], p.options[1:]...)
 			if err == nil {
 				t.Errorf("got nil error; want error with message %q", p.errorMsg)
 				return
@@ -723,6 +727,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				`subdomains of public suffix "github.io" are by default prohibited`,
 		}, {
 			desc:     "missing call to FromOrigins",
+			options:  []fcors.OptionCred{fcors.WithAnyMethod()},
 			errorMsg: `fcors: zero origins allowed: missing call to FromOrigins in AllowAccessWithCredentials`,
 		}, {
 			desc: "empty method name",
@@ -1023,7 +1028,10 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 	}
 	for _, p := range policies {
 		f := func(t *testing.T) {
-			_, err := fcors.AllowAccessWithCredentials(p.options...)
+			if len(p.options) == 0 {
+				t.Skip("skipping test because zero options")
+			}
+			_, err := fcors.AllowAccessWithCredentials(p.options[0], p.options[1:]...)
 			if err == nil {
 				t.Errorf("got nil error; want error with message %q", p.errorMsg)
 				return

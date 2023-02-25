@@ -61,8 +61,12 @@ type OptionCred interface {
 	applyCred(*Config) error
 }
 
-func AllowAccess(opts ...OptionAnon) (Middleware, error) {
+func AllowAccess(opt OptionAnon, opts ...OptionAnon) (Middleware, error) {
 	cfg := newConfig(false)
+	err := opt.applyAnon(cfg)
+	if err != nil {
+		return nil, err
+	}
 	for _, opt := range opts {
 		err := opt.applyAnon(cfg)
 		if err != nil {
@@ -76,8 +80,12 @@ func AllowAccess(opts ...OptionAnon) (Middleware, error) {
 	return cfg.middleware(), nil
 }
 
-func AllowAccessWithCredentials(opts ...OptionCred) (Middleware, error) {
+func AllowAccessWithCredentials(opt OptionCred, opts ...OptionCred) (Middleware, error) {
 	cfg := newConfig(true)
+	err := opt.applyCred(cfg)
+	if err != nil {
+		return nil, err
+	}
 	for _, opt := range opts {
 		err := opt.applyCred(cfg)
 		if err != nil {
