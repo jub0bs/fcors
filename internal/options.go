@@ -61,13 +61,13 @@ type OptionCred interface {
 	applyCred(*Config) error
 }
 
-func AllowAccess(opt OptionAnon, opts ...OptionAnon) (Middleware, error) {
+func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 	cfg := newConfig(false)
-	err := opt.applyAnon(cfg)
+	err := one.applyAnon(cfg)
 	if err != nil {
 		return nil, err
 	}
-	for _, opt := range opts {
+	for _, opt := range others {
 		err := opt.applyAnon(cfg)
 		if err != nil {
 			return nil, err
@@ -80,13 +80,13 @@ func AllowAccess(opt OptionAnon, opts ...OptionAnon) (Middleware, error) {
 	return cfg.middleware(), nil
 }
 
-func AllowAccessWithCredentials(opt OptionCred, opts ...OptionCred) (Middleware, error) {
+func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middleware, error) {
 	cfg := newConfig(true)
-	err := opt.applyCred(cfg)
+	err := one.applyCred(cfg)
 	if err != nil {
 		return nil, err
 	}
-	for _, opt := range opts {
+	for _, opt := range others {
 		err := opt.applyCred(cfg)
 		if err != nil {
 			return nil, err
@@ -99,7 +99,7 @@ func AllowAccessWithCredentials(opt OptionCred, opts ...OptionCred) (Middleware,
 	return cfg.middleware(), nil
 }
 
-func FromOrigins(first string, others ...string) Option {
+func FromOrigins(one string, others ...string) Option {
 	var (
 		setOfSpecs                         = make(util.Set[origin.Spec])
 		publicSuffixError                  error
@@ -135,7 +135,7 @@ func FromOrigins(first string, others ...string) Option {
 		setOfSpecs.Add(*spec)
 		return nil
 	}
-	if err := processOnePattern(first); err != nil {
+	if err := processOnePattern(one); err != nil {
 		return option(invariablyReturn(err))
 	}
 	for _, pattern := range others {
@@ -179,10 +179,10 @@ func FromAnyOrigin() OptionAnon {
 	return optionAnon(f)
 }
 
-func WithMethods(first string, others ...string) Option {
+func WithMethods(one string, others ...string) Option {
 	sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
 	allowedMethods := make(util.Set[string], sizeHint)
-	if err := processOneMethod(first, allowedMethods); err != nil {
+	if err := processOneMethod(one, allowedMethods); err != nil {
 		return option(invariablyReturn(err))
 	}
 	for _, m := range others {
@@ -236,10 +236,10 @@ func WithAnyMethod() Option {
 	return option(f)
 }
 
-func WithRequestHeaders(first string, others ...string) Option {
+func WithRequestHeaders(one string, others ...string) Option {
 	sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
 	allowedHeaders := make(util.Set[string], sizeHint)
-	if err := processOneRequestHeader(first, allowedHeaders); err != nil {
+	if err := processOneRequestHeader(one, allowedHeaders); err != nil {
 		return option(invariablyReturn(err))
 	}
 	for _, name := range others {
@@ -312,9 +312,9 @@ func MaxAgeInSeconds(delta uint) Option {
 	return option(f)
 }
 
-func ExposeResponseHeaders(first string, others ...string) Option {
+func ExposeResponseHeaders(one string, others ...string) Option {
 	exposedHeaders := make(util.Set[string], len(others))
-	if err := processOneResponseHeader(first, exposedHeaders); err != nil {
+	if err := processOneResponseHeader(one, exposedHeaders); err != nil {
 		return option(invariablyReturn(err))
 	}
 	for _, name := range others {

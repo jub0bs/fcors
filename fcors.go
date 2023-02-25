@@ -78,8 +78,8 @@ type (
 // a functioning [Middleware] and a nil error.
 //
 // Any occurrence of a nil option results in a panic.
-func AllowAccess(option OptionAnon, otherOptions ...OptionAnon) (Middleware, error) {
-	return internal.AllowAccess(option, otherOptions...)
+func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
+	return internal.AllowAccess(one, others...)
 }
 
 // AllowAccessWithCredentials configures a CORS middleware that allows
@@ -98,8 +98,8 @@ func AllowAccess(option OptionAnon, otherOptions ...OptionAnon) (Middleware, err
 // Any occurrence of a nil option results in a panic.
 //
 // [cookies]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
-func AllowAccessWithCredentials(option OptionCred, otherOptions ...OptionCred) (Middleware, error) {
-	return internal.AllowAccessWithCredentials(option, otherOptions...)
+func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middleware, error) {
+	return internal.AllowAccessWithCredentials(one, others...)
 }
 
 // FromOrigins configures a CORS middleware to allow access from any of the
@@ -236,8 +236,8 @@ func AllowAccessWithCredentials(option OptionCred, otherOptions ...OptionCred) (
 // [loopback IP address]: https://www.rfc-editor.org/rfc/rfc5735#section-3
 // [null origin]: https://portswigger.net/research/exploiting-cors-misconfigurations-for-bitcoins-and-bounties
 // [public suffix]: https://publicsuffix.org/
-func FromOrigins(pattern string, otherPatterns ...string) Option {
-	return internal.FromOrigins(pattern, otherPatterns...)
+func FromOrigins(one string, others ...string) Option {
+	return internal.FromOrigins(one, others...)
 }
 
 // FromAnyOrigin configures a CORS middleware to allow any Web origin.
@@ -289,8 +289,8 @@ func FromAnyOrigin() OptionAnon {
 // [POST]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST
 // [forbidden]: https://fetch.spec.whatwg.org/#forbidden-method
 // [illegal]: https://fetch.spec.whatwg.org/#methods
-func WithMethods(name string, otherNames ...string) Option {
-	return internal.WithMethods(name, otherNames...)
+func WithMethods(one string, others ...string) Option {
+	return internal.WithMethods(one, others...)
 }
 
 // WithAnyMethod configures a CORS middleware to allow any HTTP method.
@@ -344,8 +344,8 @@ func WithAnyMethod() Option {
 //
 // [forbidden request-header names]: https://fetch.spec.whatwg.org/#forbidden-request-header
 // [illegal header name]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
-func WithRequestHeaders(name string, otherNames ...string) Option {
-	return internal.WithRequestHeaders(name, otherNames...)
+func WithRequestHeaders(one string, others ...string) Option {
+	return internal.WithRequestHeaders(one, others...)
 }
 
 // WithAnyRequestHeaders configures a CORS middleware to allow any request
@@ -418,8 +418,8 @@ func MaxAgeInSeconds(delta uint) Option {
 // [CORS-safelisted response-header names]: https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name
 // [forbidden response-header names]: https://fetch.spec.whatwg.org/#forbidden-response-header-name
 // [illegal header name]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
-func ExposeResponseHeaders(name string, otherNames ...string) Option {
-	return internal.ExposeResponseHeaders(name, otherNames...)
+func ExposeResponseHeaders(one string, others ...string) Option {
+	return internal.ExposeResponseHeaders(one, others...)
 }
 
 // ExposeAllResponseHeaders configures a CORS middleware to expose all
