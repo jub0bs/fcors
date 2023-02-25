@@ -49,7 +49,7 @@ that allows anonymous requests from Web origin `https://example.com`,
 with any HTTP method among `GET`, `POST`, `PUT`, or `DELETE`,
 and possibly with request header `Authorization`.
 The CORS middleware in question is then applied
-to a simple handler bound to the `/hello` resource.
+to a simple handler bound to the `/hello` endpoint.
 
 ```go
 package main
