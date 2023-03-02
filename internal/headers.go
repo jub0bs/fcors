@@ -42,6 +42,7 @@ var disallowedRequestHeaderNames = util.NewSet(
 	byteLowercase(headerAllowCredentials),
 	byteLowercase(headerAllowMethods),
 	byteLowercase(headerAllowHeaders),
+	byteLowercase(headerAllowLocalNetwork),
 	byteLowercase(headerAllowPrivateNetwork),
 	byteLowercase(headerMageAge),
 	byteLowercase(headerExposeHeaders),

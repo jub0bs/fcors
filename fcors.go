@@ -332,6 +332,7 @@ func WithAnyMethod() Option {
 //
 //   - Access-Control-Allow-Credentials
 //   - Access-Control-Allow-Headers
+//   - Access-Control-Allow-Local-Network
 //   - Access-Control-Allow-Methods
 //   - Access-Control-Allow-Origin
 //   - Access-Control-Allow-Private-Network
