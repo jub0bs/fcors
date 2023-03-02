@@ -18,6 +18,11 @@ func buildCorpus(patterns ...string) (Corpus, error) {
 	return c, nil
 }
 
+func isCorpusEmpty(c Corpus) bool {
+	size, finite := c.size()
+	return finite && size == 0
+}
+
 var corpusTestCases = []struct {
 	patterns []string
 	accept   []string
@@ -310,11 +315,11 @@ func TestCorpus(t *testing.T) {
 			t.Errorf("failure to build corpus: %v", err)
 			return
 		}
-		if len(c.patterns) == 0 && !corpus.IsEmpty() {
+		if len(c.patterns) == 0 && !isCorpusEmpty(corpus) {
 			t.Errorf("want empty corpus; got %v", corpus)
 			return
 		}
-		if len(c.patterns) != 0 && corpus.IsEmpty() {
+		if len(c.patterns) != 0 && isCorpusEmpty(corpus) {
 			t.Error("want non-empty corpus; got empty corpus")
 			return
 		}

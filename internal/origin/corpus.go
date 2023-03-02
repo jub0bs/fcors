@@ -203,12 +203,6 @@ func (v *Vertex) contains(portP1 int) bool {
 	return v.portP1s.Contains(portP1) || v.portP1s.Contains(anyPortP1)
 }
 
-// IsEmpty returns true if and only if c is empty.
-func (c Corpus) IsEmpty() bool {
-	size, finite := c.size()
-	return finite && size == 0
-}
-
 // size returns the number of distinct Web origins contained in c.
 // The bool result reports whether c contains a finite number of
 // origins.
