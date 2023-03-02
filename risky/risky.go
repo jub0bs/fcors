@@ -91,6 +91,7 @@ func AssumeNoExtendedWildcardSupport() fcors.OptionAnon {
 // in the Vary header of preflight responses:
 //
 //   - Access-Control-Request-Headers
+//   - Access-Control-Request-Local-Network
 //   - Access-Control-Request-Methods
 //   - Access-Control-Request-Private-Network
 //   - Origin
