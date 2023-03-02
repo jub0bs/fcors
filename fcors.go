@@ -408,6 +408,7 @@ func MaxAgeInSeconds(delta uint) Option {
 // Finally, some header names that have no place in a response are prohibited:
 //
 //   - Access-Control-Request-Headers
+//   - Access-Control-Request-Local-Network
 //   - Access-Control-Request-Method
 //   - Access-Control-Request-Private-Network
 //   - Origin

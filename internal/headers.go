@@ -54,6 +54,7 @@ var disallowedResponseHeaderNames = util.NewSet(
 	byteLowercase(headerOrigin),
 	byteLowercase(headerRequestMethod),
 	byteLowercase(headerRequestHeaders),
+	byteLowercase(headerRequestLocalNetwork),
 	byteLowercase(headerRequestPrivateNetwork),
 )
 
