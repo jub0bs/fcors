@@ -144,9 +144,10 @@ func FromOrigins(one string, others ...string) Option {
 		}
 	}
 	f := func(cfg *Config) error {
-		if !cfg.Corpus.IsEmpty() || cfg.tmp.SingleNonWildcardOrigin != "" {
+		if cfg.tmp.FromOriginsCalled {
 			return util.NewError("option " + optFO + " used multiple times")
 		}
+		cfg.tmp.FromOriginsCalled = true
 		if firstPatternSpecifiedMultipleTimes != "" {
 			const tmpl = "origin pattern %q specified multiple times"
 			return util.Errorf(tmpl, firstPatternSpecifiedMultipleTimes)
@@ -195,9 +196,10 @@ func WithMethods(one string, others ...string) Option {
 	// let's remove them silently.
 	maps.DeleteFunc(allowedMethods, isSafelisted)
 	f := func(cfg *Config) error {
-		if cfg.tmp.AllowedMethods != nil {
+		if cfg.tmp.WithMethodsCalled {
 			return util.NewError("option " + optWM + " used multiple times")
 		}
+		cfg.tmp.WithMethodsCalled = true
 		cfg.tmp.AllowedMethods = allowedMethods
 		return nil
 	}
@@ -248,9 +250,10 @@ func WithRequestHeaders(one string, others ...string) Option {
 		}
 	}
 	f := func(cfg *Config) error {
-		if cfg.tmp.AllowedRequestHeaders != nil {
+		if cfg.tmp.WithRequestHeadersCalled {
 			return util.NewError("option " + optWRH + " used multiple times")
 		}
+		cfg.tmp.WithRequestHeadersCalled = true
 		cfg.tmp.AllowedRequestHeaders = allowedHeaders
 		return nil
 	}
@@ -302,9 +305,10 @@ func MaxAgeInSeconds(delta uint) Option {
 		return option(invariablyReturn(util.Errorf(tmpl, delta, upperBound)))
 	}
 	f := func(cfg *Config) error {
-		if cfg.ACMA != nil {
+		if cfg.tmp.MaxAgeInSecondsCalled {
 			return util.NewError("option " + optWMAIS + " used multiple times")
 		}
+		cfg.tmp.MaxAgeInSecondsCalled = true
 		const base = 10
 		cfg.ACMA = []string{strconv.FormatUint(uint64(delta), base)}
 		return nil
@@ -324,9 +328,10 @@ func ExposeResponseHeaders(one string, others ...string) Option {
 	}
 	precomputed := []string{util.SortCombine(exposedHeaders, string(comma))}
 	f := func(cfg *Config) error {
-		if cfg.ACEH != nil {
+		if cfg.tmp.ExposeResponseHeadersCalled {
 			return util.NewError("option " + optERH + " used multiple times")
 		}
+		cfg.tmp.ExposeResponseHeadersCalled = true
 		cfg.ACEH = precomputed
 		return nil
 	}

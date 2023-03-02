@@ -68,6 +68,11 @@ type TempConfig struct {
 	AssumeNoExtendedWildcardSupport bool
 	SkipPublicSuffixCheck           bool
 	TolerateInsecureOrigins         bool
+	FromOriginsCalled               bool
+	WithMethodsCalled               bool
+	WithRequestHeadersCalled        bool
+	MaxAgeInSecondsCalled           bool
+	ExposeResponseHeadersCalled     bool
 }
 
 type Config struct {
@@ -111,15 +116,11 @@ func (cfg *Config) validate() error {
 		!cfg.tmp.SkipPublicSuffixCheck {
 		return cfg.tmp.PublicSuffixError
 	}
-	corpusIsEmpty := cfg.Corpus.IsEmpty()
-	if cfg.AllowArbitraryOrigins &&
-		(!corpusIsEmpty || cfg.tmp.SingleNonWildcardOrigin != "") {
+	if cfg.tmp.FromOriginsCalled && cfg.AllowArbitraryOrigins {
 		const msg = "incompatible options " + optFO + " and " + optFAO
 		return util.NewError(msg)
 	}
-	if !cfg.AllowArbitraryOrigins &&
-		corpusIsEmpty &&
-		cfg.tmp.SingleNonWildcardOrigin == "" {
+	if !cfg.AllowArbitraryOrigins && !cfg.tmp.FromOriginsCalled {
 		if cfg.Credentialed {
 			const msg = "zero origins allowed: " +
 				"missing call to " + optFO + " in AllowAccessWithCredentials"
@@ -129,42 +130,35 @@ func (cfg *Config) validate() error {
 			"missing call to " + optFO + " or " + optFAO + " in AllowAccess"
 		return util.NewError(msg)
 	}
-	if cfg.AllowArbitraryMethods &&
-		cfg.tmp.AllowedMethods != nil {
+	if cfg.tmp.WithMethodsCalled && cfg.AllowArbitraryMethods {
 		const msg = "incompatible options " + optWM + " and " + optWAM
 		return util.NewError(msg)
 	}
-	if cfg.AllowArbitraryRequestHeaders &&
-		cfg.tmp.AllowedRequestHeaders != nil {
+	if cfg.tmp.WithRequestHeadersCalled && cfg.AllowArbitraryRequestHeaders {
 		const msg = "incompatible options " + optWRH + " and " + optWARH
 		return util.NewError(msg)
 	}
-	if cfg.LocalNetworkAccess &&
-		cfg.LocalNetworkAccessInNoCorsModeOnly {
+	if cfg.LocalNetworkAccess && cfg.LocalNetworkAccessInNoCorsModeOnly {
 		const msg = "incompatible options " + optLNA + " and " + optLNANC
 		return util.NewError(msg)
 	}
-	if cfg.LocalNetworkAccess &&
-		cfg.AllowArbitraryOrigins {
+	if cfg.AllowArbitraryOrigins && cfg.LocalNetworkAccess {
 		// see note in
 		// https://developer.chrome.com/blog/local-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optLNA
 		return util.NewError(msg)
 	}
-	if cfg.LocalNetworkAccessInNoCorsModeOnly &&
-		cfg.AllowArbitraryOrigins {
+	if cfg.AllowArbitraryOrigins && cfg.LocalNetworkAccessInNoCorsModeOnly {
 		// see note in
 		// https://developer.chrome.com/blog/local-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optLNANC
 		return util.NewError(msg)
 	}
-	if cfg.ExposeAllResponseHeaders &&
-		cfg.ACEH != nil {
+	if cfg.tmp.ExposeResponseHeadersCalled && cfg.ExposeAllResponseHeaders {
 		const msg = "incompatible options " + optERH + " and " + optEARH
 		return util.NewError(msg)
 	}
-	if cfg.ExposeAllResponseHeaders &&
-		cfg.tmp.AssumeNoExtendedWildcardSupport {
+	if cfg.ExposeAllResponseHeaders && cfg.tmp.AssumeNoExtendedWildcardSupport {
 		const msg = "incompatible options " + optEARH + " and " + optANEWS
 		return util.NewError(msg)
 	}
