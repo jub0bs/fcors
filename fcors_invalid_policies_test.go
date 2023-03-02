@@ -2,6 +2,7 @@ package fcors_test
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/jub0bs/fcors"
@@ -422,7 +423,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc: "option AssumeNoExtendedWildcardSupport used multiple times",
 			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
+				fcors.FromOrigins("https://example.com"),
 				risky.AssumeNoExtendedWildcardSupport(),
 				risky.AssumeNoExtendedWildcardSupport(),
 			},
@@ -430,7 +431,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc: "option PreflightSuccessStatus used multiple times",
 			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
+				fcors.FromOrigins("https://example.com"),
 				fcors.PreflightSuccessStatus(201),
 				fcors.PreflightSuccessStatus(202),
 			},
@@ -438,7 +439,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc: "option AssumeNoWebCachingOfPreflightResponses used multiple times",
 			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
+				fcors.FromOrigins("https://example.com"),
 				risky.AssumeNoWebCachingOfPreflightResponses(),
 				risky.AssumeNoWebCachingOfPreflightResponses(),
 			},
@@ -446,7 +447,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc: "option LocalNetworkAccess used multiple times",
 			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
+				fcors.FromOrigins("https://example.com"),
 				risky.LocalNetworkAccess(),
 				risky.LocalNetworkAccess(),
 			},
@@ -454,7 +455,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc: "option LocalNetworkAccessInNoCorsModeOnly used multiple times",
 			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
+				fcors.FromOrigins("https://example.com"),
 				risky.LocalNetworkAccessInNoCorsModeOnly(),
 				risky.LocalNetworkAccessInNoCorsModeOnly(),
 			},
@@ -470,7 +471,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc: "option SkipPublicSuffixCheck used multiple times",
 			options: []fcors.OptionAnon{
-				fcors.FromOrigins("http://example.com"),
+				fcors.FromOrigins("https://example.com"),
 				risky.SkipPublicSuffixCheck(),
 				risky.SkipPublicSuffixCheck(),
 			},
@@ -543,6 +544,39 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				fcors.PreflightSuccessStatus(300),
 			},
 			errorMsg: `fcors: specified status 300 outside the 2xx range`,
+		}, {
+			desc: "multiple configuration errors",
+			options: []fcors.OptionAnon{
+				fcors.FromOrigins(
+					"http://example.com",
+					"https://example.com/",
+				),
+				fcors.WithMethods(
+					http.MethodConnect,
+					"not a valid method",
+				),
+				fcors.WithMethods(http.MethodGet),
+				fcors.WithRequestHeaders(
+					"not a valid header",
+					"Access-control-allow-origin",
+				),
+				fcors.WithRequestHeaders("Authorization"),
+				fcors.MaxAgeInSeconds(86401),
+				fcors.MaxAgeInSeconds(129),
+			},
+			errorMsg: strings.Join(
+				[]string{
+					`fcors: invalid origin pattern: "https://example.com/"`,
+					`fcors: forbidden method name "CONNECT"`,
+					`fcors: invalid method name "not a valid method"`,
+					`fcors: option WithMethods used multiple times`,
+					`fcors: invalid request-header name "not a valid header"`,
+					`fcors: disallowed request-header name "access-control-allow-origin"`,
+					`fcors: option WithRequestHeaders used multiple times`,
+					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
+					`fcors: option MaxAgeInSeconds used multiple times`,
+					`fcors: most origin patterns like "http://example.com" that use insecure scheme "http" are by default prohibited`,
+				}, "\n"),
 		},
 	}
 	for _, p := range policies {
@@ -988,7 +1022,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc: "option SkipPublicSuffixCheck used multiple times",
 			options: []fcors.OptionCred{
-				fcors.FromOrigins("http://example.com"),
+				fcors.FromOrigins("https://example.com"),
 				risky.SkipPublicSuffixCheck(),
 				risky.SkipPublicSuffixCheck(),
 			},
@@ -1024,6 +1058,39 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.PreflightSuccessStatus(300),
 			},
 			errorMsg: `fcors: specified status 300 outside the 2xx range`,
+		}, {
+			desc: "multiple configuration errors",
+			options: []fcors.OptionCred{
+				fcors.FromOrigins(
+					"http://example.com",
+					"https://example.com/",
+				),
+				fcors.WithMethods(
+					http.MethodConnect,
+					"not a valid method",
+				),
+				fcors.WithMethods(http.MethodGet),
+				fcors.WithRequestHeaders(
+					"not a valid header",
+					"Access-control-allow-origin",
+				),
+				fcors.WithRequestHeaders("Authorization"),
+				fcors.MaxAgeInSeconds(86401),
+				fcors.MaxAgeInSeconds(129),
+			},
+			errorMsg: strings.Join(
+				[]string{
+					`fcors: invalid origin pattern: "https://example.com/"`,
+					`fcors: forbidden method name "CONNECT"`,
+					`fcors: invalid method name "not a valid method"`,
+					`fcors: option WithMethods used multiple times`,
+					`fcors: invalid request-header name "not a valid header"`,
+					`fcors: disallowed request-header name "access-control-allow-origin"`,
+					`fcors: option WithRequestHeaders used multiple times`,
+					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
+					`fcors: option MaxAgeInSeconds used multiple times`,
+					`fcors: most origin patterns like "http://example.com" that use insecure scheme "http" are by default prohibited`,
+				}, "\n"),
 		},
 	}
 	for _, p := range policies {

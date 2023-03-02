@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/jub0bs/fcors/internal/origin"
@@ -63,18 +64,20 @@ type OptionCred interface {
 
 func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 	cfg := newConfig(false)
-	err := one.applyAnon(cfg)
-	if err != nil {
-		return nil, err
+	var errs []error
+	if err := one.applyAnon(cfg); err != nil {
+		errs = append(errs, err)
 	}
 	for _, opt := range others {
-		err := opt.applyAnon(cfg)
-		if err != nil {
-			return nil, err
+		if err := opt.applyAnon(cfg); err != nil {
+			errs = append(errs, err)
 		}
 	}
 	if err := cfg.validate(); err != nil {
-		return nil, err
+		errs = append(errs, err)
+	}
+	if len(errs) != 0 {
+		return nil, errors.Join(errs...)
 	}
 	cfg.precomputeStuff()
 	return cfg.middleware(), nil
@@ -82,18 +85,20 @@ func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 
 func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middleware, error) {
 	cfg := newConfig(true)
-	err := one.applyCred(cfg)
-	if err != nil {
-		return nil, err
+	var errs []error
+	if err := one.applyCred(cfg); err != nil {
+		errs = append(errs, err)
 	}
 	for _, opt := range others {
-		err := opt.applyCred(cfg)
-		if err != nil {
-			return nil, err
+		if err := opt.applyCred(cfg); err != nil {
+			errs = append(errs, err)
 		}
 	}
 	if err := cfg.validate(); err != nil {
-		return nil, err
+		errs = append(errs, err)
+	}
+	if len(errs) != 0 {
+		return nil, errors.Join(errs...)
 	}
 	cfg.precomputeStuff()
 	return cfg.middleware(), nil
@@ -135,25 +140,31 @@ func FromOrigins(one string, others ...string) Option {
 		setOfSpecs.Add(*spec)
 		return nil
 	}
-	if err := processOnePattern(one); err != nil {
-		return option(invariablyReturn(err))
-	}
-	for _, pattern := range others {
-		if err := processOnePattern(pattern); err != nil {
-			return option(invariablyReturn(err))
-		}
-	}
 	f := func(cfg *Config) error {
+		var errs []error
+		if err := processOnePattern(one); err != nil {
+			errs = append(errs, err)
+		}
+		for _, pattern := range others {
+			if err := processOnePattern(pattern); err != nil {
+				errs = append(errs, err)
+			}
+		}
 		if cfg.tmp.FromOriginsCalled {
-			return util.NewError("option " + optFO + " used multiple times")
+			err := util.NewError("option " + optFO + " used multiple times")
+			errs = append(errs, err)
 		}
 		cfg.tmp.FromOriginsCalled = true
 		if firstPatternSpecifiedMultipleTimes != "" {
 			const tmpl = "origin pattern %q specified multiple times"
-			return util.Errorf(tmpl, firstPatternSpecifiedMultipleTimes)
+			err := util.Errorf(tmpl, firstPatternSpecifiedMultipleTimes)
+			errs = append(errs, err)
 		}
 		cfg.tmp.InsecureOriginPatternError = insecureOriginPatternError
 		cfg.tmp.PublicSuffixError = publicSuffixError
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
 		if len(setOfSpecs) == 1 && nonWildcardOrigin != "" {
 			// special case in which we don't need a corpus at all
 			cfg.tmp.SingleNonWildcardOrigin = nonWildcardOrigin
@@ -181,25 +192,30 @@ func FromAnyOrigin() OptionAnon {
 }
 
 func WithMethods(one string, others ...string) Option {
-	sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
-	allowedMethods := make(util.Set[string], sizeHint)
-	if err := processOneMethod(one, allowedMethods); err != nil {
-		return option(invariablyReturn(err))
-	}
-	for _, m := range others {
-		if err := processOneMethod(m, allowedMethods); err != nil {
-			return option(invariablyReturn(err))
-		}
-	}
-	// Because safelisted methods need not be explicitly allowed
-	// (see https://stackoverflow.com/a/71429784/2541573),
-	// let's remove them silently.
-	maps.DeleteFunc(allowedMethods, isSafelisted)
 	f := func(cfg *Config) error {
+		sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
+		allowedMethods := make(util.Set[string], sizeHint)
+		var errs []error
+		if err := processOneMethod(one, allowedMethods); err != nil {
+			errs = append(errs, err)
+		}
+		for _, m := range others {
+			if err := processOneMethod(m, allowedMethods); err != nil {
+				errs = append(errs, err)
+			}
+		}
+		// Because safelisted methods need not be explicitly allowed
+		// (see https://stackoverflow.com/a/71429784/2541573),
+		// let's remove them silently.
+		maps.DeleteFunc(allowedMethods, isSafelisted)
 		if cfg.tmp.WithMethodsCalled {
-			return util.NewError("option " + optWM + " used multiple times")
+			err := util.NewError("option " + optWM + " used multiple times")
+			errs = append(errs, err)
 		}
 		cfg.tmp.WithMethodsCalled = true
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
 		cfg.tmp.AllowedMethods = allowedMethods
 		return nil
 	}
@@ -239,21 +255,26 @@ func WithAnyMethod() Option {
 }
 
 func WithRequestHeaders(one string, others ...string) Option {
-	sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
-	allowedHeaders := make(util.Set[string], sizeHint)
-	if err := processOneRequestHeader(one, allowedHeaders); err != nil {
-		return option(invariablyReturn(err))
-	}
-	for _, name := range others {
-		if err := processOneRequestHeader(name, allowedHeaders); err != nil {
-			return option(invariablyReturn(err))
-		}
-	}
 	f := func(cfg *Config) error {
+		sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
+		allowedHeaders := make(util.Set[string], sizeHint)
+		var errs []error
+		if err := processOneRequestHeader(one, allowedHeaders); err != nil {
+			errs = append(errs, err)
+		}
+		for _, name := range others {
+			if err := processOneRequestHeader(name, allowedHeaders); err != nil {
+				errs = append(errs, err)
+			}
+		}
 		if cfg.tmp.WithRequestHeadersCalled {
-			return util.NewError("option " + optWRH + " used multiple times")
+			err := util.NewError("option " + optWRH + " used multiple times")
+			errs = append(errs, err)
 		}
 		cfg.tmp.WithRequestHeadersCalled = true
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
 		cfg.tmp.AllowedRequestHeaders = allowedHeaders
 		return nil
 	}
@@ -300,15 +321,21 @@ func MaxAgeInSeconds(delta uint) Option {
 	//  - WebKit/Safari:     600 (10m)
 	//     see https://github.com/WebKit/WebKit/blob/6c4c981002fe98d371b03ab862b589120661a63d/Source/WebCore/loader/CrossOriginPreflightResultCache.cpp#L42
 	const upperBound = 86400
-	if delta > upperBound {
-		const tmpl = "specified max-age value %d exceeds upper bound %d"
-		return option(invariablyReturn(util.Errorf(tmpl, delta, upperBound)))
-	}
 	f := func(cfg *Config) error {
+		var errs []error
+		if delta > upperBound {
+			const tmpl = "specified max-age value %d exceeds upper bound %d"
+			err := util.Errorf(tmpl, delta, upperBound)
+			errs = append(errs, err)
+		}
 		if cfg.tmp.MaxAgeInSecondsCalled {
-			return util.NewError("option " + optWMAIS + " used multiple times")
+			err := util.NewError("option " + optWMAIS + " used multiple times")
+			errs = append(errs, err)
 		}
 		cfg.tmp.MaxAgeInSecondsCalled = true
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
 		const base = 10
 		cfg.ACMA = []string{strconv.FormatUint(uint64(delta), base)}
 		return nil
@@ -317,22 +344,26 @@ func MaxAgeInSeconds(delta uint) Option {
 }
 
 func ExposeResponseHeaders(one string, others ...string) Option {
-	exposedHeaders := make(util.Set[string], len(others))
-	if err := processOneResponseHeader(one, exposedHeaders); err != nil {
-		return option(invariablyReturn(err))
-	}
-	for _, name := range others {
-		if err := processOneResponseHeader(name, exposedHeaders); err != nil {
-			return option(invariablyReturn(err))
-		}
-	}
-	precomputed := []string{util.SortCombine(exposedHeaders, string(comma))}
 	f := func(cfg *Config) error {
+		exposedHeaders := make(util.Set[string], len(others))
+		var errs []error
+		if err := processOneResponseHeader(one, exposedHeaders); err != nil {
+			errs = append(errs, err)
+		}
+		for _, name := range others {
+			if err := processOneResponseHeader(name, exposedHeaders); err != nil {
+				errs = append(errs, err)
+			}
+		}
 		if cfg.tmp.ExposeResponseHeadersCalled {
-			return util.NewError("option " + optERH + " used multiple times")
+			err := util.NewError("option " + optERH + " used multiple times")
+			errs = append(errs, err)
 		}
 		cfg.tmp.ExposeResponseHeadersCalled = true
-		cfg.ACEH = precomputed
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
+		cfg.ACEH = []string{util.SortCombine(exposedHeaders, string(comma))}
 		return nil
 	}
 	return option(f)
@@ -383,16 +414,21 @@ func AssumeNoExtendedWildcardSupport() OptionAnon {
 }
 
 func PreflightSuccessStatus(status uint) Option {
-	// see https://fetch.spec.whatwg.org/#ok-status
-	if !(200 <= status && status < 300) {
-		const tmpl = "specified status %d outside the 2xx range"
-		return option(invariablyReturn(util.Errorf(tmpl, status)))
-	}
 	f := func(cfg *Config) error {
+		var errs []error
+		// see https://fetch.spec.whatwg.org/#ok-status
+		if !(200 <= status && status < 300) {
+			const tmpl = "specified status %d outside the 2xx range"
+			errs = append(errs, util.Errorf(tmpl, status))
+		}
 		if cfg.tmp.CustomPreflightSuccessStatus {
-			return util.NewError("option " + optWPSS + " used multiple times")
+			err := util.NewError("option " + optWPSS + " used multiple times")
+			errs = append(errs, err)
 		}
 		cfg.tmp.CustomPreflightSuccessStatus = true
+		if len(errs) != 0 {
+			return errors.Join(errs...)
+		}
 		s := int(status) // this conversion is safe because status < 300
 		cfg.PreflightSuccessStatus = s
 		return nil
@@ -455,10 +491,4 @@ func SkipPublicSuffixCheck() Option {
 		return nil
 	}
 	return option(f)
-}
-
-func invariablyReturn(err error) func(*Config) error {
-	return func(_ *Config) error {
-		return err
-	}
 }

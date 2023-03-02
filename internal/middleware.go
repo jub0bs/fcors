@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -108,59 +109,64 @@ func newConfig(credentialed bool) *Config {
 }
 
 func (cfg *Config) validate() error {
+	var errs []error
 	if cfg.tmp.InsecureOriginPatternError != nil &&
 		!cfg.tmp.TolerateInsecureOrigins {
-		return cfg.tmp.InsecureOriginPatternError
+		errs = append(errs, cfg.tmp.InsecureOriginPatternError)
 	}
 	if cfg.tmp.PublicSuffixError != nil &&
 		!cfg.tmp.SkipPublicSuffixCheck {
-		return cfg.tmp.PublicSuffixError
+		errs = append(errs, cfg.tmp.PublicSuffixError)
 	}
 	if cfg.tmp.FromOriginsCalled && cfg.AllowArbitraryOrigins {
 		const msg = "incompatible options " + optFO + " and " + optFAO
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if !cfg.AllowArbitraryOrigins && !cfg.tmp.FromOriginsCalled {
 		if cfg.Credentialed {
 			const msg = "zero origins allowed: " +
 				"missing call to " + optFO + " in AllowAccessWithCredentials"
-			return util.NewError(msg)
+			errs = append(errs, util.NewError(msg))
+		} else {
+			const msg = "zero origins allowed: " +
+				"missing call to " + optFO + " or " + optFAO + " in AllowAccess"
+			errs = append(errs, util.NewError(msg))
 		}
-		const msg = "zero origins allowed: " +
-			"missing call to " + optFO + " or " + optFAO + " in AllowAccess"
-		return util.NewError(msg)
 	}
 	if cfg.tmp.WithMethodsCalled && cfg.AllowArbitraryMethods {
 		const msg = "incompatible options " + optWM + " and " + optWAM
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.tmp.WithRequestHeadersCalled && cfg.AllowArbitraryRequestHeaders {
 		const msg = "incompatible options " + optWRH + " and " + optWARH
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.LocalNetworkAccess && cfg.LocalNetworkAccessInNoCorsModeOnly {
 		const msg = "incompatible options " + optLNA + " and " + optLNANC
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.AllowArbitraryOrigins && cfg.LocalNetworkAccess {
 		// see note in
 		// https://developer.chrome.com/blog/local-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optLNA
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.AllowArbitraryOrigins && cfg.LocalNetworkAccessInNoCorsModeOnly {
 		// see note in
 		// https://developer.chrome.com/blog/local-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optLNANC
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.tmp.ExposeResponseHeadersCalled && cfg.ExposeAllResponseHeaders {
 		const msg = "incompatible options " + optERH + " and " + optEARH
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.ExposeAllResponseHeaders && cfg.tmp.AssumeNoExtendedWildcardSupport {
 		const msg = "incompatible options " + optEARH + " and " + optANEWS
-		return util.NewError(msg)
+		errs = append(errs, util.NewError(msg))
+	}
+	if len(errs) != 0 {
+		return errors.Join(errs...)
 	}
 	return nil
 }
