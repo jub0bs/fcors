@@ -124,12 +124,10 @@ func (cfg *Config) validate() error {
 	}
 	if !cfg.AllowArbitraryOrigins && !cfg.tmp.FromOriginsCalled {
 		if cfg.Credentialed {
-			const msg = "zero origins allowed: " +
-				"missing call to " + optFO + " in AllowAccessWithCredentials"
+			const msg = "missing call to " + optFO + " in AllowAccessWithCredentials"
 			errs = append(errs, util.NewError(msg))
 		} else {
-			const msg = "zero origins allowed: " +
-				"missing call to " + optFO + " or " + optFAO + " in AllowAccess"
+			const msg = "missing call to " + optFO + " or " + optFAO + " in AllowAccess"
 			errs = append(errs, util.NewError(msg))
 		}
 	}

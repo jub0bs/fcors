@@ -174,7 +174,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc:     "missing call to FromOrigins or FromAnyOrigin",
 			options:  []fcors.OptionAnon{fcors.WithAnyMethod()},
-			errorMsg: `fcors: zero origins allowed: missing call to FromOrigins or FromAnyOrigin in AllowAccess`,
+			errorMsg: `fcors: missing call to FromOrigins or FromAnyOrigin in AllowAccess`,
 		}, {
 			desc: "empty method name",
 			options: []fcors.OptionAnon{
@@ -762,7 +762,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:     "missing call to FromOrigins",
 			options:  []fcors.OptionCred{fcors.WithAnyMethod()},
-			errorMsg: `fcors: zero origins allowed: missing call to FromOrigins in AllowAccessWithCredentials`,
+			errorMsg: `fcors: missing call to FromOrigins in AllowAccessWithCredentials`,
 		}, {
 			desc: "empty method name",
 			options: []fcors.OptionCred{
