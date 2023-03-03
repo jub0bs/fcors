@@ -375,7 +375,7 @@ func WithAnyRequestHeaders() Option {
 //
 // Because all modern browsers cap the max-age value
 // (the larger upper bound currently is Firefox's: 86,400 seconds),
-// this option accordingly imposes an upper bound its argument:
+// this option accordingly imposes an upper bound on its argument:
 // attempts to specify a max-age value larger than 86400
 // result in a failure to build the corresponding middleware.
 //
