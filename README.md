@@ -55,9 +55,10 @@ to a simple handler bound to the `/hello` endpoint.
 package main
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/jub0bs/fcors"
 )
@@ -74,11 +75,13 @@ func main() {
 		fcors.WithRequestHeaders("Authorization"),
 	)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	http.Handle("/hello", cors(http.HandlerFunc(helloHandler)))
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
 

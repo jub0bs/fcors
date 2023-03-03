@@ -1,9 +1,10 @@
 package risky_test
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/jub0bs/fcors"
 	"github.com/jub0bs/fcors/risky"
@@ -17,7 +18,8 @@ func ExampleSkipPublicSuffixCheck() {
 	if err != nil {
 		// This branch would get executed if the call to
 		// risky.SkipPublicSuffixCheck were missing above.
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "Hello, world!\n")
@@ -34,11 +36,15 @@ func ExampleTolerateInsecureOrigins() {
 	if err != nil {
 		// This branch would get executed if the call to
 		// risky.TolerateInsecureOrigins were missing above.
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "Hello, world!\n")
 	})
-
 	http.Handle("/hello_insecure_origin", cors(helloHandler))
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }

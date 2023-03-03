@@ -1,9 +1,10 @@
 package fcors_test
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/jub0bs/fcors"
 )
@@ -24,13 +25,17 @@ func ExampleAllowAccess() {
 		fcors.MaxAgeInSeconds(30),
 	)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "Hello, world!\n")
 	})
-
 	http.Handle("/hello", cors(helloHandler))
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
 
 func ExampleAllowAccessWithCredentials() {
@@ -50,11 +55,15 @@ func ExampleAllowAccessWithCredentials() {
 		fcors.MaxAgeInSeconds(30),
 	)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "Hello, world!\n")
 	})
-
 	http.Handle("/hello", cors(helloHandler))
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
