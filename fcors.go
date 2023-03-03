@@ -373,6 +373,12 @@ func WithAnyRequestHeaders() Option {
 // causes browsers to cache preflight responses with a [default max-age value]
 // of 5 seconds.
 //
+// Because all modern browsers cap the max-age value
+// (the larger upper bound currently is Firefox's: 86,400 seconds),
+// this option accordingly imposes an upper bound its argument:
+// attempts to specify a max-age value larger than 86400
+// result in a failure to build the corresponding middleware.
+//
 // [default max-age value]: https://fetch.spec.whatwg.org/#http-access-control-max-age.
 func MaxAgeInSeconds(delta uint) Option {
 	return internal.MaxAgeInSeconds(delta)
