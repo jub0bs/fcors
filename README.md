@@ -40,7 +40,7 @@ than other CORS middleware libraries; see
 go get github.com/jub0bs/fcors
 ```
 
-fcors requires Go 1.18 or above.
+fcors requires Go 1.20 or above.
 
 ## Example
 
