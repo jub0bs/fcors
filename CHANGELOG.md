@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] (2023-03-16)
+
+## Added
+
+- **Documentation**: link to [jub0bs/fcors-examples][examples] in README.
+
+### Changed
+
+- **Documentation**: fix minimum Go version required in README.
+- **Tests**: some typo fixes
+
 ## [0.3.0] (2023-03-03)
 
 ### Added
@@ -77,9 +88,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] (2023-02-08)
 
+[0.3.1]: https://github.com/jub0bs/fcors/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jub0bs/fcors/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jub0bs/fcors/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/jub0bs/fcors/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/jub0bs/fcors/releases/tag/v0.1.0
 
+[examples]: https://github.com/jub0bs/fcors-examples
 [pna-rename]: https://github.com/WICG/local-network-access/issues/91
