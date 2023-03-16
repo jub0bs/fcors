@@ -106,6 +106,9 @@ and the `/hello` resource is now configured for CORS as desired.
 
 The documentation is available on [pkg.go.dev][pkgsite].
 
+Moreover, guidance on how to use fcors with third-party Web frameworks
+and HTTP toolkits can be found in [jub0bs/fcors-examples][fcors-examples].
+
 ## Code coverage
 
 ![coverage](https://codecov.io/gh/jub0bs/fcors/branch/main/graphs/sunburst.svg?token=N208BHWQTM)
@@ -114,6 +117,7 @@ The documentation is available on [pkg.go.dev][pkgsite].
 
 All source code is covered by the [MIT License][license].
 
+[fcors-examples]: https://github.com/jub0bs/fcors-examples
 [fearless-cors]: https://jub0bs.com/posts/2023-02-08-fearless-cors/
 [license]: https://github.com/jub0bs/fcors/blob/main/LICENSE
 [mdn-cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
