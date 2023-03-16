@@ -26,7 +26,7 @@ func TestThatNoneOfTheOptionAnonsImplementsOptionCred(t *testing.T) {
 		f := func(t *testing.T) {
 			_, ok := c.opt.(OptionCred)
 			if ok {
-				t.Errorf("%s() should not implements OptionCred, but it does", c.desc)
+				t.Errorf("%s() should not implement OptionCred, but it does", c.desc)
 			}
 		}
 		t.Run(c.desc, f)
