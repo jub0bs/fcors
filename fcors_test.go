@@ -43,6 +43,7 @@ const (
 		headerACRLN + ", " + headerACRPN + ", " + headerOrigin
 
 	wildcard                      = "*"
+	wildcardAndAuth               = wildcard + ",authorization"
 	headerValueTrue               = "true"
 	defaultPreflightSuccessStatus = http.StatusNoContent
 )

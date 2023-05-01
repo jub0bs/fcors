@@ -231,11 +231,39 @@ func Test_AllowAccessWithCredentials_From_Multiple_Origins(t *testing.T) {
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRPN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{allowedOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+				headerACRPN:  []string{headerValueTrue},
+			},
+			expectedStatus: dummyPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{allowedOrigin},
+				headerACAC: []string{headerValueTrue},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
 			name:      "CORS preflight request with GET with ACRPN from a valid but disallowed origin",
 			reqMethod: http.MethodOptions,
 			reqHeaders: http.Header{
 				headerOrigin: []string{disallowedBaseOrigin},
 				headerACRM:   []string{http.MethodGet},
+				headerACRPN:  []string{headerValueTrue},
+			},
+			expectedStatus: http.StatusForbidden,
+			expectedRespHeaders: http.Header{
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRPN from a valid but disallowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{disallowedBaseOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
 				headerACRPN:  []string{headerValueTrue},
 			},
 			expectedStatus: http.StatusForbidden,
@@ -257,11 +285,39 @@ func Test_AllowAccessWithCredentials_From_Multiple_Origins(t *testing.T) {
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRLN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{allowedOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: dummyPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{allowedOrigin},
+				headerACAC: []string{headerValueTrue},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
 			name:      "CORS preflight request with GET with ACRLN from a valid but disallowed origin",
 			reqMethod: http.MethodOptions,
 			reqHeaders: http.Header{
 				headerOrigin: []string{disallowedBaseOrigin},
 				headerACRM:   []string{http.MethodGet},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: http.StatusForbidden,
+			expectedRespHeaders: http.Header{
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRLN from a valid but disallowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{disallowedBaseOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
 				headerACRLN:  []string{headerValueTrue},
 			},
 			expectedStatus: http.StatusForbidden,

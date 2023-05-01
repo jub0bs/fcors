@@ -174,6 +174,183 @@ func Test_AllowAccess_From_Any_Origin(t *testing.T) {
 	process(t, cors(dummyHandler), cases)
 }
 
+func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers(t *testing.T) {
+	const (
+		dummyVaryValue  = "whatever"
+		dummyStatusCode = 299
+	)
+	dummyHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		// remarkable Vary header value to make sure
+		// it isn't suppressed by the middleware
+		w.Header().Add(headerVary, dummyVaryValue)
+		w.WriteHeader(dummyStatusCode)
+	})
+	const dummyValidOrigin = "https://example.com"
+	cors, err := fcors.AllowAccess(
+		fcors.FromAnyOrigin(),
+		fcors.WithAnyMethod(),
+		fcors.WithAnyRequestHeaders(),
+	)
+	if err != nil {
+		t.Errorf("got error with message %q; want nil error", err.Error())
+		return
+	}
+	cases := []TestCase{
+		{
+			name:           "non-CORS GET request",
+			reqMethod:      http.MethodGet,
+			expectedStatus: dummyStatusCode,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{dummyVaryValue},
+			},
+		}, {
+			name:           "non-CORS OPTIONS request",
+			reqMethod:      http.MethodOptions,
+			expectedStatus: dummyStatusCode,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue, dummyVaryValue},
+			},
+		}, {
+			name:      "CORS GET request from a valid and allowed origin",
+			reqMethod: http.MethodGet,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+			},
+			expectedStatus: dummyStatusCode,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{dummyVaryValue},
+			},
+		}, {
+			name:      "non-preflight CORS OPTIONS request from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+			},
+			expectedStatus: dummyStatusCode,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue, dummyVaryValue},
+			},
+		}, {
+			name:      "CORS preflight request with GET from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodGet},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodPut},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAM: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with GET with non-safelisted header names from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRH:   []string{"foo,bar,baz"},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAH: []string{wildcardAndAuth},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAM: []string{wildcard},
+				headerACAH: []string{wildcardAndAuth},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with GET with ACRPN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRPN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRPN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+				headerACRPN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAM: []string{wildcard},
+				headerACAH: []string{wildcardAndAuth},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with GET with ACRLN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodGet},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRLN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAM: []string{wildcard},
+				headerACAH: []string{wildcardAndAuth},
+				headerVary: []string{varyPreflightValue},
+			},
+		},
+	}
+	process(t, cors(dummyHandler), cases)
+}
+
 func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoExtendedWildcardSupport(t *testing.T) {
 	const (
 		dummyVaryValue  = "whatever"
@@ -303,6 +480,22 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoEx
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRPN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+				headerACRPN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAM: []string{http.MethodPut},
+				headerACAH: []string{"foo,bar,baz"},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
 			name:      "CORS preflight request with GET with ACRLN from a valid and allowed origin",
 			reqMethod: http.MethodOptions,
 			reqHeaders: http.Header{
@@ -313,6 +506,22 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoEx
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{wildcard},
+				headerVary: []string{varyPreflightValue},
+			},
+		}, {
+			name:      "CORS preflight request with PUT with non-safelisted header names with ACRLN from a valid and allowed origin",
+			reqMethod: http.MethodOptions,
+			reqHeaders: http.Header{
+				headerOrigin: []string{dummyValidOrigin},
+				headerACRM:   []string{http.MethodPut},
+				headerACRH:   []string{"foo,bar,baz"},
+				headerACRLN:  []string{headerValueTrue},
+			},
+			expectedStatus: defaultPreflightSuccessStatus,
+			expectedRespHeaders: http.Header{
+				headerACAO: []string{wildcard},
+				headerACAM: []string{http.MethodPut},
+				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		},
