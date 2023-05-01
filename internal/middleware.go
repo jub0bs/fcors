@@ -308,12 +308,11 @@ func (cfg *Config) handleCORSPreflightRequest(
 	// (see https://fetch.spec.whatwg.org/#cors-preflight-fetch-0, step 7)
 	// if the response status is not an ok status
 	// (see https://fetch.spec.whatwg.org/#ok-status).
-	//
-	// For easier troubleshooting on the client side,
-	// if any subsequent step fails, we
-	//  - respond with an ok status,
-	//  - omit the remaining CORS response headers, and
-	//  - let the browser fail the CORS-preflight fetch.
+	// If any subsequent step fails,
+	// we omit the remaining CORS response headers
+	// and let the browser fail the CORS-preflight fetch;
+	// however, for easier troubleshooting on the client side,
+	// we nonetheless respond with an ok status.
 	if !cfg.processACRPN(respHeaders, reqHeaders) {
 		w.WriteHeader(cfg.PreflightSuccessStatus)
 		return
