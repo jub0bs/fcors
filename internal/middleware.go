@@ -314,17 +314,15 @@ func (cfg *Config) handleCORSPreflightRequest(
 	//  - respond with an ok status,
 	//  - omit the remaining CORS response headers, and
 	//  - let the browser fail the CORS-preflight fetch.
+	if !cfg.processACRPN(respHeaders, reqHeaders) {
+		w.WriteHeader(cfg.PreflightSuccessStatus)
+		return
+	}
 	if !cfg.processACRM(respHeaders, acrm) {
 		w.WriteHeader(cfg.PreflightSuccessStatus)
 		return
 	}
 	if !cfg.processACRH(respHeaders, reqHeaders) {
-		w.WriteHeader(cfg.PreflightSuccessStatus)
-		return
-	}
-	// TODO: Perform this check earlier if
-	// https://github.com/WICG/local-network-access/pull/90 gets merged.
-	if !cfg.processACRPN(respHeaders, reqHeaders) {
 		w.WriteHeader(cfg.PreflightSuccessStatus)
 		return
 	}

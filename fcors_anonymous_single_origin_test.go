@@ -569,8 +569,6 @@ func Test_AllowAccess_From_Single_Origin_With_Method_And_Header_And_Expose_Heade
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{allowedMethod},
-				headerACAH: []string{strings.ToLower(allowedRequestHeader)},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -623,8 +621,6 @@ func Test_AllowAccess_From_Single_Origin_With_Method_And_Header_And_Expose_Heade
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{allowedMethod},
-				headerACAH: []string{strings.ToLower(allowedRequestHeader)},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -906,8 +902,6 @@ func Test_AllowAccess_From_Single_Origin_With_Any_Method_And_Headers_And_Expose_
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{wildcard},
-				headerACAH: []string{wildcardAndAuth},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -960,8 +954,6 @@ func Test_AllowAccess_From_Single_Origin_With_Any_Method_And_Headers_And_Expose_
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{wildcard},
-				headerACAH: []string{wildcardAndAuth},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -1229,8 +1221,9 @@ func Test_AllowAccess_From_Single_Origin_With_LocalNetworkAccessInNoCorsModeOnly
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACAPN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRPN from a valid but disallowed origin",
@@ -1283,8 +1276,9 @@ func Test_AllowAccess_From_Single_Origin_With_LocalNetworkAccessInNoCorsModeOnly
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACALN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRLN from a valid but disallowed origin",
@@ -1559,8 +1553,9 @@ func Test_AllowAccess_From_Single_Origin_With_LocalNetworkAccess(t *testing.T) {
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACAPN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRPN from a valid but disallowed origin",
@@ -1613,8 +1608,9 @@ func Test_AllowAccess_From_Single_Origin_With_LocalNetworkAccess(t *testing.T) {
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACALN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRLN from a valid but disallowed origin",
@@ -1887,8 +1883,6 @@ func Test_AllowAccess_From_Single_Origin_With_Any_Method_And_Headers_And_AssumeN
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{http.MethodPut},
-				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -1941,8 +1935,6 @@ func Test_AllowAccess_From_Single_Origin_With_Any_Method_And_Headers_And_AssumeN
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{http.MethodPut},
-				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -2224,8 +2216,6 @@ func Test_AllowAccess_From_Single_Insecure_Origin_With_Method_And_Header_And_Exp
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{allowedMethod},
-				headerACAH: []string{strings.ToLower(allowedRequestHeader)},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -2278,8 +2268,6 @@ func Test_AllowAccess_From_Single_Insecure_Origin_With_Method_And_Header_And_Exp
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
-				headerACAM: []string{allowedMethod},
-				headerACAH: []string{strings.ToLower(allowedRequestHeader)},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {

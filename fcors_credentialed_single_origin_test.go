@@ -596,8 +596,6 @@ func Test_AllowAccessWithCredentials_From_Single_Origin_With_Method_And_Header_A
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
 				headerACAC: []string{headerValueTrue},
-				headerACAM: []string{allowedMethod},
-				headerACAH: []string{strings.ToLower(allowedRequestHeader)},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -652,8 +650,6 @@ func Test_AllowAccessWithCredentials_From_Single_Origin_With_Method_And_Header_A
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
 				headerACAC: []string{headerValueTrue},
-				headerACAM: []string{allowedMethod},
-				headerACAH: []string{strings.ToLower(allowedRequestHeader)},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -952,8 +948,6 @@ func Test_AllowAccessWithCredentials_From_Single_Origin_With_Any_Method_And_Head
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
 				headerACAC: []string{headerValueTrue},
-				headerACAM: []string{http.MethodPut},
-				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -1008,8 +1002,6 @@ func Test_AllowAccessWithCredentials_From_Single_Origin_With_Any_Method_And_Head
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{allowedOrigin},
 				headerACAC: []string{headerValueTrue},
-				headerACAM: []string{http.MethodPut},
-				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {

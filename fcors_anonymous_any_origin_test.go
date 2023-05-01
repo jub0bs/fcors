@@ -313,8 +313,6 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers(t *testing.T) 
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{wildcard},
-				headerACAM: []string{wildcard},
-				headerACAH: []string{wildcardAndAuth},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -342,8 +340,6 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers(t *testing.T) 
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{wildcard},
-				headerACAM: []string{wildcard},
-				headerACAH: []string{wildcardAndAuth},
 				headerVary: []string{varyPreflightValue},
 			},
 		},
@@ -491,8 +487,6 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoEx
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{wildcard},
-				headerACAM: []string{http.MethodPut},
-				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		}, {
@@ -520,8 +514,6 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoEx
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
 				headerACAO: []string{wildcard},
-				headerACAM: []string{http.MethodPut},
-				headerACAH: []string{"foo,bar,baz"},
 				headerVary: []string{varyPreflightValue},
 			},
 		},

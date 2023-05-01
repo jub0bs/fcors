@@ -551,8 +551,9 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkA
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACAPN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRPN from a valid but disallowed origin",
@@ -605,8 +606,9 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkA
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACALN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRLN from a valid but disallowed origin",
@@ -864,8 +866,9 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkA
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACAPN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRPN from a valid but disallowed origin",
@@ -918,8 +921,9 @@ func Test_AllowAccess_From_Multiple_Origins_And_Expose_Header_With_LocalNetworkA
 			},
 			expectedStatus: dummyPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
-				headerACAO: []string{allowedOrigin},
-				headerVary: []string{varyPreflightValue},
+				headerACAO:  []string{allowedOrigin},
+				headerACALN: []string{headerValueTrue},
+				headerVary:  []string{varyPreflightValue},
 			},
 		}, {
 			name:      "CORS preflight request with GET with ACRLN from a valid but disallowed origin",
