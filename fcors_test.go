@@ -85,6 +85,7 @@ func checkResponseHeaders(
 		headerACAH,
 		headerACMA,
 		headerACAPN,
+		headerACALN,
 		headerACEH,
 		headerVary,
 	)
