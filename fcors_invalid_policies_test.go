@@ -445,21 +445,21 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors/risky: option AssumeNoWebCachingOfPreflightResponses used multiple times`,
 		}, {
-			desc: "option LocalNetworkAccess used multiple times",
+			desc: "option PrivateNetworkAccess used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
-				risky.LocalNetworkAccess(),
-				risky.LocalNetworkAccess(),
+				risky.PrivateNetworkAccess(),
+				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors/risky: option LocalNetworkAccess used multiple times`,
+			errorMsg: `fcors/risky: option PrivateNetworkAccess used multiple times`,
 		}, {
-			desc: "option LocalNetworkAccessInNoCorsModeOnly used multiple times",
+			desc: "option PrivateNetworkAccessInNoCorsModeOnly used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
 			},
-			errorMsg: `fcors/risky: option LocalNetworkAccessInNoCorsModeOnly used multiple times`,
+			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCorsModeOnly used multiple times`,
 		}, {
 			desc: "option TolerateInsecureOrigins used multiple times",
 			options: []fcors.OptionAnon{
@@ -500,27 +500,27 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: incompatible options WithRequestHeaders and WithAnyRequestHeaders`,
 		}, {
-			desc: "conjunct use of options LocalNetworkAccess and LocalNetworkAccessInNoCorsModeOnly",
+			desc: "conjunct use of options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
-				risky.LocalNetworkAccess(),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccess(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
 			},
-			errorMsg: `fcors: incompatible options LocalNetworkAccess and LocalNetworkAccessInNoCorsModeOnly`,
+			errorMsg: `fcors: incompatible options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly`,
 		}, {
-			desc: "conjunct use of options FromAnyOrigin and LocalNetworkAccess",
+			desc: "conjunct use of options FromAnyOrigin and PrivateNetworkAccess",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
-				risky.LocalNetworkAccess(),
+				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors: incompatible options FromAnyOrigin and LocalNetworkAccess`,
+			errorMsg: `fcors: incompatible options FromAnyOrigin and PrivateNetworkAccess`,
 		}, {
-			desc: "conjunct use of options FromAnyOrigin and LocalNetworkAccessInNoCorsModeOnly",
+			desc: "conjunct use of options FromAnyOrigin and PrivateNetworkAccessInNoCorsModeOnly",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
 			},
-			errorMsg: `fcors: incompatible options FromAnyOrigin and LocalNetworkAccessInNoCorsModeOnly`,
+			errorMsg: `fcors: incompatible options FromAnyOrigin and PrivateNetworkAccessInNoCorsModeOnly`,
 		}, {
 			desc: "conjunct use of options ExposeResponseHeaders and ExposeAllResponseHeaders",
 			options: []fcors.OptionAnon{
@@ -996,21 +996,21 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors/risky: option AssumeNoWebCachingOfPreflightResponses used multiple times`,
 		}, {
-			desc: "option LocalNetworkAccess used multiple times",
+			desc: "option PrivateNetworkAccess used multiple times",
 			options: []fcors.OptionCred{
 				fcors.FromOrigins("https://example.com"),
-				risky.LocalNetworkAccess(),
-				risky.LocalNetworkAccess(),
+				risky.PrivateNetworkAccess(),
+				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors/risky: option LocalNetworkAccess used multiple times`,
+			errorMsg: `fcors/risky: option PrivateNetworkAccess used multiple times`,
 		}, {
-			desc: "option LocalNetworkAccessInNoCorsModeOnly used multiple times",
+			desc: "option PrivateNetworkAccessInNoCorsModeOnly used multiple times",
 			options: []fcors.OptionCred{
 				fcors.FromOrigins("https://example.com"),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
 			},
-			errorMsg: `fcors/risky: option LocalNetworkAccessInNoCorsModeOnly used multiple times`,
+			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCorsModeOnly used multiple times`,
 		}, {
 			desc: "option TolerateInsecureOrigins used multiple times",
 			options: []fcors.OptionCred{
@@ -1044,13 +1044,13 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors: incompatible options WithRequestHeaders and WithAnyRequestHeaders`,
 		}, {
-			desc: "conjunct use of options LocalNetworkAccess and LocalNetworkAccessInNoCorsModeOnly",
+			desc: "conjunct use of options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly",
 			options: []fcors.OptionCred{
 				fcors.FromOrigins("https://example.com"),
-				risky.LocalNetworkAccess(),
-				risky.LocalNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccess(),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
 			},
-			errorMsg: `fcors: incompatible options LocalNetworkAccess and LocalNetworkAccessInNoCorsModeOnly`,
+			errorMsg: `fcors: incompatible options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly`,
 		}, {
 			desc: "preflight success status outside the 2xx range",
 			options: []fcors.OptionCred{

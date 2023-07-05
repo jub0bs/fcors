@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Behavior**: in accordance with
-  [recent changes to the Local-Network-Access spec][lna-earlier]
+  [recent changes to the Local-Network-Access spec][pna-earlier]
   and in light of Chromium's pre-existing implementation of that behavior,
   the relevant LNA check is now performed earlier
   (right after the CORS check)
@@ -111,5 +111,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.0]: https://github.com/jub0bs/fcors/releases/tag/v0.1.0
 
 [examples]: https://github.com/jub0bs/fcors-examples
-[lna-earlier]: https://github.com/WICG/local-network-access/pull/90
-[pna-rename]: https://github.com/WICG/local-network-access/issues/91
+[pna-earlier]: https://github.com/WICG/private-network-access/pull/90
+[pna-rename]: https://github.com/WICG/private-network-access/issues/91

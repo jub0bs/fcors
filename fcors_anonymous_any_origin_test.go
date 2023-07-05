@@ -156,19 +156,6 @@ func Test_AllowAccess_From_Any_Origin(t *testing.T) {
 				headerACAO: []string{wildcard},
 				headerVary: []string{varyPreflightValue},
 			},
-		}, {
-			name:      "CORS preflight request with GET with ACRLN from a valid origin",
-			reqMethod: http.MethodOptions,
-			reqHeaders: http.Header{
-				headerOrigin: []string{dummyOrigin},
-				headerACRM:   []string{http.MethodGet},
-				headerACRLN:  []string{headerValueTrue},
-			},
-			expectedStatus: dummyPreflightSuccessStatus,
-			expectedRespHeaders: http.Header{
-				headerACAO: []string{wildcard},
-				headerVary: []string{varyPreflightValue},
-			},
 		},
 	}
 	process(t, cors(dummyHandler), cases)
@@ -309,33 +296,6 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers(t *testing.T) 
 				headerACRM:   []string{http.MethodPut},
 				headerACRH:   []string{"foo,bar,baz"},
 				headerACRPN:  []string{headerValueTrue},
-			},
-			expectedStatus: defaultPreflightSuccessStatus,
-			expectedRespHeaders: http.Header{
-				headerACAO: []string{wildcard},
-				headerVary: []string{varyPreflightValue},
-			},
-		}, {
-			name:      "CORS preflight request with GET with ACRLN from a valid and allowed origin",
-			reqMethod: http.MethodOptions,
-			reqHeaders: http.Header{
-				headerOrigin: []string{dummyValidOrigin},
-				headerACRM:   []string{http.MethodGet},
-				headerACRLN:  []string{headerValueTrue},
-			},
-			expectedStatus: defaultPreflightSuccessStatus,
-			expectedRespHeaders: http.Header{
-				headerACAO: []string{wildcard},
-				headerVary: []string{varyPreflightValue},
-			},
-		}, {
-			name:      "CORS preflight request with PUT with non-safelisted header names with ACRLN from a valid and allowed origin",
-			reqMethod: http.MethodOptions,
-			reqHeaders: http.Header{
-				headerOrigin: []string{dummyValidOrigin},
-				headerACRM:   []string{http.MethodPut},
-				headerACRH:   []string{"foo,bar,baz"},
-				headerACRLN:  []string{headerValueTrue},
 			},
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{
@@ -483,33 +443,6 @@ func Test_AllowAccess_From_Any_Origin_With_Any_Method_And_Headers_And_AssumeNoEx
 				headerACRM:   []string{http.MethodPut},
 				headerACRH:   []string{"foo,bar,baz"},
 				headerACRPN:  []string{headerValueTrue},
-			},
-			expectedStatus: defaultPreflightSuccessStatus,
-			expectedRespHeaders: http.Header{
-				headerACAO: []string{wildcard},
-				headerVary: []string{varyPreflightValue},
-			},
-		}, {
-			name:      "CORS preflight request with GET with ACRLN from a valid and allowed origin",
-			reqMethod: http.MethodOptions,
-			reqHeaders: http.Header{
-				headerOrigin: []string{dummyValidOrigin},
-				headerACRM:   []string{http.MethodGet},
-				headerACRLN:  []string{headerValueTrue},
-			},
-			expectedStatus: defaultPreflightSuccessStatus,
-			expectedRespHeaders: http.Header{
-				headerACAO: []string{wildcard},
-				headerVary: []string{varyPreflightValue},
-			},
-		}, {
-			name:      "CORS preflight request with PUT with non-safelisted header names with ACRLN from a valid and allowed origin",
-			reqMethod: http.MethodOptions,
-			reqHeaders: http.Header{
-				headerOrigin: []string{dummyValidOrigin},
-				headerACRM:   []string{http.MethodPut},
-				headerACRH:   []string{"foo,bar,baz"},
-				headerACRLN:  []string{headerValueTrue},
 			},
 			expectedStatus: defaultPreflightSuccessStatus,
 			expectedRespHeaders: http.Header{

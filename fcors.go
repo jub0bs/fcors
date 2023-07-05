@@ -332,7 +332,6 @@ func WithAnyMethod() Option {
 //
 //   - Access-Control-Allow-Credentials
 //   - Access-Control-Allow-Headers
-//   - Access-Control-Allow-Local-Network
 //   - Access-Control-Allow-Methods
 //   - Access-Control-Allow-Origin
 //   - Access-Control-Allow-Private-Network
@@ -414,7 +413,6 @@ func MaxAgeInSeconds(delta uint) Option {
 // Finally, some header names that have no place in a response are prohibited:
 //
 //   - Access-Control-Request-Headers
-//   - Access-Control-Request-Local-Network
 //   - Access-Control-Request-Method
 //   - Access-Control-Request-Private-Network
 //   - Origin

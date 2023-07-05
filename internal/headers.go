@@ -12,8 +12,7 @@ var discreteForbiddenHeaderNames = util.NewSet(
 	"accept-encoding",
 	byteLowercase(headerRequestHeaders),
 	byteLowercase(headerRequestMethod),
-	// see https://wicg.github.io/local-network-access/#forbidden-header-names
-	byteLowercase(headerRequestLocalNetwork),
+	// see https://wicg.github.io/private-network-access/#forbidden-header-names
 	byteLowercase(headerRequestPrivateNetwork),
 	"connection",
 	"content-length",
@@ -42,7 +41,6 @@ var disallowedRequestHeaderNames = util.NewSet(
 	byteLowercase(headerAllowCredentials),
 	byteLowercase(headerAllowMethods),
 	byteLowercase(headerAllowHeaders),
-	byteLowercase(headerAllowLocalNetwork),
 	byteLowercase(headerAllowPrivateNetwork),
 	byteLowercase(headerMageAge),
 	byteLowercase(headerExposeHeaders),
@@ -54,7 +52,6 @@ var disallowedResponseHeaderNames = util.NewSet(
 	byteLowercase(headerOrigin),
 	byteLowercase(headerRequestMethod),
 	byteLowercase(headerRequestHeaders),
-	byteLowercase(headerRequestLocalNetwork),
 	byteLowercase(headerRequestPrivateNetwork),
 )
 

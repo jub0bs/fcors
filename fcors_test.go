@@ -25,7 +25,6 @@ const (
 	headerOrigin = "Origin"
 	headerACRM   = "Access-Control-Request-Method"
 	headerACRH   = "Access-Control-Request-Headers"
-	headerACRLN  = "Access-Control-Request-Local-Network"
 	headerACRPN  = "Access-Control-Request-Private-Network"
 
 	headerACAO = "Access-Control-Allow-Origin"
@@ -34,13 +33,12 @@ const (
 	headerACMA  = "Access-Control-Max-Age"
 	headerACAM  = "Access-Control-Allow-Methods"
 	headerACAH  = "Access-Control-Allow-Headers"
-	headerACALN = "Access-Control-Allow-Local-Network"
 	headerACAPN = "Access-Control-Allow-Private-Network"
 	headerACEH  = "Access-Control-Expose-Headers"
 	headerVary  = "Vary"
 
 	varyPreflightValue = headerACRH + ", " + headerACRM + ", " +
-		headerACRLN + ", " + headerACRPN + ", " + headerOrigin
+		headerACRPN + ", " + headerOrigin
 
 	wildcard                      = "*"
 	wildcardAndAuth               = wildcard + ",authorization"
@@ -86,7 +84,6 @@ func checkResponseHeaders(
 		headerACAH,
 		headerACMA,
 		headerACAPN,
-		headerACALN,
 		headerACEH,
 		headerVary,
 	)

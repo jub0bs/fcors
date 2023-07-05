@@ -14,13 +14,11 @@ const (
 
 	headerRequestMethod         = "Access-Control-Request-Method"
 	headerRequestHeaders        = "Access-Control-Request-Headers"
-	headerRequestLocalNetwork   = "Access-Control-Request-Local-Network"
 	headerRequestPrivateNetwork = "Access-Control-Request-Private-Network"
 
 	headerAllowMethods        = "Access-Control-Allow-Methods"
 	headerAllowHeaders        = "Access-Control-Allow-Headers"
 	headerMageAge             = "Access-Control-Max-Age"
-	headerAllowLocalNetwork   = "Access-Control-Allow-Local-Network"
 	headerAllowPrivateNetwork = "Access-Control-Allow-Private-Network"
 
 	headerAllowOrigin      = "Access-Control-Allow-Origin"
@@ -50,8 +48,6 @@ func init() {
 	b.WriteString(headerRequestHeaders)
 	b.WriteString(commaSpace)
 	b.WriteString(headerRequestMethod)
-	b.WriteString(commaSpace)
-	b.WriteString(headerRequestLocalNetwork)
 	b.WriteString(commaSpace)
 	b.WriteString(headerRequestPrivateNetwork)
 	b.WriteString(commaSpace)
@@ -91,8 +87,8 @@ type Config struct {
 	AllowArbitraryOrigins                  bool
 	Credentialed                           bool
 	ExposeAllResponseHeaders               bool
-	LocalNetworkAccess                     bool
-	LocalNetworkAccessInNoCorsModeOnly     bool
+	PrivateNetworkAccess                   bool
+	PrivateNetworkAccessInNoCorsModeOnly   bool
 	AssumeNoWebCachingOfPreflightResponses bool
 	ACEH                                   []string
 	//lint:ignore U1000 because we pad to the end of the 3rd cache line
@@ -139,20 +135,20 @@ func (cfg *Config) validate() error {
 		const msg = "incompatible options " + optWRH + " and " + optWARH
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.LocalNetworkAccess && cfg.LocalNetworkAccessInNoCorsModeOnly {
-		const msg = "incompatible options " + optLNA + " and " + optLNANC
+	if cfg.PrivateNetworkAccess && cfg.PrivateNetworkAccessInNoCorsModeOnly {
+		const msg = "incompatible options " + optPNA + " and " + optPNANC
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.AllowArbitraryOrigins && cfg.LocalNetworkAccess {
+	if cfg.AllowArbitraryOrigins && cfg.PrivateNetworkAccess {
 		// see note in
-		// https://developer.chrome.com/blog/local-network-access-preflight/#no-cors-mode
-		const msg = "incompatible options " + optFAO + " and " + optLNA
+		// https://developer.chrome.com/blog/private-network-access-preflight/#no-cors-mode
+		const msg = "incompatible options " + optFAO + " and " + optPNA
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.AllowArbitraryOrigins && cfg.LocalNetworkAccessInNoCorsModeOnly {
+	if cfg.AllowArbitraryOrigins && cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		// see note in
-		// https://developer.chrome.com/blog/local-network-access-preflight/#no-cors-mode
-		const msg = "incompatible options " + optFAO + " and " + optLNANC
+		// https://developer.chrome.com/blog/private-network-access-preflight/#no-cors-mode
+		const msg = "incompatible options " + optFAO + " and " + optPNANC
 		errs = append(errs, util.NewError(msg))
 	}
 	if cfg.tmp.ExposeResponseHeadersCalled && cfg.ExposeAllResponseHeaders {
@@ -250,8 +246,8 @@ func (cfg *Config) middleware() Middleware {
 }
 
 func (cfg *Config) handleNonCORSRequest(respHeaders http.Header, isOptionsReq bool) {
-	// see https://wicg.github.io/local-network-access/#shortlinks
-	if cfg.LocalNetworkAccessInNoCorsModeOnly {
+	// see https://wicg.github.io/private-network-access/#shortlinks
+	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
 			respHeaders.Add(headerVary, precomputedPreflightVaryValue[0])
 		}
@@ -360,31 +356,24 @@ func (cfg *Config) processOriginForPreflight(respHeaders http.Header, origins []
 }
 
 // About this specific check, see
-// https://wicg.github.io/local-network-access/#cors-preflight, item 4.2.
+// https://wicg.github.io/private-network-access/#cors-preflight, item 4.2.
 func (cfg *Config) processACRPN(respHeaders, reqHeaders http.Header) bool {
-	acrpn, acrpnFound := first(reqHeaders, headerRequestPrivateNetwork)
-	rpn := acrpnFound && acrpn[0] == headerValueTrue
-	acrln, acrlnFound := first(reqHeaders, headerRequestLocalNetwork)
-	rln := acrlnFound && acrln[0] == headerValueTrue
-	if !rpn && !rln { // no request for local network access
+	acrpn, found := first(reqHeaders, headerRequestPrivateNetwork)
+	if !found || acrpn[0] != headerValueTrue { // no request for private network access
 		return true
 	}
-	if !cfg.LocalNetworkAccess && !cfg.LocalNetworkAccessInNoCorsModeOnly {
+	if !cfg.PrivateNetworkAccess && !cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		return false
 	}
-	if rpn {
-		respHeaders[headerAllowPrivateNetwork] = precomputedTrue
-	} else {
-		respHeaders[headerAllowLocalNetwork] = precomputedTrue
-	}
+	respHeaders[headerAllowPrivateNetwork] = precomputedTrue
 	return true
 }
 
 // Note: only for _non-preflight_ CORS requests
 func (cfg *Config) handleNonPreflightCORSRequest(w http.ResponseWriter, origins []string, isOptionsReq bool) {
 	respHeaders := w.Header()
-	// see https://wicg.github.io/local-network-access/#shortlinks
-	if cfg.LocalNetworkAccessInNoCorsModeOnly {
+	// see https://wicg.github.io/private-network-access/#shortlinks
+	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
 			respHeaders.Add(headerVary, precomputedPreflightVaryValue[0])
 		}
