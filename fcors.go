@@ -3,7 +3,7 @@ Package fcors provides [net/http] middleware for
 [Cross-Origin Resource Sharing (CORS)].
 
 For things to work properly, fcors users must follow certain rules;
-the key words "MUST", "MUST NOT", "SHOULD", and "MAY" below
+the key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" below
 are to be interpreted as described in [RFC 2119]:
 
   - Because [CORS-preflight requests] use [OPTIONS] as their method,
@@ -16,7 +16,7 @@ are to be interpreted as described in [RFC 2119]:
   - Other middleware (if any) in the chain MUST NOT alter any
     [CORS response headers] that are set by this library's middleware
     and MUST NOT add more [CORS response headers].
-  - Other middleware (if any) in the chain MUST NOT alter any
+  - Other middleware (if any) in the chain SHOULD NOT alter any
     [Vary header] that is set by this library's middleware,
     but it MAY add more Vary headers.
 
