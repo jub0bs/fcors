@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] (2023-07-10)
+
+### Added
+
+- **API**: options `PrivateNetworkAccess` and
+  `PrivateNetworkAccessInNoCorsModeOnly`.
+
+### Changed
+
+- **Behavior**: in light of [the W3C's recent rename][pna-rename2]
+  of "Local Network Access" to "Private Network Access",
+  middleware no longer support
+  the `Access-Control-Request-Local-Network`
+  and `Access-Control-Allow-Local-Network` headers.
+- **Behavior**: `Access-Control-Request-Local-Network`
+  no longer is a forbidden request-header name.
+- **Documentation**: add section entitled 'Praise for fcors' in README.
+- **Documentation**: minor cosmetic and wording improvements in README
+
+### Removed
+
+- **API** (breaking changes):
+  options `LocalNetworkAccess` and `LocalNetworkAccessInNoCorsModeOnly`
+  have respectively been renamed to
+  `PrivateNetworkAccess` and `PrivateNetworkAccessInNoCorsModeOnly`.
+
 ## [0.4.0] (2023-05-01)
 
 ## Added
@@ -103,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] (2023-02-08)
 
+[0.5.0]: https://github.com/jub0bs/fcors/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/jub0bs/fcors/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/jub0bs/fcors/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jub0bs/fcors/compare/v0.2.0...v0.3.0
@@ -113,3 +140,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [examples]: https://github.com/jub0bs/fcors-examples
 [pna-earlier]: https://github.com/WICG/private-network-access/pull/90
 [pna-rename]: https://github.com/WICG/private-network-access/issues/91
+[pna-rename2]: https://github.com/WICG/private-network-access/pull/106
