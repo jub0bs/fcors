@@ -10,6 +10,7 @@ A principled CORS middleware library for Go.
 
 - [About CORS](https://github.com/jub0bs/fcors/#about-cors)
 - [Design philosophy](https://github.com/jub0bs/fcors/#design-philosophy)
+- [Praise for fcors](https://github.com/jub0bs/fcors/#praise-for-fcors)
 - [Installation](https://github.com/jub0bs/fcors/#installation)
 - [Example](https://github.com/jub0bs/fcors/#example)
 - [Documentation](https://github.com/jub0bs/fcors/#documentation)
@@ -33,6 +34,15 @@ fcors is designed to be both easier to use and harder to misuse
 than other CORS middleware libraries; see
 [_Fearless CORS: a design philosophy for CORS middleware libraries
 (and a Go implementation)_][fearless-cors].
+
+## Praise for fcors
+
+> I really like the declarative API. It lets you say what behavior you want
+> rather than setting specific headers. It means that, as a user,
+> you don’t have to relearn the nuances of CORS every time you want to make
+> a change.
+
+Paul Carleton (Staff Software Engineer at [Stripe][stripe])
 
 ## Installation
 
@@ -124,3 +134,4 @@ All source code is covered by the [MIT License][license].
 [mdn-sop]: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
 [net-http]: https://pkg.go.dev/net/http
 [pkgsite]: https://pkg.go.dev/github.com/jub0bs/fcors
+[stripe]: https://stripe.com
