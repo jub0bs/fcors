@@ -55,38 +55,38 @@ to a simple handler bound to the `/hello` endpoint.
 package main
 
 import (
-	"fmt"
-	"io"
-	"net/http"
-	"os"
+  "fmt"
+  "io"
+  "net/http"
+  "os"
 
-	"github.com/jub0bs/fcors"
+  "github.com/jub0bs/fcors"
 )
 
 func main() {
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins("https://example.com"),
-		fcors.WithMethods(
-			http.MethodGet,
-			http.MethodPost,
-			http.MethodPut,
-			http.MethodDelete,
-		),
-		fcors.WithRequestHeaders("Authorization"),
-	)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	http.Handle("/hello", cors(http.HandlerFunc(helloHandler)))
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+  cors, err := fcors.AllowAccess(
+    fcors.FromOrigins("https://example.com"),
+    fcors.WithMethods(
+      http.MethodGet,
+      http.MethodPost,
+      http.MethodPut,
+      http.MethodDelete,
+    ),
+      fcors.WithRequestHeaders("Authorization"),
+  )
+  if err != nil {
+    fmt.Fprintln(os.Stderr, err)
+    os.Exit(1)
+  }
+    http.Handle("/hello", cors(http.HandlerFunc(helloHandler)))
+    if err := http.ListenAndServe(":8080", nil); err != nil {
+      fmt.Fprintln(os.Stderr, err)
+      os.Exit(1)
+    }
 }
 
 func helloHandler(w http.ResponseWriter, _ *http.Request) {
-	io.WriteString(w, "Hello, world!\n")
+  io.WriteString(w, "Hello, world!\n")
 }
 ``` 
 
