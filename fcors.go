@@ -7,9 +7,6 @@ use the [AllowAccess] function.
 To create a CORS middleware that also allows [credentialed access]
 (e.g. with [cookies]), use the [AllowAccessWithCredentials] function.
 
-CORS middleware provided by this package are, of course, safe for concurrent
-use by multiple goroutines.
-
 Note that, for things to work properly, fcors users must follow certain rules;
 the key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" below
 are to be interpreted as described in [RFC 2119]:
@@ -51,6 +48,9 @@ import (
 
 // Middleware is a convenience alias for the type of a function that
 // takes a [http.Handler] and returns a [http.Handler].
+//
+// The middleware provided by this package are, of course,
+// safe for concurrent use by multiple goroutines.
 type Middleware = func(http.Handler) http.Handler
 
 type (
