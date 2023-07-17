@@ -82,17 +82,17 @@ func main() {
       http.MethodPut,
       http.MethodDelete,
     ),
-      fcors.WithRequestHeaders("Authorization"),
+    fcors.WithRequestHeaders("Authorization"),
   )
   if err != nil {
     fmt.Fprintln(os.Stderr, err)
     os.Exit(1)
   }
-    http.Handle("/hello", cors(http.HandlerFunc(helloHandler)))
-    if err := http.ListenAndServe(":8080", nil); err != nil {
-      fmt.Fprintln(os.Stderr, err)
-      os.Exit(1)
-    }
+  http.Handle("/hello", cors(http.HandlerFunc(helloHandler)))
+  if err := http.ListenAndServe(":8080", nil); err != nil {
+    fmt.Fprintln(os.Stderr, err)
+    os.Exit(1)
+  }
 }
 
 func helloHandler(w http.ResponseWriter, _ *http.Request) {
