@@ -19,10 +19,6 @@ import (
 // This option applies to all the origins allowed in the configuration
 // of the corresponding middleware.
 //
-// Using this option more than once in a call to
-// [github.com/jub0bs/fcors.AllowAccess] or
-// [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
-// a failure to build the corresponding middleware.
 // Using this option in conjunction with option
 // [PrivateNetworkAccessInNoCorsModeOnly] in a call to
 // [github.com/jub0bs/fcors.AllowAccess] or
@@ -43,10 +39,6 @@ func PrivateNetworkAccess() fcors.Option {
 // This option applies to all the origins allowed in the configuration
 // of the corresponding middleware.
 //
-// Using this option more than once in a call to
-// [github.com/jub0bs/fcors.AllowAccess] or
-// [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
-// a failure to build the corresponding middleware.
 // Using this option in conjunction with option
 // [PrivateNetworkAccess] in a call to [github.com/jub0bs/fcors.AllowAccess]
 // or [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
@@ -70,9 +62,6 @@ func PrivateNetworkAccessInNoCorsModeOnly() fcors.Option {
 // with older browsers. Be aware that, all other things being equal,
 // using this option leads to comparatively larger responses.
 //
-// Using this option more than once in a call to
-// [github.com/jub0bs/fcors.AllowAccess] results in
-// a failure to build the corresponding middleware.
 // Using this option in conjunction with option
 // [github.com/jub0bs/fcors.ExposeAllResponseHeaders]
 // in a call to [github.com/jub0bs/fcors.AllowAccess]
@@ -99,11 +88,6 @@ func AssumeNoExtendedWildcardSupport() fcors.OptionAnon {
 // cache your responses to OPTIONS requests and you want to minimize the size
 // of preflight responses.
 //
-// Using this option more than once in a call to
-// [github.com/jub0bs/fcors.AllowAccess] or
-// [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
-// a failure to build the corresponding middleware.
-//
 // [Vary header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary
 // [not meant to be cached]: https://www.rfc-editor.org/rfc/rfc7231#section-4.3.7
 func AssumeNoWebCachingOfPreflightResponses() fcors.Option {
@@ -117,10 +101,6 @@ func AssumeNoWebCachingOfPreflightResponses() fcors.Option {
 // [active network attacks] that can lead to exfiltration of sensitive data,
 // as described by James Kettle in [his AppSec EU 2017 talk].
 //
-// Using this option more than once in a call to
-// [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
-// a failure to build the corresponding middleware.
-//
 // [active network attacks]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 // [his AppSec EU 2017 talk]: https://www.youtube.com/watch?v=wgkj4ZgxI4c&t=1305s
 func TolerateInsecureOrigins() fcors.Option {
@@ -133,10 +113,6 @@ func TolerateInsecureOrigins() fcors.Option {
 // Be aware that allowing all subdomains of a public suffix (e.g. com)
 // is dangerous because such domains (e.g. jub0bs-attacker.com) are typically
 // registrable by anyone, including attackers.
-//
-// Using this option more than once in a call to
-// [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
-// a failure to build the corresponding middleware.
 //
 // [public suffix]: https://publicsuffix.org/
 func SkipPublicSuffixCheck() fcors.Option {

@@ -80,6 +80,9 @@ type (
 // AllowAccess requires a single call to option [FromOrigins]
 // or option [FromAnyOrigin] as one of its arguments.
 //
+// Using a given option more than once in a call to AllowAccess
+// results in a failure to build the corresponding middleware.
+//
 // If the specified options are invalid or mutually incompatible, AllowAccess
 // returns a nil [Middleware] and some non-nil error. Otherwise, it returns
 // a functioning [Middleware] and a nil error.
@@ -98,6 +101,9 @@ func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 // AllowAccessWithCredentials requires a single call to option [FromOrigins]
 // as one of its arguments.
 //
+// Using a given option more than once in a call to AllowAccessWithCredentials
+// results in a failure to build the corresponding middleware.
+//
 // If the specified options are invalid or mutually incompatible,
 // AllowAccessWithCredentials returns a nil [Middleware] and some non-nil
 // error. Otherwise, it returns a functioning [Middleware] and a nil error.
@@ -112,9 +118,6 @@ func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middlewar
 // FromOrigins configures a CORS middleware to allow access from any of the
 // [Web origins] encompassed by the specified origin patterns.
 //
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 // Using this option in conjunction with option [FromAnyOrigin] in a call
 // to [AllowAccess] results in a failure to build the corresponding middleware.
 // Any occurrence of an illegal pattern results in a failure to build
@@ -250,8 +253,6 @@ func FromOrigins(one string, others ...string) Option {
 
 // FromAnyOrigin configures a CORS middleware to allow any Web origin.
 //
-// Using this option more than once in a call to [AllowAccess] results in a
-// failure to build the corresponding middleware.
 // Using this option in conjunction with option [FromOrigins]
 // in a call to [AllowAccess] results in a failure to build the corresponding
 // middleware.
@@ -262,9 +263,6 @@ func FromAnyOrigin() OptionAnon {
 // WithMethods configures a CORS middleware to allow any of the specified
 // HTTP methods.
 //
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 // Using this option in conjunction with option [WithAnyMethod] in a call
 // to [AllowAccess] results in a failure to build the corresponding middleware.
 //
@@ -303,9 +301,6 @@ func WithMethods(one string, others ...string) Option {
 
 // WithAnyMethod configures a CORS middleware to allow any HTTP method.
 //
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 // Using this option in conjunction with option [WithMethods] in a call
 // to [AllowAccess] results in a failure to build the corresponding middleware.
 func WithAnyMethod() Option {
@@ -315,9 +310,6 @@ func WithAnyMethod() Option {
 // WithRequestHeaders configures a CORS middleware to allow all of the
 // specified request headers to the client.
 //
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 // Using this option in conjunction with option [WithAnyRequestHeaders]
 // in a call to [AllowAccess] results in a failure to build the corresponding
 // middleware.
@@ -359,9 +351,6 @@ func WithRequestHeaders(one string, others ...string) Option {
 // WithAnyRequestHeaders configures a CORS middleware to allow any request
 // headers.
 //
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 // Using this option in conjunction with option [WithRequestHeaders] in a call
 // to [AllowAccess] results in a failure to build the corresponding middleware.
 func WithAnyRequestHeaders() Option {
@@ -370,10 +359,6 @@ func WithAnyRequestHeaders() Option {
 
 // MaxAgeInSeconds configures a CORS middleware to intruct browsers to
 // cache preflight responses for a maximum duration of delta seconds.
-//
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 //
 // Specifying a max-age value of 0 instructs browsers to eschew caching of
 // preflight responses altogether, whereas omitting to specify a max age
@@ -394,9 +379,6 @@ func MaxAgeInSeconds(delta uint) Option {
 // ExposeResponseHeaders configures a CORS middleware to expose all of the
 // specified response headers to the client.
 //
-// Using this option more than once in a call to [AllowAccess] or
-// [AllowAccessWithCredentials] results in a failure to build the
-// corresponding middleware.
 // Using this option in conjunction with option [ExposeAllResponseHeaders]
 // in a call to [AllowAccess] results in a failure to build the corresponding
 // middleware.
@@ -439,8 +421,6 @@ func ExposeResponseHeaders(one string, others ...string) Option {
 // ExposeAllResponseHeaders configures a CORS middleware to expose all
 // response headers.
 //
-// Using this option more than once in a call to [AllowAccess] results in
-// a failure to build the corresponding middleware.
 // Using this option in conjunction with option [ExposeResponseHeaders]
 // in a call to [AllowAccess] results in a failure to build the
 // corresponding middleware.
