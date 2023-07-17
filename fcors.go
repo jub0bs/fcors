@@ -371,7 +371,7 @@ func WithAnyRequestHeaders() Option {
 // attempts to specify a max-age value larger than 86400
 // result in a failure to build the corresponding middleware.
 //
-// [default max-age value]: https://fetch.spec.whatwg.org/#http-access-control-max-age.
+// [default max-age value]: https://fetch.spec.whatwg.org/#http-access-control-max-age
 func MaxAgeInSeconds(delta uint) Option {
 	return internal.MaxAgeInSeconds(delta)
 }

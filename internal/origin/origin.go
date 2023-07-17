@@ -26,7 +26,7 @@ const (
 
 // Origin represents a (tuple) [Web origin].
 //
-// [Web origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin.
+// [Web origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin
 type Origin struct {
 	// Scheme is the origin's scheme.
 	Scheme string
