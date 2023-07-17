@@ -2,7 +2,15 @@
 Package fcors provides [net/http] middleware for
 [Cross-Origin Resource Sharing (CORS)].
 
-For things to work properly, fcors users must follow certain rules;
+To create a CORS middleware that only allows anonymous access,
+use the [AllowAccess] function.
+To create a CORS middleware that also allows [credentialed access]
+(e.g. with [cookies]), use the [AllowAccessWithCredentials] function.
+
+CORS middleware provided by this package are, of course, safe for concurrent
+use by multiple goroutines.
+
+Note that, for things to work properly, fcors users must follow certain rules;
 the key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" below
 are to be interpreted as described in [RFC 2119]:
 
@@ -18,14 +26,11 @@ are to be interpreted as described in [RFC 2119]:
     and MUST NOT add more [CORS response headers].
   - Other middleware (if any) in the chain SHOULD NOT alter any
     [Vary header] that is set by this library's middleware,
-    but it MAY add more Vary headers.
+    but they MAY add more Vary headers.
 
-The package provides basic options for configuring a CORS middleware,
+This package provides basic options for configuring a CORS middleware,
 but more advanced (and potentially dangerous) options can be found in the
 [github.com/jub0bs/fcors/risky] package.
-
-CORS middleware provided by this package are, of course, safe for concurrent
-use by multiple goroutines.
 
 [CORS response headers]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#the_http_response_headers
 [CORS-preflight requests]: https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
@@ -33,6 +38,8 @@ use by multiple goroutines.
 [OPTIONS]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS
 [RFC 2119]: https://www.ietf.org/rfc/rfc2119.txt
 [Vary header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary
+[cookies]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
+[credentialed access]: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
 */
 package fcors
 
