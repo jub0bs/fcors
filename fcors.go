@@ -133,7 +133,7 @@ func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middlewar
 //	https://www.xn--xample-9ua.com // legal (Punycode)
 //	https://www.éxample.com        // illegal (Unicode)
 //
-// For security reasons, the [null origin] is illegal.
+// For [security reasons], the [null origin] is illegal.
 //
 // Hosts that are IPv4 addresses must be specified in [dotted-quad notation]:
 //
@@ -241,8 +241,9 @@ func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middlewar
 // [compressed form]: https://datatracker.ietf.org/doc/html/rfc5952
 // [dotted-quad notation]: https://en.wikipedia.org/wiki/Dot-decimal_notation
 // [loopback IP address]: https://www.rfc-editor.org/rfc/rfc5735#section-3
-// [null origin]: https://portswigger.net/research/exploiting-cors-misconfigurations-for-bitcoins-and-bounties
+// [null origin]: https://fetch.spec.whatwg.org/#append-a-request-origin-header
 // [public suffix]: https://publicsuffix.org/
+// [security reasons]: https://portswigger.net/research/exploiting-cors-misconfigurations-for-bitcoins-and-bounties
 func FromOrigins(one string, others ...string) Option {
 	return internal.FromOrigins(one, others...)
 }
