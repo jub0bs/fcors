@@ -60,7 +60,7 @@ type (
 	// You're not meant to implement this interface.
 	OptionAnon = internal.OptionAnon
 	// An OptionAnon configures a CORS middleware that allows credentialed
-	// access (i.e. with credentials).
+	// access (e.g. with cookies).
 	//
 	// You're not meant to implement this interface.
 	OptionCred = internal.OptionCred
