@@ -29,47 +29,50 @@ const (
 )
 
 type Option interface {
-	OptionAnon
-	OptionCred
+	applier
+	// Important: this is a dummy method whose sole purpose
+	// is to guarantee that Option strictly subsume OptionAnon.
+	cred()
 }
 
 type option func(*Config) error
 
-func (f option) applyAnon(c *Config) error {
-	return f(c)
+func (f option) apply(cfg *Config) error {
+	return f(cfg)
 }
 
-func (f option) applyCred(c *Config) error {
-	return f(c)
-}
+func (option) cred() {}
+
+var _ Option = (option)(nil)
 
 type OptionAnon interface {
-	applyAnon(*Config) error
+	applier
 }
 
-// We need a concrete type dedicated to the OptionAnon type
-// and distinct from the option type
-// because we want to prevent users from type-asserting
-// Option values (like that returned by AllowAnyOrigin)
-// to the OptionCred type.
+// A concrete type that satisfies OptionAnon but does not satisfy Option.
+// We need this distinct type because we want to prevent users
+// from type-asserting OptionAnon values (like that returned by FromAnyOrigin)
+// to the Option type.
 type optionAnon func(*Config) error
 
-func (f optionAnon) applyAnon(c *Config) error {
-	return f(c)
+func (f optionAnon) apply(cfg *Config) error {
+	return f(cfg)
 }
 
-type OptionCred interface {
-	applyCred(*Config) error
+var _ OptionAnon = (optionAnon)(nil)
+
+type applier interface {
+	apply(*Config) error
 }
 
 func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 	cfg := newConfig(false)
 	var errs []error
-	if err := one.applyAnon(cfg); err != nil {
+	if err := one.apply(cfg); err != nil {
 		errs = append(errs, err)
 	}
 	for _, opt := range others {
-		if err := opt.applyAnon(cfg); err != nil {
+		if err := opt.apply(cfg); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -83,14 +86,14 @@ func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 	return cfg.middleware(), nil
 }
 
-func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middleware, error) {
+func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error) {
 	cfg := newConfig(true)
 	var errs []error
-	if err := one.applyCred(cfg); err != nil {
+	if err := one.apply(cfg); err != nil {
 		errs = append(errs, err)
 	}
 	for _, opt := range others {
-		if err := opt.applyCred(cfg); err != nil {
+		if err := opt.apply(cfg); err != nil {
 			errs = append(errs, err)
 		}
 	}

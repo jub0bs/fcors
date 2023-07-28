@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestThatNoneOfTheOptionAnonsImplementsOptionCred(t *testing.T) {
+func TestThatNoneOfTheOptionAnonsImplementsOption(t *testing.T) {
 	// important property that prevents users from subverting
 	// fcors's compile-time guarantees
 	cases := []struct {
@@ -24,9 +24,9 @@ func TestThatNoneOfTheOptionAnonsImplementsOptionCred(t *testing.T) {
 	}
 	for _, c := range cases {
 		f := func(t *testing.T) {
-			_, ok := c.opt.(OptionCred)
+			_, ok := c.opt.(Option)
 			if ok {
-				t.Errorf("%s() should not implement OptionCred, but it does", c.desc)
+				t.Errorf("%s() should not satisfy Option, but it does", c.desc)
 			}
 		}
 		t.Run(c.desc, f)

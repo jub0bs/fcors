@@ -4,8 +4,9 @@ Package fcors provides [net/http] middleware for
 
 To create a CORS middleware that only allows anonymous access,
 use the [AllowAccess] function.
-To create a CORS middleware that also allows [credentialed access]
-(e.g. with [cookies]), use the [AllowAccessWithCredentials] function.
+To create a CORS middleware that allows both anonymous access and
+[credentialed access] (e.g. with [cookies]),
+use the [AllowAccessWithCredentials] function.
 
 Note that, for things to work properly, fcors users must follow certain rules;
 the key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" below
@@ -55,24 +56,21 @@ type Middleware = func(http.Handler) http.Handler
 
 type (
 	// An OptionAnon configures a CORS middleware that only allows anonymous
-	// access (i.e. without credentials).
+	// access.
 	//
 	// You're not meant to implement this interface.
 	OptionAnon = internal.OptionAnon
-	// An OptionAnon configures a CORS middleware that allows credentialed
-	// access (e.g. with cookies).
+	// An Option configures a CORS middleware that allows both anonymous
+	// access and [credentialed access] (e.g. with [cookies]).
 	//
 	// You're not meant to implement this interface.
-	OptionCred = internal.OptionCred
-	// An Option configures a CORS middleware, regardless of whether that
-	// middleware allows access with credentials. As such, an Option is
-	// both an [OptionAnon] and an [OptionCred].
 	//
-	// You're not meant to implement this interface.
+	// [cookies]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
+	// [credentialed access]: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
 	Option = internal.Option
 )
 
-// AllowAccess configures a CORS middleware that only allows anonymous access,
+// AllowAccess creates a CORS middleware that only allows anonymous access,
 // according to the specified options.
 // The behavior of the resulting middleware is insensitive to the order
 // in which the options that configure it are specified.
@@ -92,8 +90,8 @@ func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 	return internal.AllowAccess(one, others...)
 }
 
-// AllowAccessWithCredentials configures a CORS middleware that allows
-// credentialed access (e.g. with [cookies]),
+// AllowAccessWithCredentials creates a CORS middleware that allows
+// both anonymous access and [credentialed access] (e.g. with [cookies]),
 // according to the specified options.
 // The behavior of the resulting middleware is insensitive to the order
 // in which the options that configure it are specified.
@@ -111,7 +109,8 @@ func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 // Any occurrence of a nil option results in a panic.
 //
 // [cookies]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
-func AllowAccessWithCredentials(one OptionCred, others ...OptionCred) (Middleware, error) {
+// [credentialed access]: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
+func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error) {
 	return internal.AllowAccessWithCredentials(one, others...)
 }
 
