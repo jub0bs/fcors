@@ -87,7 +87,7 @@ type (
 //
 // Any occurrence of a nil option results in a panic.
 func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
-	return internal.AllowAccess(one, others...)
+	return internal.NewMiddleware(false, one, others...)
 }
 
 // AllowAccessWithCredentials creates a CORS middleware that allows
@@ -111,7 +111,7 @@ func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
 // [cookies]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
 // [credentialed access]: https://fetch.spec.whatwg.org/#concept-request-credentials-mode
 func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error) {
-	return internal.AllowAccessWithCredentials(one, others...)
+	return internal.NewMiddleware(true, one, others...)
 }
 
 // FromOrigins configures a CORS middleware to allow access from any of the

@@ -65,29 +65,8 @@ type applier interface {
 	apply(*Config) error
 }
 
-func AllowAccess(one OptionAnon, others ...OptionAnon) (Middleware, error) {
-	cfg := newConfig(false)
-	var errs []error
-	if err := one.apply(cfg); err != nil {
-		errs = append(errs, err)
-	}
-	for _, opt := range others {
-		if err := opt.apply(cfg); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	if err := cfg.validate(); err != nil {
-		errs = append(errs, err)
-	}
-	if len(errs) != 0 {
-		return nil, errors.Join(errs...)
-	}
-	cfg.precomputeStuff()
-	return cfg.middleware(), nil
-}
-
-func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error) {
-	cfg := newConfig(true)
+func NewMiddleware[A applier](cred bool, one A, others ...A) (Middleware, error) {
+	cfg := newConfig(cred)
 	var errs []error
 	if err := one.apply(cfg); err != nil {
 		errs = append(errs, err)
