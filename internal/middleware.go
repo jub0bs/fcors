@@ -387,7 +387,6 @@ func (cfg *Config) handleNonPreflightCORSRequest(
 	case cfg.ACAO == nil:
 		fastAdd(respHeaders, headerVary, precomputedHeaderOrigin)
 	}
-	rawOrigin := origins[0]
 	if cfg.ACAO != nil {
 		// See the last paragraph in
 		// https://fetch.spec.whatwg.org/#cors-protocol-and-http-caches.
@@ -401,17 +400,17 @@ func (cfg *Config) handleNonPreflightCORSRequest(
 		}
 		return
 	}
-	o, ok := origin.Parse(rawOrigin)
+	o, ok := origin.Parse(origins[0])
 	if !ok || !cfg.Corpus.Contains(&o) {
 		return
 	}
-	w.Header()[headerAllowOrigin] = origins
+	respHeaders[headerAllowOrigin] = origins
 	if cfg.Credentialed {
 		// We make no attempt to infer whether the request is credentialed.
-		w.Header()[headerAllowCredentials] = precomputedTrue
+		respHeaders[headerAllowCredentials] = precomputedTrue
 	}
 	if cfg.ACEH != nil {
-		w.Header()[headerExposeHeaders] = cfg.ACEH
+		respHeaders[headerExposeHeaders] = cfg.ACEH
 	}
 }
 
