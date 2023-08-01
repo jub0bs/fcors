@@ -284,8 +284,8 @@ func (cfg *Config) handleNonCORSRequest(respHeaders http.Header, isOptionsReq bo
 func (cfg *Config) handleCORSPreflightRequest(
 	w http.ResponseWriter,
 	reqHeaders http.Header,
-	origins []string, // guaranteed non-empty
-	acrm []string, // guaranteed non-empty
+	origins []string, // assumed non-empty
+	acrm []string, // assumed non-empty
 ) {
 	respHeaders := w.Header()
 	if !cfg.AssumeNoWebCachingOfPreflightResponses {
@@ -322,7 +322,10 @@ func (cfg *Config) handleCORSPreflightRequest(
 	w.WriteHeader(cfg.PreflightSuccessStatus)
 }
 
-func (cfg *Config) processOriginForPreflight(respHeaders http.Header, origins []string) bool {
+func (cfg *Config) processOriginForPreflight(
+	respHeaders http.Header,
+	origins []string, // assumed non-empty
+) bool {
 	rawOrigin := origins[0]
 	o, ok := origin.Parse(rawOrigin)
 	if !ok {
@@ -365,7 +368,11 @@ func (cfg *Config) processACRPN(respHeaders, reqHeaders http.Header) bool {
 }
 
 // Note: only for _non-preflight_ CORS requests
-func (cfg *Config) handleNonPreflightCORSRequest(w http.ResponseWriter, origins []string, isOptionsReq bool) {
+func (cfg *Config) handleNonPreflightCORSRequest(
+	w http.ResponseWriter,
+	origins []string, // assumed non-empty
+	isOptionsReq bool,
+) {
 	respHeaders := w.Header()
 	// see https://wicg.github.io/private-network-access/#shortlinks
 	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
@@ -408,11 +415,14 @@ func (cfg *Config) handleNonPreflightCORSRequest(w http.ResponseWriter, origins 
 	}
 }
 
-func (cfg *Config) processACRM(headers http.Header, acrm []string) bool {
+func (cfg *Config) processACRM(
+	headers http.Header,
+	acrm []string, // assumed non-empty
+) bool {
 	if safelistedMethods.Contains(acrm[0]) {
-		// Because CORS-safelisted methods get a free pass; see
-		// https://fetch.spec.whatwg.org/#ref-for-cors-safelisted-method%E2%91%A2;
-		// no need to set the ACAM header in this case.
+		// CORS-safelisted methods get a free pass; see
+		// https://fetch.spec.whatwg.org/#ref-for-cors-safelisted-method%E2%91%A2.
+		// Therefore, no need to set the ACAM header in this case.
 		return true
 	}
 	if cfg.ACAM != nil {
