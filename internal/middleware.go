@@ -237,7 +237,7 @@ func (cfg *Config) middleware() Middleware {
 				cfg.handleCORSPreflightRequest(w, r.Header, origins, acrm)
 				return
 			}
-			// r is a non-prelight OPTIONS CORS request.
+			// r is a non-preflight OPTIONS CORS request.
 			cfg.handleNonPreflightCORSRequest(w, origins, isOptionsReq)
 			h.ServeHTTP(w, r)
 		}
@@ -295,7 +295,7 @@ func (cfg *Config) handleCORSPreflightRequest(
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	// At this stage, browsers fail the CORS-prelight check
+	// At this stage, browsers fail the CORS-preflight check
 	// (see https://fetch.spec.whatwg.org/#cors-preflight-fetch-0, step 7)
 	// if the response status is not an ok status
 	// (see https://fetch.spec.whatwg.org/#ok-status).
