@@ -53,6 +53,18 @@ type TestCase struct {
 	expectedRespHeaders http.Header
 }
 
+var dummyHandler = http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
+
+var headerVaryBefore = []string{"before"}
+
+var varyMiddleware = func(next http.Handler) http.Handler {
+	f := func(w http.ResponseWriter, r *http.Request) {
+		w.Header()[headerVary] = headerVaryBefore
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(f)
+}
+
 func process(t *testing.T, handler http.Handler, cases []TestCase) {
 	t.Helper()
 	for _, c := range cases {

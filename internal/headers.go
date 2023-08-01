@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/jub0bs/fcors/internal/util"
@@ -84,4 +85,19 @@ func isForbiddenRequestHeaderName(name string) bool {
 	}
 	return strings.HasPrefix(name, "proxy-") ||
 		strings.HasPrefix(name, "sec-")
+}
+
+// fastAdd allows us to save a heap allocation in the most common case.
+func fastAdd(
+	h http.Header,
+	key string, // assumed to be in canonical format
+	value []string, // assumed to contain exactly one element
+) {
+	old, exists := h[key]
+	if !exists { // fast path
+		h[key] = value
+		return
+	}
+	// slow path
+	h[key] = append(old, value[0])
 }

@@ -366,6 +366,8 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 
 // In this unlikely use case, a middleware adding a Vary header is stacked
 // on top of a CORS middleware that allows multiple origins.
+// As result, we incur a heap allocation when we add a second Vary header;
+// see the slow path of the fastAdd function.
 func BenchmarkMiddlewareInvocationVary(b *testing.B) {
 	cors := mustAllowAccess(
 		fcors.FromOrigins("https://*.example.com"),
@@ -419,16 +421,4 @@ func bigSliceOfJunk(size int) []string {
 		out[i] = fmt.Sprintf("foobarbazquxquux-%d", i)
 	}
 	return out
-}
-
-var dummyHandler = http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
-
-var headerVaryBefore = []string{"before"}
-
-var varyMiddleware = func(next http.Handler) http.Handler {
-	f := func(w http.ResponseWriter, r *http.Request) {
-		w.Header()[headerVary] = headerVaryBefore
-		next.ServeHTTP(w, r)
-	}
-	return http.HandlerFunc(f)
 }

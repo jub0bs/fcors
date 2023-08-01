@@ -38,6 +38,7 @@ var (
 	// effective constants (precomputed as a micro-optimization)
 	precomputedPreflightVaryValue []string
 	precomputedTrue               = []string{headerValueTrue}
+	precomputedHeaderOrigin       = []string{headerOrigin}
 )
 
 type Middleware = func(http.Handler) http.Handler
@@ -249,18 +250,18 @@ func (cfg *Config) handleNonCORSRequest(respHeaders http.Header, isOptionsReq bo
 	// see https://wicg.github.io/private-network-access/#shortlinks
 	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
-			respHeaders.Add(headerVary, precomputedPreflightVaryValue[0])
+			fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		}
 		return
 	}
 	var varyHeaderAdded bool
 	if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
-		respHeaders.Add(headerVary, precomputedPreflightVaryValue[0])
+		fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		varyHeaderAdded = true
 	}
 	if cfg.ACAO == nil {
 		if !varyHeaderAdded {
-			respHeaders.Add(headerVary, headerOrigin)
+			fastAdd(respHeaders, headerVary, precomputedHeaderOrigin)
 		}
 		return
 	}
@@ -288,13 +289,7 @@ func (cfg *Config) handleCORSPreflightRequest(
 ) {
 	respHeaders := w.Header()
 	if !cfg.AssumeNoWebCachingOfPreflightResponses {
-		// We deliberately eschew http.ResponseWriter.Header().Add
-		// in order to avoid a heap allocation.
-		// We don't expect that clobbering the value of
-		// an existing Vary header
-		// (presumably added by some previous middleware)
-		// would affect the outcome of this preflight request.
-		respHeaders[headerVary] = precomputedPreflightVaryValue
+		fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 	}
 	if !cfg.processOriginForPreflight(respHeaders, origins) {
 		w.WriteHeader(http.StatusForbidden)
@@ -375,15 +370,15 @@ func (cfg *Config) handleNonPreflightCORSRequest(w http.ResponseWriter, origins 
 	// see https://wicg.github.io/private-network-access/#shortlinks
 	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
-			respHeaders.Add(headerVary, precomputedPreflightVaryValue[0])
+			fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		}
 		return
 	}
 	switch {
 	case isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses:
-		respHeaders.Add(headerVary, precomputedPreflightVaryValue[0])
+		fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 	case cfg.ACAO == nil:
-		respHeaders.Add(headerVary, headerOrigin)
+		fastAdd(respHeaders, headerVary, precomputedHeaderOrigin)
 	}
 	rawOrigin := origins[0]
 	if cfg.ACAO != nil {
