@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] (2023-08-01)
+
+### Changed
+
+- **Dependencies**: update to `golang.org/x/exp`
+  v0.0.0-20230801115018-d63ba01acd4b
+- **Documentation**: no longer mention Twitter in the security policy.
+- **Documentation**: minor improvements
+- **Performance**: middleware invocations now only incur heap allocations
+  in rare cases; more specifically, allocations only occur
+  if the CORS middleware allows multiple origins
+  and another middleware up the chain adds a `Vary` header to responses.
+- **Tests**: improve test and benchmark suites.
+
+### Removed
+
+- **API** (breaking change): interface type `OptionCred`.
+
 ## [0.5.1] (2023-07-17)
 
 ### Changed
@@ -137,6 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] (2023-02-08)
 
+[0.6.0]: https://github.com/jub0bs/fcors/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/jub0bs/fcors/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/jub0bs/fcors/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/jub0bs/fcors/compare/v0.3.1...v0.4.0
