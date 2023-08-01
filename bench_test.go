@@ -4,32 +4,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
 	"github.com/jub0bs/fcors"
 )
 
-var dummyHandler = http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-	const (
-		dummyVaryValue  = "whatever"
-		dummyStatusCode = 299
-	)
-	w.Header().Add(headerVary, dummyVaryValue)
-	w.WriteHeader(dummyStatusCode)
-})
-
-var requestHeadersAllowedByDefaultInRsCORS = fcors.WithRequestHeaders(
-	"Accept",
-	"Content-Type",
-	"X-Requested-With",
-)
-
-func BenchmarkStartup(b *testing.B) {
+func BenchmarkMiddlewareInitialization(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_, err := fcors.AllowAccessWithCredentials(
+		fcors.AllowAccessWithCredentials(
 			fcors.FromOrigins(
 				"https://*.example0.com",
 				"https://*.example1.com",
@@ -40,469 +24,392 @@ func BenchmarkStartup(b *testing.B) {
 				"https://*.example6.com",
 				"https://*.example7.com",
 			),
-			fcors.WithRequestHeaders("authorization"),
-			fcors.WithMethods("PUT"),
+			fcors.WithRequestHeaders("Authorization"),
+			fcors.WithMethods(http.MethodPut),
 		)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+	}
+}
+
+type middleware struct {
+	name string
+	cors fcors.Middleware
+	reqs []request
+}
+
+type request struct {
+	name    string
+	method  string
+	headers http.Header
+}
+
+var requestHeadersAllowedByDefaultInRsCORS = fcors.WithRequestHeaders(
+	"Accept",
+	"Content-Type",
+	"X-Requested-With",
+)
+
+func mustAllowAccess(one fcors.OptionAnon, others ...fcors.OptionAnon) fcors.Middleware {
+	cors, err := fcors.AllowAccess(one, others...)
+	if err != nil {
+		panic("invalid policy")
+	}
+	return cors
+}
+
+func mustAllowAccessWithCredentials(one fcors.Option, others ...fcors.Option) fcors.Middleware {
+	cors, err := fcors.AllowAccessWithCredentials(one, others...)
+	if err != nil {
+		panic("invalid policy")
+	}
+	return cors
+}
+
+func identity[T any](t T) T { return t }
+
+func BenchmarkMiddlewareInvocation(b *testing.B) {
+	var middlewares = []middleware{
+		{
+			name: "without CORS config",
+			cors: identity[http.Handler],
+			reqs: []request{
+				{
+					name:   "CORS preflight request from some origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from some origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+					},
+				},
+			},
+		}, {
+			name: "allow arbitrary origin",
+			cors: mustAllowAccess(
+				fcors.FromAnyOrigin(),
+				requestHeadersAllowedByDefaultInRsCORS,
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from some origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from some origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+					},
+				},
+			},
+		}, {
+			name: "allow one origin",
+			cors: mustAllowAccess(
+				fcors.FromOrigins("https://example.com"),
+				requestHeadersAllowedByDefaultInRsCORS,
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from allowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from allowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+					},
+				}, {
+					name:   "CORS preflight request from disallowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://attacker.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from disallowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://attacker.com"},
+					},
+				},
+			},
+		}, {
+			name: "allow multiple origins",
+			cors: mustAllowAccess(
+				fcors.FromOrigins(
+					"https://*.example.com",
+					"https://*.google.com",
+					"https://*.twitter.com",
+					"https://*.stackoverflow.com",
+					"https://*.reddit.com",
+					"https://*.quora.com",
+					"https://*.example.co.uk",
+					"https://*.google.co.uk",
+					"https://*.twitter.co.uk",
+					"https://*.stackoverflow.co.uk",
+					"https://*.reddit.co.uk",
+					"https://*.quora.co.uk",
+					"https://*.example.com.au",
+					"https://*.google.com.au",
+					"https://*.twitter.com.au",
+					"https://*.stackoverflow.com.au",
+					"https://*.reddit.com.au",
+					"https://*.quora.com.au",
+					"https://*.example.fr",
+					"https://*.google.fr",
+					"https://*.twitter.fr",
+					"https://*.stackoverflow.fr",
+					"https://*.reddit.fr",
+					"https://*.quora.fr",
+				),
+				requestHeadersAllowedByDefaultInRsCORS,
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from allowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://foo.quora.fr"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from allowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://foo.quora.fr"},
+					},
+				}, {
+					name:   "CORS preflight request from disallowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://attacker.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from disallowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://attacker.com"},
+					},
+				}, {
+					name:   "CORS preflight request from abnormally long origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {abnormallyLongOrigin},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from abnormally long origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {abnormallyLongOrigin},
+					},
+				},
+			},
+		}, {
+			name: "allow one pathological origin",
+			cors: mustAllowAccess(
+				fcors.FromOrigins(
+					"https://a" + strings.Repeat(".a", 126),
+				),
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from pathological disallowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://b" + strings.Repeat(".a", 126)},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from pathological disallowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://b" + strings.Repeat(".a", 126)},
+					},
+				}, {
+					name:   "CORS preflight request from allowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://a" + strings.Repeat(".a", 126)},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from allowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://a" + strings.Repeat(".a", 126)},
+					},
+				},
+			},
+		}, {
+			name: "allow two pathological origins",
+			cors: mustAllowAccess(
+				fcors.FromOrigins(
+					"https://a"+strings.Repeat(".a", 126),
+					"https://b"+strings.Repeat(".a", 126),
+				),
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from pathological disallowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://c" + strings.Repeat(".a", 126)},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from pathological disallowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://c" + strings.Repeat(".a", 126)},
+					},
+				}, {
+					name:   "CORS preflight request from allowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://a" + strings.Repeat(".a", 126)},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {"authorization"},
+					},
+				}, {
+					name:   "actual CORS request from allowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://a" + strings.Repeat(".a", 126)},
+					},
+				},
+			},
+		}, {
+			name: "allow one origin with credentials with any request headers",
+			cors: mustAllowAccessWithCredentials(
+				fcors.FromOrigins("https://example.com"),
+				fcors.WithAnyRequestHeaders(),
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from allowed origin with adversarial ACRH",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {strings.Join(bigSliceOfJunk(10000), ", ")},
+					},
+				},
+			},
+		}, {
+			name: "allow one origin with credentials and expose some response headers",
+			cors: mustAllowAccessWithCredentials(
+				fcors.FromOrigins("https://example.com"),
+				requestHeadersAllowedByDefaultInRsCORS,
+				fcors.ExposeResponseHeaders("foo", "bar", "baz"),
+			),
+			reqs: []request{
+				{
+					name:   "CORS preflight request from allowed origin",
+					method: http.MethodOptions,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+						headerACRM:   {http.MethodGet},
+						headerACRH:   {strings.Join(bigSliceOfJunk(10000), ", ")},
+					},
+				}, {
+					name:   "actual CORS request from allowed origin",
+					method: http.MethodGet,
+					headers: http.Header{
+						headerOrigin: {"https://example.com"},
+					},
+				},
+			},
+		},
+	}
+	for _, mw := range middlewares {
+		handler := mw.cors(dummyHandler)
+		for _, req := range mw.reqs {
+			name := fmt.Sprintf("%s vs %s", mw.name, req.name)
+			f := func(b *testing.B) {
+				req := newRequest(b, req.method, req.headers)
+				rec := httptest.NewRecorder()
+				b.ReportAllocs()
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					// important because rec is shared across iterations
+					clear(rec.Header())
+					handler.ServeHTTP(rec, req)
+				}
+			}
+			b.Run(name, f)
 		}
 	}
 }
 
-func BenchmarkWithout(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, dummyEndpoint, nil)
-	req.Header.Add(headerOrigin, "https://jub0bs.com")
-	res := httptest.NewRecorder()
-	handler := dummyHandler
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkActualAllowAnyOrigin(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, "https://example.com/foo", nil)
-	req.Header.Add(headerOrigin, "https://example.com")
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromAnyOrigin(),
+// In this unlikely use case, a middleware adding a Vary header is stacked
+// on top of a CORS middleware that allows multiple origins.
+func BenchmarkMiddlewareInvocationVary(b *testing.B) {
+	cors := mustAllowAccess(
+		fcors.FromOrigins("https://*.example.com"),
 		requestHeadersAllowedByDefaultInRsCORS,
 	)
-	if err != nil {
-		b.Error(err)
-		return
+	handler := varyMiddleware(cors(dummyHandler))
+	reqs := []request{
+		{
+			name:   "CORS preflight request from allowed origin",
+			method: http.MethodOptions,
+			headers: http.Header{
+				headerOrigin: {"https://foo.example.com"},
+				headerACRM:   {http.MethodGet},
+				headerACRH:   {"authorization"},
+			},
+		}, {
+			name:   "actual CORS request from allowed origin",
+			method: http.MethodGet,
+			headers: http.Header{
+				headerOrigin: {"https://foo.example.com"},
+			},
+		},
 	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkActualAllowSingleOrigin(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, dummyEndpoint, nil)
-	const origin = "https://example.com"
-	req.Header.Add(headerOrigin, origin)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(origin),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowMultipleOriginsFails(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	const origin = "https://exzxcample.com"
-	req.Header.Add(headerOrigin, origin)
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(
-			"https://example.com",
-			"https://google.com",
-			"https://twitter.com",
-			"https://stackoverflow.com",
-			"https://reddit.com",
-			"https://quora.com",
-			"https://example.co.uk",
-			"https://google.co.uk",
-			"https://twitter.co.uk",
-			"https://stackoverflow.co.uk",
-			"https://reddit.co.uk",
-			"https://quora.co.uk",
-			"https://example.com.au",
-			"https://google.com.au",
-			"https://twitter.com.au",
-			"https://stackoverflow.com.au",
-			"https://reddit.com.au",
-			"https://quora.com.au",
-			"https://example.fr",
-			"https://google.fr",
-			"https://twitter.fr",
-			"https://stackoverflow.fr",
-			"https://reddit.fr",
-			"https://quora.fr",
-		),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
+	for _, req := range reqs {
+		name := fmt.Sprintf("allow multiple origins vs %s", req.name)
+		f := func(b *testing.B) {
+			req := newRequest(b, req.method, req.headers)
+			rec := httptest.NewRecorder()
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				// important because rec is shared across iterations
+				clear(rec.Header())
+				handler.ServeHTTP(rec, req)
+			}
+		}
+		b.Run(name, f)
 	}
 }
 
-func BenchmarkActualAllowMultipleBaseOriginsFails(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, dummyEndpoint, nil)
-	req.Header.Add(headerOrigin, "https://attacker.com")
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(
-			"https://*.example.com",
-			"https://*.google.com",
-			"https://*.twitter.com",
-			"https://*.stackoverflow.com",
-			"https://*.reddit.com",
-			"https://*.quora.com",
-		),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkActualAbnormallyLongOrigin(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, dummyEndpoint, nil)
-	const abnormallyLongOrigin = "https://foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
-		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.com"
-	req.Header.Add(headerOrigin, abnormallyLongOrigin)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(
-			"https://*.example.com",
-			"https://*.google.com",
-			"https://*.twitter.com",
-			"https://*.stackoverflow.com",
-			"https://*.reddit.com",
-			"https://*.quora.com",
-		),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowAnyOrigin(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	const origin = "https://example.com"
-	req.Header.Add(headerOrigin, origin)
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromAnyOrigin(),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowAnyOriginWithPutAndExposeHeaders(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	const origin = "https://example.com"
-	req.Header.Add(headerOrigin, origin)
-	req.Header.Add("Access-Control-Request-Method", http.MethodPut)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromAnyOrigin(),
-		fcors.WithMethods(http.MethodPut),
-		requestHeadersAllowedByDefaultInRsCORS,
-		fcors.ExposeResponseHeaders("foo", "bar", "baz"),
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowMultipleBaseOriginsFails(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	req.Header.Add(headerOrigin, "https://attacker.com")
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(
-			"https://*.example.com",
-			"https://*.google.com",
-			"https://*.twitter.com",
-			"https://*.stackoverflow.com",
-			"https://*.reddit.com",
-			"https://*.quora.com",
-			"https://*.example.co.uk",
-			"https://*.google.co.uk",
-			"https://*.twitter.co.uk",
-			"https://*.stackoverflow.co.uk",
-			"https://*.reddit.co.uk",
-			"https://*.quora.co.uk",
-			"https://*.example.com.au",
-			"https://*.google.com.au",
-			"https://*.twitter.com.au",
-			"https://*.stackoverflow.com.au",
-			"https://*.reddit.com.au",
-			"https://*.quora.com.au",
-			"https://*.example.fr",
-			"https://*.google.fr",
-			"https://*.twitter.fr",
-			"https://*.stackoverflow.fr",
-			"https://*.reddit.fr",
-			"https://*.quora.fr",
-			"https://*.example1.com",
-			"https://*.google1.com",
-			"https://*.twitter1.com",
-			"https://*.stackoverflow1.com",
-			"https://*.reddit1.com",
-			"https://*.quora1.com",
-			"https://*.example1.co.uk",
-			"https://*.google1.co.uk",
-			"https://*.twitter1.co.uk",
-			"https://*.stackoverflow1.co.uk",
-			"https://*.reddit1.co.uk",
-			"https://*.quora1.co.uk",
-			"https://*.example1.com.au",
-			"https://*.google1.com.au",
-			"https://*.twitter1.com.au",
-			"https://*.stackoverflow1.com.au",
-			"https://*.reddit1.com.au",
-			"https://*.quora1.com.au",
-			"https://*.example1.fr",
-			"https://*.google1.fr",
-			"https://*.twitter1.fr",
-			"https://*.stackoverflow1.fr",
-			"https://*.reddit1.fr",
-			"https://*.quora1.fr",
-		),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowMultipleBaseOriginsSucceeds(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	req.Header.Add(headerOrigin, "https://foo.quora.fr")
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(
-			"https://*.example.com",
-			"https://*.google.com",
-			"https://*.twitter.com",
-			"https://*.stackoverflow.com",
-			"https://*.reddit.com",
-			"https://*.quora.com",
-			"https://*.example.co.uk",
-			"https://*.google.co.uk",
-			"https://*.twitter.co.uk",
-			"https://*.stackoverflow.co.uk",
-			"https://*.reddit.co.uk",
-			"https://*.quora.co.uk",
-			"https://*.example.com.au",
-			"https://*.google.com.au",
-			"https://*.twitter.com.au",
-			"https://*.stackoverflow.com.au",
-			"https://*.reddit.com.au",
-			"https://*.quora.com.au",
-			"https://*.example.fr",
-			"https://*.google.fr",
-			"https://*.twitter.fr",
-			"https://*.stackoverflow.fr",
-			"https://*.reddit.fr",
-			"https://*.quora.fr",
-		),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowMultipleBaseOriginsFails2(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	req.Header.Add(headerOrigin, "https://attacker.com")
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	res := httptest.NewRecorder()
-	const nbSpecs = 1000
-	specs := make([]string, nbSpecs)
-	for i := 0; i < nbSpecs; i++ {
-		specs[i] = fmt.Sprintf("https://*.example%d.com", i)
-	}
-	cors, err := fcors.AllowAccess(
-		fcors.FromOrigins(specs[0], specs[1:]...),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAllowAnyOriginWithSingleHeader(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	const origin = "https://example.com"
-	req.Header.Add(headerOrigin, origin)
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	req.Header.Add("Access-Control-Request-Headers", "Accept")
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccess(
-		fcors.FromAnyOrigin(),
-		requestHeadersAllowedByDefaultInRsCORS,
-	)
-	if err != nil {
-		b.Error(err)
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightAdversarialACRH(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	const origin = "https://example.com"
-	req.Header.Add(headerOrigin, origin)
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	adversarialACRH := strings.Join(bigSliceOfJunk(10000), ", ")
-	req.Header.Add("Access-Control-Request-Headers", adversarialACRH)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccessWithCredentials(
-		fcors.FromOrigins(origin),
-		fcors.WithAnyRequestHeaders(),
-	)
-	if err != nil {
-		b.Error(err.Error())
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkPreflightPathologicalCaseForCorpus(b *testing.B) {
-	req := httptest.NewRequest(http.MethodOptions, dummyEndpoint, nil)
-	origin := "https://a" + strings.Repeat(".a", 126)
-	req.Header.Add(headerOrigin, origin)
-	req.Header.Add("Access-Control-Request-Method", http.MethodGet)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccessWithCredentials(
-		fcors.FromOrigins("https://b"+strings.Repeat(".a", 126)),
-		fcors.WithAnyRequestHeaders(),
-	)
-	if err != nil {
-		b.Error(err.Error())
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
-	}
-}
-
-func BenchmarkActualPathologicalCaseForCorpus(b *testing.B) {
-	req := httptest.NewRequest(http.MethodGet, dummyEndpoint, nil)
-	origin := "https://a" + strings.Repeat(".a", 126)
-	req.Header.Add(headerOrigin, origin)
-	res := httptest.NewRecorder()
-	cors, err := fcors.AllowAccessWithCredentials(
-		fcors.FromOrigins("https://b"+strings.Repeat(".a", 126)),
-		fcors.WithAnyRequestHeaders(),
-	)
-	if err != nil {
-		b.Error(err.Error())
-		return
-	}
-	handler := cors(http.HandlerFunc(dummyHandler))
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler.ServeHTTP(res, req)
+// TODO: replace by clear builtin when migrating to Go 1.21
+func clear(h http.Header) {
+	for k := range h {
+		delete(h, k)
 	}
 }
 
@@ -512,4 +419,16 @@ func bigSliceOfJunk(size int) []string {
 		out[i] = fmt.Sprintf("foobarbazquxquux-%d", i)
 	}
 	return out
+}
+
+var dummyHandler = http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
+
+var headerVaryBefore = []string{"before"}
+
+var varyMiddleware = func(next http.Handler) http.Handler {
+	f := func(w http.ResponseWriter, r *http.Request) {
+		w.Header()[headerVary] = headerVaryBefore
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(f)
 }

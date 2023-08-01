@@ -11,7 +11,6 @@ import (
 )
 
 const (
-	dummyEndpoint        = "https://example.com/whatever"
 	dummyInvalidOrigin   = "https://jub0bs.com/"
 	abnormallyLongOrigin = "https://foobarbaz.foobarbaz.foobarbaz." +
 		"foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz.foobarbaz." +
@@ -58,7 +57,7 @@ func process(t *testing.T, handler http.Handler, cases []TestCase) {
 	t.Helper()
 	for _, c := range cases {
 		f := func(t *testing.T) {
-			req := newRequest(t, c.reqMethod, dummyEndpoint, c.reqHeaders)
+			req := newRequest(t, c.reqMethod, c.reqHeaders)
 			rec := httptest.NewRecorder()
 			handler.ServeHTTP(rec, req)
 			res := rec.Result()
@@ -107,9 +106,10 @@ func checkResponseHeaders(
 	}
 }
 
-func newRequest(t *testing.T, method, url string, headers http.Header) *http.Request {
-	t.Helper()
-	req := httptest.NewRequest(method, url, nil)
+func newRequest(tb testing.TB, method string, headers http.Header) *http.Request {
+	tb.Helper()
+	const dummyEndpoint = "https://example.com/whatever"
+	req := httptest.NewRequest(method, dummyEndpoint, nil)
 	req.Header = headers
 	return req
 }
