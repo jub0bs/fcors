@@ -15,6 +15,7 @@ A principled CORS middleware library for Go.
 - [Example](https://github.com/jub0bs/fcors/#example)
 - [Documentation](https://github.com/jub0bs/fcors/#documentation)
 - [Code coverage](https://github.com/jub0bs/fcors/#code-coverage)
+- [Benchmarks](https://github.com/jub0bs/fcors/#benchmarks)
 - [License](https://github.com/jub0bs/fcors/#license)
 
 ## About CORS
@@ -123,10 +124,16 @@ and HTTP toolkits can be found in [jub0bs/fcors-examples][fcors-examples].
 
 ![coverage](https://codecov.io/gh/jub0bs/fcors/branch/main/graphs/sunburst.svg?token=N208BHWQTM)
 
+## Benchmarks
+
+Some benchmarks pitting jub0bs/fcors against [rs/cors][rs-cors]
+are available in [jub0bs/fcors-benchmarks][fcors-benchmarks].
+
 ## License
 
 All source code is covered by the [MIT License][license].
 
+[fcors-benchmarks]: https://github.com/jub0bs/fcors-benchmarks
 [fcors-examples]: https://github.com/jub0bs/fcors-examples
 [fearless-cors]: https://jub0bs.com/posts/2023-02-08-fearless-cors/
 [license]: https://github.com/jub0bs/fcors/blob/main/LICENSE
@@ -134,4 +141,5 @@ All source code is covered by the [MIT License][license].
 [mdn-sop]: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
 [net-http]: https://pkg.go.dev/net/http
 [pkgsite]: https://pkg.go.dev/github.com/jub0bs/fcors
+[rs-cors]: https://github.com/rs/cors
 [stripe]: https://stripe.com
