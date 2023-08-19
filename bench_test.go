@@ -48,18 +48,20 @@ var requestHeadersAllowedByDefaultInRsCORS = fcors.WithRequestHeaders(
 	"X-Requested-With",
 )
 
-func mustAllowAccess(one fcors.OptionAnon, others ...fcors.OptionAnon) fcors.Middleware {
+func mustAllowAccess(tb testing.TB, one fcors.OptionAnon, others ...fcors.OptionAnon) fcors.Middleware {
+	tb.Helper()
 	cors, err := fcors.AllowAccess(one, others...)
 	if err != nil {
-		panic("invalid policy")
+		tb.Fatal("invalid policy")
 	}
 	return cors
 }
 
-func mustAllowAccessWithCredentials(one fcors.Option, others ...fcors.Option) fcors.Middleware {
+func mustAllowAccessWithCredentials(tb testing.TB, one fcors.Option, others ...fcors.Option) fcors.Middleware {
+	tb.Helper()
 	cors, err := fcors.AllowAccessWithCredentials(one, others...)
 	if err != nil {
-		panic("invalid policy")
+		tb.Fatal("invalid policy")
 	}
 	return cors
 }
@@ -91,6 +93,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow arbitrary origin",
 			cors: mustAllowAccess(
+				b,
 				fcors.FromAnyOrigin(),
 				requestHeadersAllowedByDefaultInRsCORS,
 			),
@@ -114,6 +117,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow one origin",
 			cors: mustAllowAccess(
+				b,
 				fcors.FromOrigins("https://example.com"),
 				requestHeadersAllowedByDefaultInRsCORS,
 			),
@@ -151,6 +155,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow multiple origins",
 			cors: mustAllowAccess(
+				b,
 				fcors.FromOrigins(
 					"https://*.example.com",
 					"https://*.google.com",
@@ -227,8 +232,9 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow one pathological origin",
 			cors: mustAllowAccess(
+				b,
 				fcors.FromOrigins(
-					"https://a" + strings.Repeat(".a", 126),
+					"https://a"+strings.Repeat(".a", 126),
 				),
 			),
 			reqs: []request{
@@ -265,6 +271,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow two pathological origins",
 			cors: mustAllowAccess(
+				b,
 				fcors.FromOrigins(
 					"https://a"+strings.Repeat(".a", 126),
 					"https://b"+strings.Repeat(".a", 126),
@@ -304,6 +311,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow one origin with credentials with any request headers",
 			cors: mustAllowAccessWithCredentials(
+				b,
 				fcors.FromOrigins("https://example.com"),
 				fcors.WithAnyRequestHeaders(),
 			),
@@ -321,6 +329,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		}, {
 			name: "allow one origin with credentials and expose some response headers",
 			cors: mustAllowAccessWithCredentials(
+				b,
 				fcors.FromOrigins("https://example.com"),
 				requestHeadersAllowedByDefaultInRsCORS,
 				fcors.ExposeResponseHeaders("foo", "bar", "baz"),
@@ -349,7 +358,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 		for _, req := range mw.reqs {
 			name := fmt.Sprintf("%s vs %s", mw.name, req.name)
 			f := func(b *testing.B) {
-				req := newRequest(b, req.method, req.headers)
+				req := newRequest(req.method, req.headers)
 				rec := httptest.NewRecorder()
 				b.ReportAllocs()
 				b.ResetTimer()
@@ -370,6 +379,7 @@ func BenchmarkMiddlewareInvocation(b *testing.B) {
 // see the slow path of the fastAdd function.
 func BenchmarkMiddlewareInvocationVary(b *testing.B) {
 	cors := mustAllowAccess(
+		b,
 		fcors.FromOrigins("https://*.example.com"),
 		requestHeadersAllowedByDefaultInRsCORS,
 	)
@@ -394,7 +404,7 @@ func BenchmarkMiddlewareInvocationVary(b *testing.B) {
 	for _, req := range reqs {
 		name := fmt.Sprintf("allow multiple origins vs %s", req.name)
 		f := func(b *testing.B) {
-			req := newRequest(b, req.method, req.headers)
+			req := newRequest(req.method, req.headers)
 			rec := httptest.NewRecorder()
 			b.ReportAllocs()
 			b.ResetTimer()

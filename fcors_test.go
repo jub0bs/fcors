@@ -69,7 +69,7 @@ func process(t *testing.T, handler http.Handler, cases []TestCase) {
 	t.Helper()
 	for _, c := range cases {
 		f := func(t *testing.T) {
-			req := newRequest(t, c.reqMethod, c.reqHeaders)
+			req := newRequest(c.reqMethod, c.reqHeaders)
 			rec := httptest.NewRecorder()
 			handler.ServeHTTP(rec, req)
 			res := rec.Result()
@@ -118,8 +118,7 @@ func checkResponseHeaders(
 	}
 }
 
-func newRequest(tb testing.TB, method string, headers http.Header) *http.Request {
-	tb.Helper()
+func newRequest(method string, headers http.Header) *http.Request {
 	const dummyEndpoint = "https://example.com/whatever"
 	req := httptest.NewRequest(method, dummyEndpoint, nil)
 	req.Header = headers
