@@ -50,7 +50,7 @@ Paul Carleton (Staff Software Engineer at [Stripe][stripe])
 go get github.com/jub0bs/fcors
 ```
 
-fcors requires Go 1.20 or above.
+fcors requires Go 1.21 or above.
 
 ## Example
 

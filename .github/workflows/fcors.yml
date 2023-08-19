@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: [ '1.20.x' ]
+        go-version: [ '1.21.x' ]
     steps:
       - name: Checkout Source
         uses: actions/checkout@v3
@@ -34,7 +34,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        go-version: [1.20.x]
+        go-version: [1.21.x]
     name: Benchmark comparison ${{ matrix.os }} @ Go ${{ matrix.go-version }}
     runs-on: ${{ matrix.os }}
     steps:
