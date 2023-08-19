@@ -8,6 +8,8 @@ import (
 )
 
 // A Set represents a mathematical set whose elements have type E.
+// Don't expect this type to work properly for elements that are
+// not reflexive for equality.
 type Set[E comparable] map[E]struct{}
 
 // NewSet returns a Set that contains all of es (and no other elements).
