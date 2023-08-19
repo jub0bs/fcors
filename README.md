@@ -20,11 +20,12 @@ A principled CORS middleware library for Go.
 
 ## About CORS
 
-[Cross-Origin Resource Sharing (CORS)][mdn-cors] is a mechanism
-that lets servers instruct browsers to relax, for select clients,
-some restrictions (in terms of both sending and reading)
-enforced by the [Same-Origin Policy (SOP)][mdn-sop]
-on cross-origin network access.
+The [Same-Origin Policy (SOP)][mdn-sop] is a security mechanism that
+Web browsers implement to protect their users.
+In particular, the SOP restricts cross-origin network access
+in terms of both sending and reading.
+[Cross-Origin Resource Sharing (CORS)][mdn-cors] is a protocol that
+lets servers instruct browsers to relax those restrictions for select clients.
 
 jub0bs/fcors allows you to configure and build [net/http][net-http] middleware
 that implement CORS.
