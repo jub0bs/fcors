@@ -32,3 +32,11 @@ func TestThatNoneOfTheOptionAnonsImplementsOption(t *testing.T) {
 		t.Run(c.desc, f)
 	}
 }
+
+// Because option's cred method is never meant to be called,
+// this test admittedly is a bit silly; it's needed only to
+// (somewhat artificially) bridge the gap to 100% code coverage.
+func TestCredMethod(_ *testing.T) {
+	var opt option
+	opt.cred()
+}
