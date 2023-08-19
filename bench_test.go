@@ -418,13 +418,6 @@ func BenchmarkMiddlewareInvocationVary(b *testing.B) {
 	}
 }
 
-// TODO: replace by clear builtin when migrating to Go 1.21
-func clear(h http.Header) {
-	for k := range h {
-		delete(h, k)
-	}
-}
-
 func bigSliceOfJunk(size int) []string {
 	out := make([]string, size)
 	for i := 0; i < size; i++ {
