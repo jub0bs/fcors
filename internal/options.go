@@ -2,11 +2,11 @@ package internal
 
 import (
 	"errors"
+	"maps"
 	"strconv"
 
 	"github.com/jub0bs/fcors/internal/origin"
 	"github.com/jub0bs/fcors/internal/util"
-	"golang.org/x/exp/maps"
 )
 
 const (

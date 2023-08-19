@@ -1,10 +1,8 @@
 package util
 
 import (
+	"slices"
 	"strings"
-
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
 
 // A Set represents a mathematical set whose elements have type E.
@@ -35,7 +33,17 @@ func (s Set[E]) Contains(e E) bool {
 // SortCombine sorts the elements of s in lexicographical order,
 // joins them with delim, and returns the resulting string.
 func SortCombine(s Set[string], delim string) string {
-	keys := maps.Keys(s)
-	slices.Sort(keys)
-	return strings.Join(keys, delim)
+	elems := toSlice(s)
+	slices.Sort(elems)
+	return strings.Join(elems, delim)
+}
+
+// toSlice returns the elements of the set s.
+// The elements will be in an indeterminate order.
+func toSlice[E comparable](s Set[E]) []E {
+	elems := make([]E, 0, len(s))
+	for e := range s {
+		elems = append(elems, e)
+	}
+	return elems
 }

@@ -3,11 +3,11 @@ package fcors_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strconv"
 	"testing"
 
 	"github.com/jub0bs/fcors/internal/util"
-	"golang.org/x/exp/slices"
 )
 
 const (
