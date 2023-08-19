@@ -1,4 +1,4 @@
-# fcors
+# jub0bs/fcors
 
 [![godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://pkg.go.dev/github.com/jub0bs/fcors)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](https://github.com/jub0bs/fcors/raw/main/LICENSE)
@@ -25,17 +25,17 @@ some restrictions (in terms of both sending and reading)
 enforced by the [Same-Origin Policy (SOP)][mdn-sop]
 on cross-origin network access.
 
-fcors allows you to configure and build [net/http][net-http] middleware
+jub0bs/fcors allows you to configure and build [net/http][net-http] middleware
 that implement CORS.
 
 ## Design philosophy
 
-fcors is designed to be both easier to use and harder to misuse
+jub0bs/fcors is designed to be both easier to use and harder to misuse
 than other CORS middleware libraries; see
 [_Fearless CORS: a design philosophy for CORS middleware libraries
 (and a Go implementation)_][fearless-cors].
 
-## Praise for fcors
+## Praise for jub0bs/fcors
 
 > I really like the declarative API. It lets you say what behavior you want
 > rather than setting specific headers. It means that, as a user,
@@ -50,7 +50,7 @@ Paul Carleton (Staff Software Engineer at [Stripe][stripe])
 go get github.com/jub0bs/fcors
 ```
 
-fcors requires Go 1.21 or above.
+jub0bs/fcors requires Go 1.21 or above.
 
 ## Example
 
@@ -116,7 +116,7 @@ and the `/hello` resource is now configured for CORS as desired.
 
 The documentation is available on [pkg.go.dev][pkgsite].
 
-Moreover, guidance on how to use fcors with third-party Web frameworks
+Moreover, guidance on how to use jub0bs/fcors with third-party Web frameworks
 and HTTP toolkits can be found in [jub0bs/fcors-examples][fcors-examples].
 
 ## Code coverage
