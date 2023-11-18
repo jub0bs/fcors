@@ -30,8 +30,8 @@ const (
 
 type Option interface {
 	applier
-	// Important: this is a dummy method whose sole purpose
-	// is to guarantee that Option strictly subsume OptionAnon.
+	// cred is a no-op function whose sole purpose is to guarantee that
+	// Option strictly subsume OptionAnon.
 	cred()
 }
 

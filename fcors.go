@@ -168,7 +168,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //	https://foo.example.com
 //	https://bar.example.com
 //
-// but not
+// but not the following origin,
 //
 //	https://bar.foo.example.com
 //
@@ -263,7 +263,8 @@ func FromAnyOrigin() OptionAnon {
 // HTTP methods.
 //
 // Using this option in conjunction with option [WithAnyMethod] in a call
-// to [AllowAccess] results in a failure to build the corresponding middleware.
+// to [AllowAccess] or [AllowAccessWithCredentials] results in a failure
+// to build the corresponding middleware.
 //
 // Method names are case-sensitive.
 //
@@ -301,7 +302,8 @@ func WithMethods(one string, others ...string) Option {
 // WithAnyMethod configures a CORS middleware to allow any HTTP method.
 //
 // Using this option in conjunction with option [WithMethods] in a call
-// to [AllowAccess] results in a failure to build the corresponding middleware.
+// to [AllowAccess] or [AllowAccessWithCredentials] results in a failure
+// to build the corresponding middleware.
 func WithAnyMethod() Option {
 	return internal.WithAnyMethod()
 }
@@ -310,8 +312,8 @@ func WithAnyMethod() Option {
 // specified request headers to the client.
 //
 // Using this option in conjunction with option [WithAnyRequestHeaders]
-// in a call to [AllowAccess] results in a failure to build the corresponding
-// middleware.
+// in a call to [AllowAccess] or [AllowAccessWithCredentials] results
+// in a failure to build the corresponding middleware.
 //
 // Any occurrence of an [invalid header name] results in a failure to build the
 // corresponding middleware.
@@ -323,7 +325,7 @@ func WithAnyMethod() Option {
 //
 // The CORS protocol defines a number of so-called
 // "[forbidden request-header names]", which are never allowed
-// and get silently dropped by browsers.
+// and that browsers silently drop from client requests.
 // Specifying one or more forbidden request-header name(s) results
 // in a failure to build the corresponding middleware.
 //
@@ -351,7 +353,8 @@ func WithRequestHeaders(one string, others ...string) Option {
 // headers.
 //
 // Using this option in conjunction with option [WithRequestHeaders] in a call
-// to [AllowAccess] results in a failure to build the corresponding middleware.
+// to [AllowAccess] or [AllowAccessWithCredentials] results in a failure to
+// build the corresponding middleware.
 func WithAnyRequestHeaders() Option {
 	return internal.WithAnyRequestHeaders()
 }
