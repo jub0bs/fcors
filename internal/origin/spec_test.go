@@ -288,7 +288,7 @@ var parseSpecCases = []TestCase{
 		input:   "http://**.example.com:*",
 		failure: true,
 	}, {
-		name:    "wildcard in illegal place",
+		name:    "out-of-place wildcard",
 		input:   "http://fooo.*.example.com:3999",
 		failure: true,
 	}, {
@@ -312,7 +312,7 @@ var parseSpecCases = []TestCase{
 		input:   "http://*.**.example.com:3999",
 		failure: true,
 	}, {
-		name:    "double wildcard in illegal place",
+		name:    "out-of-place double wildcard",
 		input:   "http://fooo.**.example.com:3999",
 		failure: true,
 	}, {

@@ -20,7 +20,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		{
 			desc:     "specified origin contains whitespace",
 			options:  []fcors.OptionAnon{fcors.FromOrigins(" http://example.com:6060 ")},
-			errorMsg: `fcors: invalid or unsupported scheme: " http://example.com:6060 "`,
+			errorMsg: `fcors: invalid or prohibited scheme: " http://example.com:6060 "`,
 		}, {
 			desc:    "specified origin is insecure",
 			options: []fcors.OptionAnon{fcors.FromOrigins("http://example.com:6060")},
@@ -37,11 +37,11 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc:     "specified origin is the null origin",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("null")},
-			errorMsg: `fcors: unsupported "null" origin`,
+			errorMsg: `fcors: prohibited origin "null"`,
 		}, {
 			desc:     "specified origin contains an invalid scheme",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("httpsfoo://example.com:6060")},
-			errorMsg: `fcors: invalid or unsupported scheme: "httpsfoo://example.com:6060"`,
+			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://example.com:6060"`,
 		}, {
 			desc:     "specified origin contains a userinfo",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://user:password@example.com:6060")},
@@ -94,7 +94,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc:     "specified base origin contains whitespace",
 			options:  []fcors.OptionAnon{fcors.FromOrigins(" http://*.example.com:6060 ")},
-			errorMsg: `fcors: invalid or unsupported scheme: " http://*.example.com:6060 "`,
+			errorMsg: `fcors: invalid or prohibited scheme: " http://*.example.com:6060 "`,
 		}, {
 			desc:    "specified base origin is insecure",
 			options: []fcors.OptionAnon{fcors.FromOrigins("http://*.example.com:6060")},
@@ -115,7 +115,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc:     "specified base origin contains an invalid scheme",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("httpsfoo://*.example.com:6060")},
-			errorMsg: `fcors: invalid or unsupported scheme: "httpsfoo://*.example.com:6060"`,
+			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains a userinfo",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://user:password@*.example.com:6060")},
@@ -190,12 +190,18 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: invalid method name "résumé"`,
 		}, {
+			desc: "wildcard origin",
+			options: []fcors.OptionAnon{
+				fcors.FromOrigins("*"),
+			},
+			errorMsg: `fcors: prohibited origin "*"`,
+		}, {
 			desc: "wildcard method name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
 				fcors.WithMethods("*"),
 			},
-			errorMsg: `fcors: disallowed method name "*"`,
+			errorMsg: `fcors: prohibited method name "*"`,
 		}, {
 			desc: "invalid second method name",
 			options: []fcors.OptionAnon{
@@ -237,7 +243,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				fcors.FromAnyOrigin(),
 				fcors.WithRequestHeaders("*"),
 			},
-			errorMsg: `fcors: disallowed request-header name "*"`,
+			errorMsg: `fcors: prohibited request-header name "*"`,
 		}, {
 			desc: "invalid second request-header name",
 			options: []fcors.OptionAnon{
@@ -274,12 +280,12 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: request-header name "foo" specified multiple times`,
 		}, {
-			desc: "disallowed request-header name",
+			desc: "prohibited request-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
 				fcors.WithRequestHeaders("access-control-allow-origin"),
 			},
-			errorMsg: `fcors: disallowed request-header name "access-control-allow-origin"`,
+			errorMsg: `fcors: prohibited request-header name "access-control-allow-origin"`,
 		}, {
 			desc: "max age exceeds upper bound",
 			options: []fcors.OptionAnon{
@@ -307,14 +313,14 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				fcors.FromAnyOrigin(),
 				fcors.ExposeResponseHeaders("*"),
 			},
-			errorMsg: `fcors: disallowed response-header name "*"`,
+			errorMsg: `fcors: prohibited response-header name "*"`,
 		}, {
 			desc: "wildcard response-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
 				fcors.ExposeResponseHeaders("*"),
 			},
-			errorMsg: `fcors: disallowed response-header name "*"`,
+			errorMsg: `fcors: prohibited response-header name "*"`,
 		}, {
 			desc: "invalid second response-header name",
 			options: []fcors.OptionAnon{
@@ -337,12 +343,12 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: response-header name "foo" specified multiple times`,
 		}, {
-			desc: "disallowed response-header name",
+			desc: "prohibited response-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
 				fcors.ExposeResponseHeaders("access-control-request-method"),
 			},
-			errorMsg: `fcors: disallowed response-header name "access-control-request-method"`,
+			errorMsg: `fcors: prohibited response-header name "access-control-request-method"`,
 		}, {
 			desc: "safelisted response-header name",
 			options: []fcors.OptionAnon{
@@ -571,7 +577,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 					`fcors: invalid method name "not a valid method"`,
 					`fcors: option WithMethods used multiple times`,
 					`fcors: invalid request-header name "not a valid header"`,
-					`fcors: disallowed request-header name "access-control-allow-origin"`,
+					`fcors: prohibited request-header name "access-control-allow-origin"`,
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,
@@ -608,7 +614,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		{
 			desc:     "specified origin contains whitespace",
 			options:  []fcors.Option{fcors.FromOrigins(" http://example.com:6060 ")},
-			errorMsg: `fcors: invalid or unsupported scheme: " http://example.com:6060 "`,
+			errorMsg: `fcors: invalid or prohibited scheme: " http://example.com:6060 "`,
 		}, {
 			desc:    "specified origin is insecure",
 			options: []fcors.Option{fcors.FromOrigins("http://example.com:6060")},
@@ -625,11 +631,11 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:     "specified origin is the null origin",
 			options:  []fcors.Option{fcors.FromOrigins("null")},
-			errorMsg: `fcors: unsupported "null" origin`,
+			errorMsg: `fcors: prohibited origin "null"`,
 		}, {
 			desc:     "specified origin contains an invalid scheme",
 			options:  []fcors.Option{fcors.FromOrigins("httpsfoo://example.com:6060")},
-			errorMsg: `fcors: invalid or unsupported scheme: "httpsfoo://example.com:6060"`,
+			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://example.com:6060"`,
 		}, {
 			desc:     "specified origin contains a userinfo",
 			options:  []fcors.Option{fcors.FromOrigins("https://user:password@example.com:6060")},
@@ -682,7 +688,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:     "specified base origin contains whitespace",
 			options:  []fcors.Option{fcors.FromOrigins(" http://*.example.com:6060 ")},
-			errorMsg: `fcors: invalid or unsupported scheme: " http://*.example.com:6060 "`,
+			errorMsg: `fcors: invalid or prohibited scheme: " http://*.example.com:6060 "`,
 		}, {
 			desc:    "specified base origin is insecure",
 			options: []fcors.Option{fcors.FromOrigins("http://*.example.com:6060")},
@@ -703,7 +709,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:     "specified base origin contains an invalid scheme",
 			options:  []fcors.Option{fcors.FromOrigins("httpsfoo://*.example.com:6060")},
-			errorMsg: `fcors: invalid or unsupported scheme: "httpsfoo://*.example.com:6060"`,
+			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains a userinfo",
 			options:  []fcors.Option{fcors.FromOrigins("https://user:password@*.example.com:6060")},
@@ -783,7 +789,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.FromOrigins("https://example.com"),
 				fcors.WithMethods("*"),
 			},
-			errorMsg: `fcors: disallowed method name "*"`,
+			errorMsg: `fcors: prohibited method name "*"`,
 		}, {
 			desc: "invalid second method name",
 			options: []fcors.Option{
@@ -811,7 +817,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.FromOrigins("https://example.com"),
 				fcors.WithRequestHeaders("*"),
 			},
-			errorMsg: `fcors: disallowed request-header name "*"`,
+			errorMsg: `fcors: prohibited request-header name "*"`,
 		}, {
 			desc: "invalid second request-header name",
 			options: []fcors.Option{
@@ -848,12 +854,12 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors: request-header name "foo" specified multiple times`,
 		}, {
-			desc: "disallowed request-header name",
+			desc: "prohibited request-header name",
 			options: []fcors.Option{
 				fcors.FromOrigins("https://example.com"),
 				fcors.WithRequestHeaders("access-control-allow-origin"),
 			},
-			errorMsg: `fcors: disallowed request-header name "access-control-allow-origin"`,
+			errorMsg: `fcors: prohibited request-header name "access-control-allow-origin"`,
 		}, {
 			desc: "max age exceeds upper bound",
 			options: []fcors.Option{
@@ -881,14 +887,14 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.FromOrigins("https://example.com"),
 				fcors.ExposeResponseHeaders("*"),
 			},
-			errorMsg: `fcors: disallowed response-header name "*"`,
+			errorMsg: `fcors: prohibited response-header name "*"`,
 		}, {
 			desc: "wildcard response-header name",
 			options: []fcors.Option{
 				fcors.FromOrigins("https://example.com"),
 				fcors.ExposeResponseHeaders("*"),
 			},
-			errorMsg: `fcors: disallowed response-header name "*"`,
+			errorMsg: `fcors: prohibited response-header name "*"`,
 		}, {
 			desc: "invalid second response-header name",
 			options: []fcors.Option{
@@ -911,12 +917,12 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors: response-header name "foo" specified multiple times`,
 		}, {
-			desc: "disallowed response-header name",
+			desc: "prohibited response-header name",
 			options: []fcors.Option{
 				fcors.FromOrigins("https://example.com"),
 				fcors.ExposeResponseHeaders("access-control-request-method"),
 			},
-			errorMsg: `fcors: disallowed response-header name "access-control-request-method"`,
+			errorMsg: `fcors: prohibited response-header name "access-control-request-method"`,
 		}, {
 			desc: "safelisted response-header name",
 			options: []fcors.Option{
@@ -1085,7 +1091,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 					`fcors: invalid method name "not a valid method"`,
 					`fcors: option WithMethods used multiple times`,
 					`fcors: invalid request-header name "not a valid header"`,
-					`fcors: disallowed request-header name "access-control-allow-origin"`,
+					`fcors: prohibited request-header name "access-control-allow-origin"`,
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,

@@ -94,18 +94,21 @@ func (s *Spec) HostIsEffectiveTLD() (string, bool) {
 }
 
 func ParseSpec(s string) (*Spec, error) {
-	full := s
-	if s == "null" {
-		return nil, util.Errorf("unsupported %q origin", s)
+	if s == "*" {
+		return nil, util.Errorf(`prohibited origin %q`, s)
 	}
+	if s == "null" {
+		return nil, util.Errorf("prohibited origin %q", s)
+	}
+	full := s
 	scheme, s, ok := scanHttpScheme(s)
 	if !ok {
-		const tmpl = "invalid or unsupported scheme: %q"
+		const tmpl = "invalid or prohibited scheme: %q"
 		return nil, util.Errorf(tmpl, full)
 	}
 	s, ok = consume(schemeHostSep, s)
 	if !ok {
-		const tmpl = "invalid or unsupported scheme: %q"
+		const tmpl = "invalid or prohibited scheme: %q"
 		return nil, util.Errorf(tmpl, full)
 	}
 	hostPattern, s, err := parseHostPattern(s, full)
@@ -129,7 +132,7 @@ func ParseSpec(s string) (*Spec, error) {
 		}
 		if port+1 == anyPortP1 && hostPattern.Kind.ArbitrarySubdomains() {
 			const tmpl = "specifying both arbitrary subdomains " +
-				"and arbitrary ports is illegal: %q"
+				"and arbitrary ports is prohibited: %q"
 			return nil, util.Errorf(tmpl, full)
 		}
 		if isDefaultPortForScheme(scheme, port) {
@@ -188,7 +191,7 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 			return nil, s, util.InvalidOriginPatternErr(full)
 		}
 		if ip.Is4In6() {
-			const tmpl = "illegal IPv4-mapped IPv6 address: %q"
+			const tmpl = "prohibited IPv4-mapped IPv6 address: %q"
 			return nil, s, util.Errorf(tmpl, full)
 		}
 		var ipStr = ip.String()

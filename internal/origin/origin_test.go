@@ -21,11 +21,11 @@ var parseCases = []struct {
 			},
 		},
 	}, {
-		desc:    "unsupported scheme",
+		desc:    "prohibited scheme",
 		input:   "foo://example.com:",
 		failure: true,
 	}, {
-		desc:    "unsupported scheme starting with supported scheme",
+		desc:    "prohibited scheme starting with supported scheme",
 		input:   "httpsfoo://example.com:",
 		failure: true,
 	}, {
@@ -87,7 +87,7 @@ var parseCases = []struct {
 		input:   "https://.example.com",
 		failure: true,
 	}, {
-		desc:    "domain with invalid char after host",
+		desc:    "domain with illegal char after host",
 		input:   "https://example.com^8080",
 		failure: true,
 	}, {

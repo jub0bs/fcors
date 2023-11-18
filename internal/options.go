@@ -213,7 +213,7 @@ func processOneMethod(name string, allowedMethods util.Set[string]) error {
 		return util.Errorf("invalid method name %q", name)
 	}
 	if name == wildcard {
-		return util.Errorf(`disallowed method name "*"`)
+		return util.Errorf(`prohibited method name "*"`)
 	}
 	if byteLowercasedForbiddenMethods.Contains(byteLowercase(name)) {
 		return util.Errorf("forbidden method name %q", name)
@@ -275,8 +275,8 @@ func processOneRequestHeader(name string, allowedHeaders util.Set[string]) error
 	if isForbiddenRequestHeaderName(name) {
 		return util.Errorf("forbidden request-header name %q", name)
 	}
-	if disallowedRequestHeaderNames.Contains(name) {
-		return util.Errorf("disallowed request-header name %q", name)
+	if prohibitedRequestHeaderNames.Contains(name) {
+		return util.Errorf("prohibited request-header name %q", name)
 	}
 	if allowedHeaders.Contains(name) {
 		return util.Errorf("request-header name %q specified multiple times", name)
@@ -359,8 +359,8 @@ func processOneResponseHeader(name string, exposedHeaders util.Set[string]) erro
 	if forbiddenResponseHeaderNames.Contains(name) {
 		return util.Errorf("forbidden response-header name %q", name)
 	}
-	if disallowedResponseHeaderNames.Contains(name) {
-		return util.Errorf("disallowed response-header name %q", name)
+	if prohibitedResponseHeaderNames.Contains(name) {
+		return util.Errorf("prohibited response-header name %q", name)
 	}
 	if safelistedResponseHeaderNames.Contains(name) {
 		const tmpl = "response-header name %q needs not be explicitly exposed"

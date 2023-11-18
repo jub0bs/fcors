@@ -119,41 +119,41 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //
 // Using this option in conjunction with option [FromAnyOrigin] in a call
 // to [AllowAccess] results in a failure to build the corresponding middleware.
-// Any occurrence of an illegal pattern results in a failure to build
+// Any occurrence of a prohibited pattern results in a failure to build
 // the corresponding middleware.
 //
-// Legal schemes are limited to http (with a caveat explained further down)
+// Permitted schemes are limited to http (with a caveat explained further down)
 // and https:
 //
-//	http://example.com             // legal
-//	https://example.com            // legal
-//	chrome-extension://example.com // illegal
+//	http://example.com             // permitted
+//	https://example.com            // permitted
+//	chrome-extension://example.com // prohibited
 //
-// Origins must be specified in [ASCII serialized form]; Unicode is illegal:
+// Origins must be specified in [ASCII serialized form]; Unicode is prohibited:
 //
-//	https://example.com            // legal
-//	https://www.xn--xample-9ua.com // legal (Punycode)
-//	https://www.éxample.com        // illegal (Unicode)
+//	https://example.com            // permitted
+//	https://www.xn--xample-9ua.com // permitted (Punycode)
+//	https://www.éxample.com        // prohibited (Unicode)
 //
-// For [security reasons], the [null origin] is illegal.
+// For [security reasons], the [null origin] is prohibited.
 //
 // Hosts that are IPv4 addresses must be specified in [dotted-quad notation]:
 //
-//	http://255.0.0.0  // legal
-//	http://0xFF000000 // illegal
+//	http://255.0.0.0  // permitted
+//	http://0xFF000000 // prohibited
 //
 // Hosts that are IPv6 addresses must be specified in their [compressed form]:
 //
-//	http://[::1]:9090                                     // legal
-//	http://[0:0:0:0:0:0:0:0001]:9090                      // illegal
-//	http://[0000:0000:0000:0000:0000:0000:0000:0001]:9090 // illegal
+//	http://[::1]:9090                                     // permitted
+//	http://[0:0:0:0:0:0:0:0001]:9090                      // prohibited
+//	http://[0000:0000:0000:0000:0000:0000:0000:0001]:9090 // prohibited
 //
 // Default ports (80 for http, 443 for https) must be elided:
 //
-//	http://example.com      // legal
-//	http://example.com:80   // illegal
-//	https://example.com     // legal
-//	https://example.com:443 // illegal
+//	http://example.com      // permitted
+//	http://example.com:80   // prohibited
+//	https://example.com     // permitted
+//	https://example.com:443 // prohibited
 //
 // In addition to support for exact origins,
 // this option provides limited support for origin patterns
@@ -196,18 +196,18 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //	http://localhost:9090
 //
 // Specifying both arbitrary subdomains and arbitrary ports
-// in a given origin pattern is illegal:
+// in a given origin pattern is prohibited:
 //
-//	https://*.example.com:*     // illegal
-//	https://**.example.com:*    // illegal
-//	https://*.example.com       // legal
-//	https://**.example.com      // legal
-//	https://*.example.com:9090  // legal
-//	https://**.example.com:9090 // legal
-//	https://example.com:*       // legal
+//	https://*.example.com:*     // prohibited
+//	https://**.example.com:*    // prohibited
+//	https://*.example.com       // permitted
+//	https://**.example.com      // permitted
+//	https://*.example.com:9090  // permitted
+//	https://**.example.com:9090 // permitted
+//	https://example.com:*       // permitted
 //
 // No other types of origin patterns are supported.
-// In particular, a single asterisk is not a legal origin pattern.
+// In particular, a single asterisk is a prohibited origin pattern.
 // If you want to allow (anonymous) access from all origins,
 // use option [FromAnyOrigin] instead of this one.
 //
@@ -273,7 +273,7 @@ func FromAnyOrigin() OptionAnon {
 // harmless but never actually necessary.
 //
 // Moreover, the CORS protocol forbids the use of some method names.
-// Accordingly, any occurrence of an [illegal] or [forbidden] method name
+// Accordingly, any occurrence of an [invalid] or [forbidden] method name
 // results in a failure to build the corresponding middleware.
 //
 // Although a valid method name, a literal * is also prohibited;
@@ -293,7 +293,7 @@ func FromAnyOrigin() OptionAnon {
 // [HEAD]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD
 // [POST]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST
 // [forbidden]: https://fetch.spec.whatwg.org/#forbidden-method
-// [illegal]: https://fetch.spec.whatwg.org/#methods
+// [invalid]: https://fetch.spec.whatwg.org/#methods
 func WithMethods(one string, others ...string) Option {
 	return internal.WithMethods(one, others...)
 }
@@ -313,7 +313,7 @@ func WithAnyMethod() Option {
 // in a call to [AllowAccess] results in a failure to build the corresponding
 // middleware.
 //
-// Any occurrence of an [illegal header name] results in a failure to build the
+// Any occurrence of an [invalid header name] results in a failure to build the
 // corresponding middleware.
 //
 // Header names are case-insensitive.
@@ -342,7 +342,7 @@ func WithAnyMethod() Option {
 // instead of this one.
 //
 // [forbidden request-header names]: https://fetch.spec.whatwg.org/#forbidden-request-header
-// [illegal header name]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+// [invalid header name]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
 func WithRequestHeaders(one string, others ...string) Option {
 	return internal.WithRequestHeaders(one, others...)
 }
@@ -382,7 +382,7 @@ func MaxAgeInSeconds(delta uint) Option {
 // in a call to [AllowAccess] results in a failure to build the corresponding
 // middleware.
 //
-// Any occurrence of an [illegal header name] results in a failure to build the
+// Any occurrence of an [invalid header name] results in a failure to build the
 // corresponding middleware.
 //
 // Header names are case-insensitive.
@@ -412,7 +412,7 @@ func MaxAgeInSeconds(delta uint) Option {
 //
 // [CORS-safelisted response-header names]: https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name
 // [forbidden response-header names]: https://fetch.spec.whatwg.org/#forbidden-response-header-name
-// [illegal header name]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+// [invalid header name]: https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
 func ExposeResponseHeaders(one string, others ...string) Option {
 	return internal.ExposeResponseHeaders(one, others...)
 }

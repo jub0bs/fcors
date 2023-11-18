@@ -36,7 +36,7 @@ var discreteForbiddenHeaderNames = util.NewSet(
 
 // almost always a mistake to allow the following as request headers
 // as a result of misunderstanding of the CORS protocol.
-var disallowedRequestHeaderNames = util.NewSet(
+var prohibitedRequestHeaderNames = util.NewSet(
 	byteLowercase(wildcard),
 	byteLowercase(headerAllowOrigin),
 	byteLowercase(headerAllowCredentials),
@@ -48,7 +48,7 @@ var disallowedRequestHeaderNames = util.NewSet(
 )
 
 // almost always a mistake to expose the following as response headers
-var disallowedResponseHeaderNames = util.NewSet(
+var prohibitedResponseHeaderNames = util.NewSet(
 	byteLowercase(wildcard),
 	byteLowercase(headerOrigin),
 	byteLowercase(headerRequestMethod),
