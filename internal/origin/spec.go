@@ -82,7 +82,7 @@ func (s *Spec) IsDeemedInsecure() bool {
 func (s *Spec) HostIsEffectiveTLD() (string, bool) {
 	host := s.HostPattern.hostOnly()
 	// For cases like of a Web origin that ends with a full stop,
-	// we need to to trim the latter for this check.
+	// we need to trim the latter for this check.
 	host = strings.TrimSuffix(host, string(fullStop))
 	// We ignore the second (boolean) result because
 	// it's false for some listed eTLDs (e.g. github.io)

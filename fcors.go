@@ -359,7 +359,7 @@ func WithAnyRequestHeaders() Option {
 	return internal.WithAnyRequestHeaders()
 }
 
-// MaxAgeInSeconds configures a CORS middleware to intruct browsers to
+// MaxAgeInSeconds configures a CORS middleware to instruct browsers to
 // cache preflight responses for a maximum duration of delta seconds.
 //
 // Specifying a max-age value of 0 instructs browsers to eschew caching of
