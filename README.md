@@ -35,7 +35,9 @@ that implement CORS.
 jub0bs/fcors is designed to be both easier to use and harder to misuse
 than other CORS middleware libraries; see
 [_Fearless CORS: a design philosophy for CORS middleware libraries
-(and a Go implementation)_][fearless-cors].
+(and a Go implementation)_][fearless-cors] and
+[_Useful Functional-Options Tricks for Better Libraries_
+(GopherCon Europe 2023)][funcopts].
 
 ## Praise for jub0bs/fcors
 
@@ -137,6 +139,7 @@ All source code is covered by the [MIT License][license].
 [fcors-benchmarks]: https://github.com/jub0bs/fcors-benchmarks
 [fcors-examples]: https://github.com/jub0bs/fcors-examples
 [fearless-cors]: https://jub0bs.com/posts/2023-02-08-fearless-cors/
+[funcopts]: https://www.youtube.com/watch?v=5uM6z7RnReE
 [license]: https://github.com/jub0bs/fcors/blob/main/LICENSE
 [mdn-cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [mdn-sop]: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
