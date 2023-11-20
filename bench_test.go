@@ -358,7 +358,6 @@ func BenchmarkMiddleware(b *testing.B) {
 		},
 	}
 	middlewares = append(middlewares, mw)
-
 	mw = middleware{name: "allow one origin with credentials and expose some response headers"}
 	f = func(b *testing.B) {
 		b.ReportAllocs()
@@ -400,13 +399,11 @@ func BenchmarkMiddleware(b *testing.B) {
 			name := fmt.Sprintf("%s vs %s", mw.name, req.name)
 			f := func(b *testing.B) {
 				req := newRequest(req.method, req.headers)
-				rec := httptest.NewRecorder()
+				recs := makeResponseRecorders(b.N)
 				b.ReportAllocs()
 				b.ResetTimer()
 				for i := 0; i < b.N; i++ {
-					// important because rec is shared across iterations
-					clear(rec.Header())
-					handler.ServeHTTP(rec, req)
+					handler.ServeHTTP(recs[i], req)
 				}
 			}
 			b.Run(name, f)
@@ -448,17 +445,23 @@ func BenchmarkMiddlewareInvocationVary(b *testing.B) {
 		name := fmt.Sprintf("allow multiple origins vs %s", req.name)
 		f := func(b *testing.B) {
 			req := newRequest(req.method, req.headers)
-			rec := httptest.NewRecorder()
+			recs := makeResponseRecorders(b.N)
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				// important because rec is shared across iterations
-				clear(rec.Header())
-				handler.ServeHTTP(rec, req)
+				handler.ServeHTTP(recs[i], req)
 			}
 		}
 		b.Run(name, f)
 	}
+}
+
+func makeResponseRecorders(n int) []*httptest.ResponseRecorder {
+	recs := make([]*httptest.ResponseRecorder, n)
+	for i := 0; i < n; i++ {
+		recs[i] = httptest.NewRecorder()
+	}
+	return recs
 }
 
 func bigSliceOfJunk(size int) []string {
