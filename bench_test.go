@@ -233,8 +233,8 @@ func BenchmarkMiddleware(b *testing.B) {
 	middlewares = append(middlewares, mw)
 
 	mw = middleware{name: "allow one pathological origin"}
+	origin := "https://a" + strings.Repeat(".a", 126)
 	f = func(b *testing.B) {
-		origin := "https://a" + strings.Repeat(".a", 126)
 		b.ReportAllocs()
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -282,9 +282,9 @@ func BenchmarkMiddleware(b *testing.B) {
 	middlewares = append(middlewares, mw)
 
 	mw = middleware{name: "allow two pathological origins"}
+	originA := "https://a" + strings.Repeat(".a", 126)
+	originB := "https://b" + strings.Repeat(".a", 126)
 	f = func(b *testing.B) {
-		originA := "https://a" + strings.Repeat(".a", 126)
-		originB := "https://b" + strings.Repeat(".a", 126)
 		b.ReportAllocs()
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
