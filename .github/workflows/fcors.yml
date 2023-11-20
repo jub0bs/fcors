@@ -10,13 +10,13 @@ jobs:
         go-version: [ '1.21.x' ]
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
           args: ./...
       - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -39,16 +39,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code (previous)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
           path: previous
       - name: Checkout Code (new)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: new
       - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install benchstat
