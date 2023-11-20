@@ -56,11 +56,11 @@ jobs:
       - name: Run Benchmark (previous)
         run: |
           cd previous
-          go test -run=^$ -bench=. -count=10 . > benchmark.txt
+          go test -run=^$ -bench=. -count=10 . -benchtime 100000x > benchmark.txt
       - name: Run Benchmark (new)
         run: |
           cd new
-          go test -run=^$ -bench=. -count=10 . > benchmark.txt
+          go test -run=^$ -bench=. -count=10 . -benchtime 100000x > benchmark.txt
       - name: Run benchstat
         run: |
           benchstat previous/benchmark.txt new/benchmark.txt
