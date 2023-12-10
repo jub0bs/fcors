@@ -350,6 +350,13 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: prohibited response-header name "access-control-request-method"`,
 		}, {
+			desc: "prohibited preflight response-header name",
+			options: []fcors.OptionAnon{
+				fcors.FromAnyOrigin(),
+				fcors.ExposeResponseHeaders("access-control-max-age"),
+			},
+			errorMsg: `fcors: prohibited response-header name "access-control-max-age"`,
+		}, {
 			desc: "safelisted response-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
@@ -923,6 +930,13 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.ExposeResponseHeaders("access-control-request-method"),
 			},
 			errorMsg: `fcors: prohibited response-header name "access-control-request-method"`,
+		}, {
+			desc: "prohibited preflight response-header name",
+			options: []fcors.Option{
+				fcors.FromOrigins("https://example.com"),
+				fcors.ExposeResponseHeaders("access-control-max-age"),
+			},
+			errorMsg: `fcors: prohibited response-header name "access-control-max-age"`,
 		}, {
 			desc: "safelisted response-header name",
 			options: []fcors.Option{

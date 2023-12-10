@@ -54,6 +54,10 @@ var prohibitedResponseHeaderNames = util.NewSet(
 	byteLowercase(headerRequestMethod),
 	byteLowercase(headerRequestHeaders),
 	byteLowercase(headerRequestPrivateNetwork),
+	byteLowercase(headerAllowMethods),
+	byteLowercase(headerAllowHeaders),
+	byteLowercase(headerMageAge),
+	byteLowercase(headerAllowPrivateNetwork),
 )
 
 // see https://fetch.spec.whatwg.org/#forbidden-response-header-name
