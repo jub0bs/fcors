@@ -99,10 +99,10 @@ func AssumeNoWebCachingOfPreflightResponses() fcors.Option {
 // which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits.
 // Be aware that allowing insecure origins exposes your clients to
 // [active network attacks] that can lead to exfiltration of sensitive data,
-// as described by James Kettle in [his AppSec EU 2017 talk].
+// as described by James Kettle in [the talk he gave at AppSec EU 2017].
 //
 // [active network attacks]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
-// [his AppSec EU 2017 talk]: https://www.youtube.com/watch?v=wgkj4ZgxI4c&t=1305s
+// [the talk he gave at AppSec EU 2017]: https://www.youtube.com/watch?v=wgkj4ZgxI4c&t=1305s
 func TolerateInsecureOrigins() fcors.Option {
 	return internal.TolerateInsecureOrigins()
 }
