@@ -1,6 +1,6 @@
 # jub0bs/fcors
 
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://pkg.go.dev/github.com/jub0bs/fcors)
+[![Go Reference](https://pkg.go.dev/badge/github.com/jub0bs/fcors.svg)](https://pkg.go.dev/github.com/jub0bs/fcors)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](https://github.com/jub0bs/fcors/raw/main/LICENSE)
 [![build](https://github.com/jub0bs/fcors/actions/workflows/fcors.yml/badge.svg)](https://github.com/jub0bs/fcors/actions/workflows/fcors.yml)
 [![codecov](https://codecov.io/gh/jub0bs/fcors/branch/main/graph/badge.svg?token=N208BHWQTM)](https://codecov.io/gh/jub0bs/fcors)
