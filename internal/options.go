@@ -164,10 +164,10 @@ func FromOrigins(one string, others ...string) Option {
 
 func FromAnyOrigin() OptionAnon {
 	f := func(cfg *Config) error {
-		if cfg.AllowArbitraryOrigins {
+		if cfg.AllowAnyOrigin {
 			return util.NewError("option " + optFAO + " used multiple times")
 		}
-		cfg.AllowArbitraryOrigins = true
+		cfg.AllowAnyOrigin = true
 		return nil
 	}
 	return optionAnon(f)
@@ -227,10 +227,10 @@ func processOneMethod(name string, allowedMethods util.Set[string]) error {
 
 func WithAnyMethod() Option {
 	f := func(cfg *Config) error {
-		if cfg.AllowArbitraryMethods {
+		if cfg.AllowAnyMethod {
 			return util.NewError("option " + optWAM + " used multiple times")
 		}
-		cfg.AllowArbitraryMethods = true
+		cfg.AllowAnyMethod = true
 		return nil
 	}
 	return option(f)
@@ -287,10 +287,10 @@ func processOneRequestHeader(name string, allowedHeaders util.Set[string]) error
 
 func WithAnyRequestHeaders() Option {
 	f := func(cfg *Config) error {
-		if cfg.AllowArbitraryRequestHeaders {
+		if cfg.AllowAnyRequestHeaders {
 			return util.NewError("option " + optWARH + " used multiple times")
 		}
-		cfg.AllowArbitraryRequestHeaders = true
+		cfg.AllowAnyRequestHeaders = true
 		return nil
 	}
 	return option(f)

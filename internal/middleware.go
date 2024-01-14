@@ -83,10 +83,10 @@ type Config struct {
 	ACAH                                   []string
 	ACMA                                   []string
 	PreflightSuccessStatus                 int
-	AllowArbitraryMethods                  bool
-	AllowArbitraryRequestHeaders           bool
-	AllowArbitraryOrigins                  bool
-	Credentialed                           bool
+	AllowAnyMethod                         bool
+	AllowAnyRequestHeaders                 bool
+	AllowAnyOrigin                         bool
+	AllowCredentials                       bool
 	ExposeAllResponseHeaders               bool
 	PrivateNetworkAccess                   bool
 	PrivateNetworkAccessInNoCorsModeOnly   bool
@@ -96,10 +96,10 @@ type Config struct {
 	_padding40 [40]bool
 }
 
-func newConfig(credentialed bool) *Config {
+func newConfig(creds bool) *Config {
 	config := Config{
 		tmp:                    new(TempConfig),
-		Credentialed:           credentialed,
+		AllowCredentials:       creds,
 		PreflightSuccessStatus: http.StatusNoContent,
 	}
 	return &config
@@ -115,12 +115,12 @@ func (cfg *Config) validate() error {
 		!cfg.tmp.SkipPublicSuffixCheck {
 		errs = append(errs, cfg.tmp.PublicSuffixError)
 	}
-	if cfg.tmp.FromOriginsCalled && cfg.AllowArbitraryOrigins {
+	if cfg.tmp.FromOriginsCalled && cfg.AllowAnyOrigin {
 		const msg = "incompatible options " + optFO + " and " + optFAO
 		errs = append(errs, util.NewError(msg))
 	}
-	if !cfg.AllowArbitraryOrigins && !cfg.tmp.FromOriginsCalled {
-		if cfg.Credentialed {
+	if !cfg.AllowAnyOrigin && !cfg.tmp.FromOriginsCalled {
+		if cfg.AllowCredentials {
 			const msg = "missing call to " + optFO + " in AllowAccessWithCredentials"
 			errs = append(errs, util.NewError(msg))
 		} else {
@@ -128,11 +128,11 @@ func (cfg *Config) validate() error {
 			errs = append(errs, util.NewError(msg))
 		}
 	}
-	if cfg.tmp.WithMethodsCalled && cfg.AllowArbitraryMethods {
+	if cfg.tmp.WithMethodsCalled && cfg.AllowAnyMethod {
 		const msg = "incompatible options " + optWM + " and " + optWAM
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.tmp.WithRequestHeadersCalled && cfg.AllowArbitraryRequestHeaders {
+	if cfg.tmp.WithRequestHeadersCalled && cfg.AllowAnyRequestHeaders {
 		const msg = "incompatible options " + optWRH + " and " + optWARH
 		errs = append(errs, util.NewError(msg))
 	}
@@ -140,13 +140,13 @@ func (cfg *Config) validate() error {
 		const msg = "incompatible options " + optPNA + " and " + optPNANC
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.AllowArbitraryOrigins && cfg.PrivateNetworkAccess {
+	if cfg.AllowAnyOrigin && cfg.PrivateNetworkAccess {
 		// see note in
 		// https://developer.chrome.com/blog/private-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optPNA
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.AllowArbitraryOrigins && cfg.PrivateNetworkAccessInNoCorsModeOnly {
+	if cfg.AllowAnyOrigin && cfg.PrivateNetworkAccessInNoCorsModeOnly {
 		// see note in
 		// https://developer.chrome.com/blog/private-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optPNANC
@@ -170,7 +170,7 @@ func (cfg *Config) precomputeStuff() {
 	precomputedWildcard := []string{wildcard}
 	// precompute ACAO if it can be static
 	switch {
-	case !cfg.Credentialed && cfg.AllowArbitraryOrigins:
+	case !cfg.AllowCredentials && cfg.AllowAnyOrigin:
 		cfg.ACAO = precomputedWildcard
 	case cfg.tmp.SingleNonWildcardOrigin != "":
 		cfg.ACAO = []string{cfg.tmp.SingleNonWildcardOrigin}
@@ -178,8 +178,8 @@ func (cfg *Config) precomputeStuff() {
 
 	// precompute ACAM if it can be static
 	switch {
-	case !cfg.Credentialed &&
-		cfg.AllowArbitraryMethods &&
+	case !cfg.AllowCredentials &&
+		cfg.AllowAnyMethod &&
 		!cfg.tmp.AssumeNoExtendedWildcardSupport:
 		cfg.ACAM = precomputedWildcard
 	case len(cfg.tmp.AllowedMethods) != 0:
@@ -189,8 +189,8 @@ func (cfg *Config) precomputeStuff() {
 
 	// precompute ACAH if it can be static
 	switch {
-	case !cfg.Credentialed &&
-		cfg.AllowArbitraryRequestHeaders &&
+	case !cfg.AllowCredentials &&
+		cfg.AllowAnyRequestHeaders &&
 		!cfg.tmp.AssumeNoExtendedWildcardSupport:
 		var b strings.Builder
 		b.WriteString(wildcard)
@@ -203,7 +203,7 @@ func (cfg *Config) precomputeStuff() {
 	}
 
 	// possibly overwrite precomputed ACEH (can always be static)
-	if !cfg.Credentialed &&
+	if !cfg.AllowCredentials &&
 		cfg.ExposeAllResponseHeaders &&
 		!cfg.tmp.AssumeNoExtendedWildcardSupport {
 		cfg.ACEH = precomputedWildcard
@@ -268,7 +268,7 @@ func (cfg *Config) handleNonCORSRequest(respHeaders http.Header, isOptionsReq bo
 	// See the last paragraph in
 	// https://fetch.spec.whatwg.org/#cors-protocol-and-http-caches.
 	respHeaders[headerAllowOrigin] = cfg.ACAO
-	if cfg.Credentialed {
+	if cfg.AllowCredentials {
 		// See https://github.com/whatwg/fetch/issues/1601.
 		// We make no attempt to infer whether the request is credentialed.
 		respHeaders[headerAllowCredentials] = precomputedTrue
@@ -332,11 +332,11 @@ func (cfg *Config) processOriginForPreflight(
 		return false
 	}
 	if cfg.ACAO != nil { // by construction, guaranteed to be non-empty
-		if !cfg.AllowArbitraryOrigins && cfg.ACAO[0] != rawOrigin {
+		if !cfg.AllowAnyOrigin && cfg.ACAO[0] != rawOrigin {
 			return false
 		}
 		respHeaders[headerAllowOrigin] = cfg.ACAO
-		if cfg.Credentialed {
+		if cfg.AllowCredentials {
 			// We make no attempt to infer whether the request is credentialed.
 			respHeaders[headerAllowCredentials] = precomputedTrue
 		}
@@ -346,7 +346,7 @@ func (cfg *Config) processOriginForPreflight(
 		return false
 	}
 	respHeaders[headerAllowOrigin] = origins
-	if cfg.Credentialed {
+	if cfg.AllowCredentials {
 		// We make no attempt to infer whether the request is credentialed.
 		respHeaders[headerAllowCredentials] = precomputedTrue
 	}
@@ -391,7 +391,7 @@ func (cfg *Config) handleNonPreflightCORSRequest(
 		// See the last paragraph in
 		// https://fetch.spec.whatwg.org/#cors-protocol-and-http-caches.
 		respHeaders[headerAllowOrigin] = cfg.ACAO
-		if cfg.Credentialed {
+		if cfg.AllowCredentials {
 			// We make no attempt to infer whether the request is credentialed.
 			respHeaders[headerAllowCredentials] = precomputedTrue
 		}
@@ -405,7 +405,7 @@ func (cfg *Config) handleNonPreflightCORSRequest(
 		return
 	}
 	respHeaders[headerAllowOrigin] = origins
-	if cfg.Credentialed {
+	if cfg.AllowCredentials {
 		// We make no attempt to infer whether the request is credentialed.
 		respHeaders[headerAllowCredentials] = precomputedTrue
 	}
@@ -428,7 +428,7 @@ func (cfg *Config) processACRM(
 		headers[headerAllowMethods] = cfg.ACAM
 		return true
 	}
-	if !cfg.AllowArbitraryMethods {
+	if !cfg.AllowAnyMethod {
 		return false
 	}
 	headers[headerAllowMethods] = acrm
@@ -444,7 +444,7 @@ func (cfg *Config) processACRH(respHeaders, reqHeaders http.Header) bool {
 		respHeaders[headerAllowHeaders] = cfg.ACAH
 		return true
 	}
-	if !cfg.AllowArbitraryRequestHeaders {
+	if !cfg.AllowAnyRequestHeaders {
 		return false
 	}
 	// We can take a shortcut here and simply reuse the request's ACRH header.
