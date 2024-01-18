@@ -308,8 +308,8 @@ func WithAnyMethod() Option {
 	return internal.WithAnyMethod()
 }
 
-// WithRequestHeaders configures a CORS middleware to allow all of the
-// specified request headers to the client.
+// WithRequestHeaders configures a CORS middleware to allow any of the
+// specified request headers.
 //
 // Using this option in conjunction with option [WithAnyRequestHeaders]
 // in a call to [AllowAccess] or [AllowAccessWithCredentials] results
@@ -378,8 +378,8 @@ func MaxAgeInSeconds(delta uint) Option {
 	return internal.MaxAgeInSeconds(delta)
 }
 
-// ExposeResponseHeaders configures a CORS middleware to expose all of the
-// specified response headers to the client.
+// ExposeResponseHeaders configures a CORS middleware to expose the specified
+// response headers to the client.
 //
 // Using this option in conjunction with option [ExposeAllResponseHeaders]
 // in a call to [AllowAccess] results in a failure to build the corresponding
@@ -421,7 +421,7 @@ func ExposeResponseHeaders(one string, others ...string) Option {
 }
 
 // ExposeAllResponseHeaders configures a CORS middleware to expose all
-// response headers.
+// response headers to the client.
 //
 // Using this option in conjunction with option [ExposeResponseHeaders]
 // in a call to [AllowAccess] results in a failure to build the
