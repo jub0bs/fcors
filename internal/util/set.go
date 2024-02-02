@@ -11,9 +11,10 @@ import (
 type Set[E comparable] map[E]struct{}
 
 // NewSet returns a Set that contains all of es (and no other elements).
-func NewSet[E comparable](es ...E) Set[E] {
-	set := make(Set[E], len(es))
-	for _, e := range es {
+func NewSet[E comparable](first E, rest ...E) Set[E] {
+	set := make(Set[E], 1+len(rest))
+	set.Add(first)
+	for _, e := range rest {
 		set.Add(e)
 	}
 	return set
