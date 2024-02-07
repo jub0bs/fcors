@@ -79,8 +79,12 @@ var parseCases = []struct {
 		input:   "http://[::1].:90",
 		failure: true,
 	}, {
-		desc:    "domain with colon but without port",
+		desc:    "domain with colon but no port",
 		input:   "https://example.com:",
+		failure: true,
+	}, {
+		desc:    "domain with 0 port",
+		input:   "https://example.com:0",
 		failure: true,
 	}, {
 		desc:    "domain with a leading full stop",
@@ -110,6 +114,14 @@ var parseCases = []struct {
 			Host:   Host{Value: "example.com"},
 			Port:   6060,
 		},
+	}, {
+		desc:    "IP host with colon but no port",
+		input:   "http://127.0.0.1:",
+		failure: true,
+	}, {
+		desc:    "IP host with 0 port",
+		input:   "http://127.0.0.1:0",
+		failure: true,
 	}, {
 		desc:  "ipv4 port",
 		input: "http://127.0.0.1:6060",

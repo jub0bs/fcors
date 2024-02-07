@@ -73,8 +73,12 @@ var parseSpecCases = []TestCase{
 		input:   "https://foo.^bar",
 		failure: true,
 	}, {
-		name:    "host-port sep but no port",
+		name:    "domain with colon but no port",
 		input:   "https://foo:",
+		failure: true,
+	}, {
+		name:    "domain with 0 port",
+		input:   "https://foo:0",
 		failure: true,
 	}, {
 		name:    "non-numeric port",
@@ -103,6 +107,14 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:    "longer invalid TLD",
 		input:   "http://foo.bar.baz.012345678901234567890123456789:6060",
+		failure: true,
+	}, {
+		name:    "IP host with colon but no port",
+		input:   "http://127.0.0.1:",
+		failure: true,
+	}, {
+		name:    "IP host with 0 port",
+		input:   "http://127.0.0.1:0",
 		failure: true,
 	}, {
 		name:    "https scheme with IPv4 host",
