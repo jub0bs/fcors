@@ -19,31 +19,17 @@ const validHostOf251chars = "a2345678901234567890123456789012345678901234567890"
 
 var parseSpecCases = []TestCase{
 	{
-		name:    "single-wildcard sequence followed by 252 chars",
+		name:    "wildcard character sequence followed by 252 chars",
 		input:   "https://*.a" + validHostOf251chars,
 		failure: true,
 	}, {
-		name:  "single-wildcard sequence followed by 251 chars",
+		name:  "wildcard character sequence followed by 251 chars",
 		input: "https://*." + validHostOf251chars,
 		want: Spec{
 			Scheme: "https",
 			HostPattern: HostPattern{
 				Value: "*." + validHostOf251chars,
-				Kind:  SpecKindDomainAnySub,
-			},
-		},
-	}, {
-		name:    "double-wildcard sequence followed by 252 chars",
-		input:   "https://**.a" + validHostOf251chars,
-		failure: true,
-	}, {
-		name:  "double-wildcard sequence followed by 251 chars",
-		input: "https://**." + validHostOf251chars,
-		want: Spec{
-			Scheme: "https",
-			HostPattern: HostPattern{
-				Value: "**." + validHostOf251chars,
-				Kind:  SpecKindDomainAnySubOfAnyDepth,
+				Kind:  SpecKindSubdomains,
 			},
 		},
 	}, {
@@ -258,34 +244,23 @@ var parseSpecCases = []TestCase{
 		input:   "http://xn--f",
 		failure: true,
 	}, {
-		name:  "arbitrary subdomains of depth one",
+		name:  "arbitrary subdomains of depth one or more",
 		input: "http://*.example.com:3999",
 		want: Spec{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "*.example.com",
-				Kind:  SpecKindDomainAnySub,
+				Kind:  SpecKindSubdomains,
 			},
 			PortP1: 3999 + 1,
 		},
 	}, {
-		name:  "arbitrary subdomains of any depth",
-		input: "http://**.example.com:3999",
-		want: Spec{
-			Scheme: "http",
-			HostPattern: HostPattern{
-				Value: "**.example.com",
-				Kind:  SpecKindDomainAnySubOfAnyDepth,
-			},
-			PortP1: 3999 + 1,
-		},
-	}, {
-		name:    "arbitrary subdomains of depth one and arbitrary ports",
+		name:    "arbitrary subdomains of depth one or more and arbitrary ports",
 		input:   "http://*.example.com:*",
 		failure: true,
 	}, {
-		name:    "arbitrary subdomains of any depth and arbitrary ports",
-		input:   "http://**.example.com:*",
+		name:    "leading double asterisk",
+		input:   "http://**.example.com:3999",
 		failure: true,
 	}, {
 		name:    "out-of-place wildcard",
@@ -296,36 +271,12 @@ var parseSpecCases = []TestCase{
 		input:   "http://*example.com:3999",
 		failure: true,
 	}, {
-		name:    "arbitrary subdomains with IPv6",
+		name:    "wildcard character sequence with IPv6",
 		input:   "http://*.[::1]:3999",
 		failure: true,
 	}, {
-		name:    "arbitrary subdomains with IPv4",
+		name:    "wildcard character sequence with IPv4",
 		input:   "http://*.127.0.0.1:3999",
-		failure: true,
-	}, {
-		name:    "double wildcard followed by single wildcard",
-		input:   "http://**.*.example.com:3999",
-		failure: true,
-	}, {
-		name:    "single wildcard followed by double wildcard",
-		input:   "http://*.**.example.com:3999",
-		failure: true,
-	}, {
-		name:    "out-of-place double wildcard",
-		input:   "http://fooo.**.example.com:3999",
-		failure: true,
-	}, {
-		name:    "double wildcard not followed by a full stop",
-		input:   "http://**example.com:3999",
-		failure: true,
-	}, {
-		name:    "arbitrary subdomains of any depth with IPv6",
-		input:   "http://**.[::1]:3999",
-		failure: true,
-	}, {
-		name:    "arbitrary subdomains of any depth with IPv4",
-		input:   "http://**.127.0.0.1:3999",
 		failure: true,
 	},
 }
@@ -363,16 +314,10 @@ func TestIsDeemedInsecure(t *testing.T) {
 			pattern: "https://*.example.com",
 			want:    false,
 		}, {
-			pattern: "https://**.example.com",
-			want:    false,
-		}, {
 			pattern: "http://example.com",
 			want:    true,
 		}, {
 			pattern: "http://*.example.com",
-			want:    true,
-		}, {
-			pattern: "http://**.example.com",
 			want:    true,
 		}, {
 			pattern: "http://127.0.0.1",
@@ -418,10 +363,6 @@ func TestHostIsEffectiveTLD(t *testing.T) {
 			isETLD:  true,
 			eTLD:    "com",
 		}, {
-			pattern: "https://**.com",
-			isETLD:  true,
-			eTLD:    "com",
-		}, {
 			pattern: "https://*.github.io",
 			isETLD:  true,
 			eTLD:    "github.io",
@@ -432,11 +373,6 @@ func TestHostIsEffectiveTLD(t *testing.T) {
 		}, {
 			pattern: "https://*.example.com",
 			isETLD:  false,
-			eTLD:    "",
-		}, {
-			pattern: "https://**.example.com",
-			isETLD:  false,
-			eTLD:    "",
 		},
 	}
 	for _, c := range cases {

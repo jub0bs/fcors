@@ -17,10 +17,8 @@ const (
 )
 
 const (
-	// marks one arbitrary label
-	anyLabel = "*"
-	// marks any positive number of arbitrary labels
-	anyLabels = "**"
+	// marks one or more period-separated arbitrary DNS labels
+	oneOrMoreLabels = "*"
 	// marks an arbitrary (possibly implicit) port number
 	anyPort = "*"
 	// sentinel value indicating that arbitrary port number are allowed
@@ -31,34 +29,28 @@ const (
 type SpecKind uint8
 
 const (
-	// domain without wildcards
+	// domain
 	SpecKindDomain SpecKind = iota
 	// non-loopback IP address
 	SpecKindNonLoopbackIP
 	// loopback IP address
 	SpecKindLoopbackIP
-	// domain with one arbitrary DNS label
-	SpecKindDomainAnySub
-	// domain with one or more arbitrary DNS labels
-	SpecKindDomainAnySubOfAnyDepth
+	// arbitrary subdomains of depth one or more
+	SpecKindSubdomains
 )
 
 // ArbitrarySubdomains returns true if k is one of [SpecKindDomainAnySub]
 // or [SpecKindDomainAnySubOfAnyDepth].
 func (k SpecKind) ArbitrarySubdomains() bool {
-	return k == SpecKindDomainAnySub || k == SpecKindDomainAnySubOfAnyDepth
+	return k == SpecKindSubdomains
 }
 
 // wildcardCharSeqLen returns the length of a wildcard character sequence.
 func (k SpecKind) wildcardCharSeqLen() int {
-	switch k {
-	case SpecKindDomainAnySub:
-		return len(anyLabel) + 1 // 1 for label separator
-	case SpecKindDomainAnySubOfAnyDepth:
-		return len(anyLabels) + 1 // 1 for label separator
-	default:
-		return 0
+	if k == SpecKindSubdomains {
+		return len(oneOrMoreLabels) + 1 // 1 for label separator
 	}
+	return 0
 }
 
 type Spec struct {
@@ -170,7 +162,7 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 	}
 	if pattern.Kind.ArbitrarySubdomains() {
 		// At least two bytes (e.g. "a.") are required for the part
-		// corresponding to the wildcard sequence in a valid origin,
+		// corresponding to the wildcard character sequence in a valid origin,
 		// hence the subtraction in the following expression.
 		if len(host.Value) > maxHostLen-2 {
 			return nil, s, util.InvalidOriginPatternErr(full)
@@ -230,16 +222,11 @@ var profile = idna.New(
 // hostOnly returns strictly the host part of the pattern,
 // without any leading wildcard character sequence.
 func (hp *HostPattern) hostOnly() string {
-	switch hp.Kind {
-	case SpecKindDomainAnySub:
+	if hp.Kind == SpecKindSubdomains {
 		// *.example[.]com => example[.]com
-		return hp.Value[len(anyLabel)+1:]
-	case SpecKindDomainAnySubOfAnyDepth:
-		// **.example[.]com => example[.]com
-		return hp.Value[len(anyLabels)+1:]
-	default:
-		return hp.Value
+		return hp.Value[len(oneOrMoreLabels)+1:]
 	}
+	return hp.Value
 }
 
 // parsePortPattern parses a port pattern. It returns the port number,
@@ -263,21 +250,14 @@ func isDefaultPortForScheme(scheme string, port int) bool {
 		port == portHTTPS && scheme == schemeHTTPS
 }
 
-// peekKind checks for the presence of any leading wildcard character sequence
+// peekKind checks for the presence of a wildcard character sequence
 // in s and returns the associated spec kind.
 // In the absence of any wildcard character sequence, it defaults to
 // [SpecKindDomain].
 func peekKind(s string) SpecKind {
-	const (
-		sgl = anyLabel + string(fullStop)
-		dbl = anyLabels + string(fullStop)
-	)
-	switch {
-	case strings.HasPrefix(s, sgl):
-		return SpecKindDomainAnySub
-	case strings.HasPrefix(s, dbl):
-		return SpecKindDomainAnySubOfAnyDepth
-	default:
-		return SpecKindDomain
+	const wildcardSeq = oneOrMoreLabels + string(fullStop)
+	if strings.HasPrefix(s, wildcardSeq) {
+		return SpecKindSubdomains
 	}
+	return SpecKindDomain
 }

@@ -76,16 +76,18 @@ var corpusTestCases = []struct {
 		},
 	}, {
 		patterns: []string{"https://*.foo.example.com"},
-		accept:   []string{"https://bar.foo.example.com"},
+		accept: []string{
+			"https://bar.foo.example.com",
+			"https://baz.bar.foo.example.com",
+		},
 		reject: []string{
 			"https://foo.example.com",
 			"https://foo.example.com:6060",
 			"http://foo.example.com",
 			"https://quux.example.com",
-			"https://baz.bar.foo.example.com",
 		},
 	}, {
-		patterns: []string{"https://**.foo.example.com"},
+		patterns: []string{"https://*.foo.example.com"},
 		accept: []string{
 			"https://bar.foo.example.com",
 			"https://baz.bar.foo.example.com",
@@ -104,6 +106,7 @@ var corpusTestCases = []struct {
 		accept: []string{
 			"https://foo.example.com",
 			"https://bar.foo.example.com",
+			"https://baz.bar.foo.example.com",
 		},
 		reject: []string{
 			"http://foo.example.com",
@@ -111,7 +114,6 @@ var corpusTestCases = []struct {
 			"https://foo.example.com:6060",
 			"https://bar.foo.example.com:6060",
 			"https://qux.example.com",
-			"https://baz.bar.foo.example.com",
 		},
 	}, {
 		patterns: []string{
@@ -121,6 +123,7 @@ var corpusTestCases = []struct {
 		accept: []string{
 			"https://foo.example.com",
 			"https://bar.foo.example.com",
+			"https://baz.bar.foo.example.com",
 		},
 		reject: []string{
 			"http://foo.example.com",
@@ -128,7 +131,6 @@ var corpusTestCases = []struct {
 			"https://foo.example.com:6060",
 			"https://bar.foo.example.com:6060",
 			"https://qux.example.com",
-			"https://baz.bar.foo.example.com",
 		},
 	}, {
 		patterns: []string{"https://foo.example.com:9090"},
@@ -255,13 +257,13 @@ var corpusTestCases = []struct {
 			"https://foo.bar.baz.qux.quux.foo.bar.baz.qux.quux.foo.example.com",
 			"https://quux.foo.example.com",
 			"https://qux.quux.foo.example.com",
+			"https://baz.bar.foo.example.com",
 		},
 		reject: []string{
 			"http://bar.foo.example.com",
 			"https://bar.foo.example.com:9090",
 			"https://foo.example.com",
 			"https://quux.example.com",
-			"https://baz.bar.foo.example.com",
 			"http://foo.example.com",
 			"http://quux.example.com",
 			"http://baz.bar.foo.example.com",
@@ -271,7 +273,7 @@ var corpusTestCases = []struct {
 		},
 	}, {
 		patterns: []string{
-			"https://**.foo.example.com",
+			"https://*.foo.example.com",
 			"https://foo.bar.baz.qux.quux.foo.bar.baz.qux.quux.foo.example.com",
 			"https://quux.foo.example.com",
 			"https://qux.quux.foo.example.com",

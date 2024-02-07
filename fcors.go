@@ -159,25 +159,13 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // this option provides limited support for origin patterns
 // that encompass multiple origins.
 // A leading asterisk (followed by a full stop) in a host pattern
-// denotes exactly one arbitrary DNS label. For instance,
+// denotes exactly one arbitrary DNS label
+// or several period-delimited arbitrary DNS labels.
+// For instance, the pattern
 //
 //	https://*.example.com
 //
-// encompasses the following origins (among others),
-//
-//	https://foo.example.com
-//	https://bar.example.com
-//
-// but not the following origin,
-//
-//	https://bar.foo.example.com
-//
-// Two leading asterisks (followed by a full stop) in a host pattern
-// denote one or more arbitrary DNS label(s). For instance,
-//
-//	https://**.example.com
-//
-// encompasses the following origins (among others),
+// encompasses the following origins (among others):
 //
 //	https://foo.example.com
 //	https://bar.example.com
@@ -199,15 +187,12 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // in a given origin pattern is prohibited:
 //
 //	https://*.example.com:*     // prohibited
-//	https://**.example.com:*    // prohibited
 //	https://*.example.com       // permitted
-//	https://**.example.com      // permitted
 //	https://*.example.com:9090  // permitted
-//	https://**.example.com:9090 // permitted
 //	https://example.com:*       // permitted
 //
-// No other types of origin patterns are supported.
-// In particular, a single asterisk is a prohibited origin pattern.
+// No other types of origin patterns are supported. In particular,
+// an origin pattern consisting of a single asterisk is prohibited.
 // If you want to allow (anonymous) access from all origins,
 // use option [FromAnyOrigin] instead of this one.
 //
@@ -225,11 +210,8 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // that happens to be a [public suffix] is by default prohibited:
 //
 //	https://*.com          // prohibited (by default): com is a public suffix
-//	https://**.com         // prohibited (by default): com is a public suffix
 //	https://*.github.io    // prohibited (by default): github.io is a public suffix
-//	https://**.github.io   // prohibited (by default): github.io is a public suffix
 //	https://*.example.com  // ok
-//	https://**.example.com // ok
 //
 // If you need to deliberately allow arbitrary subdomains of a
 // public suffix (danger!), you must also activate option
