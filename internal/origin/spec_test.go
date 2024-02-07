@@ -135,7 +135,7 @@ var parseSpecCases = []TestCase{
 				Value: "127.0.0.1",
 				Kind:  SpecKindLoopbackIP,
 			},
-			PortP1: 90 + 1,
+			Port: 90,
 		},
 	}, {
 		name:    "https scheme with IPv6 host",
@@ -174,7 +174,7 @@ var parseSpecCases = []TestCase{
 				Value: "2001:db8:aaaa:1111::100",
 				Kind:  SpecKindNonLoopbackIP,
 			},
-			PortP1: 9090 + 1,
+			Port: 9090,
 		},
 	}, {
 		name:  "loopback IPv6 address with port",
@@ -185,7 +185,7 @@ var parseSpecCases = []TestCase{
 				Value: "::1",
 				Kind:  SpecKindLoopbackIP,
 			},
-			PortP1: 90 + 1,
+			Port: 90,
 		},
 	}, {
 		name:    "loopback IPv4 in nonstandard form",
@@ -219,7 +219,7 @@ var parseSpecCases = []TestCase{
 			HostPattern: HostPattern{
 				Value: "ex_am-ple.com",
 			},
-			PortP1: 3999 + 1,
+			Port: 3999,
 		},
 	}, {
 		name:  "trailing full stop in host",
@@ -229,7 +229,7 @@ var parseSpecCases = []TestCase{
 			HostPattern: HostPattern{
 				Value: "example.com.",
 			},
-			PortP1: 3999 + 1,
+			Port: 3999,
 		},
 	}, {
 		name:    "multiple trailing full stops in host",
@@ -252,7 +252,7 @@ var parseSpecCases = []TestCase{
 				Value: "*.example.com",
 				Kind:  SpecKindSubdomains,
 			},
-			PortP1: 3999 + 1,
+			Port: 3999,
 		},
 	}, {
 		name:    "arbitrary subdomains of depth one or more and arbitrary ports",

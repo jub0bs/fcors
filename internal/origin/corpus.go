@@ -21,7 +21,6 @@ import (
 // the empty string.
 // One or more period-delimited arbitrary DNS labels are marked by a * label.
 //
-// Port numbers are offset by 1 for convenience.
 // The absence of a port is marked by sentinel value 0.
 // An arbitrary port is marked by sentinel value -1.
 // For instance, consider the following origin patterns:
@@ -40,18 +39,18 @@ import (
 //	│
 //	├─── "http" ── x ── "localhost" ── x {-1}
 //	│              │
-//	│              └─── "::1" ── x {9091}
+//	│              └─── "::1" ── x {9090}
 //	│
-//	└─── "https" ── x ── "com" ── x ── "example" ── x {6061, 8081}
+//	└─── "https" ── x ── "com" ── x ── "example" ── x {6060, 8080}
 //	                │                               │
-//	                │                               └─── "*" ── x {7071}
+//	                │                               └─── "*" ── x {7070}
 //	                │
 //					└─── "" ── x ── "foobar" ── x ── "*" ── x {0}
 //
 // [Web origins]: https://developer.mozilla.org/en-US/docs/Glossary/Origin
 type Corpus map[string]Vertex
 
-var anyPortSingleton = util.NewSet(anyPortP1)
+var anyPortSingleton = util.NewSet(anyPort)
 
 // Add adds spec to c.
 func (c Corpus) Add(spec *Spec) {
@@ -63,7 +62,7 @@ func (c Corpus) Add(spec *Spec) {
 	edges := v.edges
 	if spec.IsIP() { // the spec's host is an IP address
 		v := edges[spec.Value]
-		if done := v.add(spec.PortP1); done {
+		if done := v.add(spec.Port); done {
 			return
 		}
 		edges[spec.Value] = v
@@ -75,7 +74,7 @@ func (c Corpus) Add(spec *Spec) {
 		rest, label, found = cutRightmostLabel(rest)
 		if !found || label == subdomainWildcard {
 			v = edges[label]
-			if done := v.add(spec.PortP1); done {
+			if done := v.add(spec.Port); done {
 				return
 			}
 			edges[label] = v
@@ -105,12 +104,12 @@ func (c Corpus) Contains(o *Origin) bool {
 		if !found {
 			return false
 		}
-		return v.contains(o.PortP1)
+		return v.contains(o.Port)
 	}
 	// the origin's host is a domain (not an IP address)
 	for rest, found := o.Host.Value, true; found; edges = v.edges {
 		// check whether arbitrarily deep subdomains are allowed here
-		if v, ok := edges[subdomainWildcard]; ok && v.contains(o.PortP1) {
+		if v, ok := edges[subdomainWildcard]; ok && v.contains(o.Port) {
 			return true
 		}
 		var label string
@@ -120,13 +119,13 @@ func (c Corpus) Contains(o *Origin) bool {
 			return false
 		}
 	}
-	return v.contains(o.PortP1)
+	return v.contains(o.Port)
 }
 
 // A Vertex represents a vertex in the tree formed by a [Corpus].
 type Vertex struct {
-	edges   map[string]Vertex
-	portP1s util.Set[int]
+	edges map[string]Vertex
+	ports util.Set[int]
 }
 
 // size returns the number of distinct Web origins stemming from v.
@@ -144,10 +143,10 @@ type Vertex struct {
 // is the only importer of the present package
 // and never builds such a pathological Vertex value.
 func (v *Vertex) size() (int, bool) {
-	if v.portP1s.Contains(anyPortP1) {
+	if v.ports.Contains(anyPort) {
 		return 0, false
 	}
-	total := len(v.portP1s)
+	total := len(v.ports)
 	for label, child := range v.edges {
 		if label == subdomainWildcard {
 			return 0, false
@@ -174,26 +173,26 @@ func cutRightmostLabel(s string) (before, label string, found bool) {
 }
 
 // add adds a port number to a Vertex
-func (v *Vertex) add(portP1 int) (done bool) {
+func (v *Vertex) add(port int) (done bool) {
 	switch {
-	case v.portP1s.Contains(anyPortP1):
+	case v.ports.Contains(anyPort):
 		// nothing more to do
 		return true
-	case portP1 == anyPortP1:
-		// anyPortP1 subsumes any specific port
-		v.portP1s = anyPortSingleton
-	case v.portP1s == nil:
-		v.portP1s = util.NewSet(portP1)
+	case port == anyPort:
+		// anyPort subsumes any specific port
+		v.ports = anyPortSingleton
+	case v.ports == nil:
+		v.ports = util.NewSet(port)
 	default:
-		v.portP1s.Add(portP1)
+		v.ports.Add(port)
 	}
 	return false
 }
 
 // contains returns true if set contains at least of i
-// and sentinel value anyPortP1, and false otherwise.
-func (v *Vertex) contains(portP1 int) bool {
-	return v.portP1s.Contains(portP1) || v.portP1s.Contains(anyPortP1)
+// and sentinel value anyPort, and false otherwise.
+func (v *Vertex) contains(port int) bool {
+	return v.ports.Contains(port) || v.ports.Contains(anyPort)
 }
 
 // size returns the number of distinct Web origins contained in c.

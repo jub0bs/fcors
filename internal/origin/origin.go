@@ -32,10 +32,9 @@ type Origin struct {
 	Scheme string
 	// Host is the origin's host.
 	Host
-	// PortP1 is the origin's port (if any) offset by 1 for convenience.
-	// For example, a value of 9091 actually represents port 9090.
+	// Port is the origin's port (if any).
 	// The zero value marks the absence of an explicit port.
-	PortP1 int
+	Port int
 }
 
 var zeroOrigin Origin
@@ -62,7 +61,7 @@ func Parse(s string) (Origin, bool) {
 	if !ok {
 		return zeroOrigin, false
 	}
-	port := -1 // assume no port at first
+	var port int // assume no port at first
 	if len(s) > 0 {
 		s, ok = consume(string(hostPortSep), s)
 		if !ok {
@@ -76,7 +75,7 @@ func Parse(s string) (Origin, bool) {
 	o := Origin{
 		Scheme: scheme,
 		Host:   host,
-		PortP1: port + 1,
+		Port:   port,
 	}
 	return o, true
 }

@@ -22,7 +22,7 @@ const (
 	// marks an arbitrary (possibly implicit) port number
 	portWildcard = "*"
 	// sentinel value indicating that arbitrary port number are allowed
-	anyPortP1 int = -1
+	anyPort int = -1
 )
 
 // SpecKind represents the kind of a host pattern.
@@ -58,11 +58,10 @@ type Spec struct {
 	Scheme string
 	// Scheme is the origin spec's host pattern.
 	HostPattern
-	// PortP1 is the origin spec's port number (if any) offset by 1.
-	// For instance, a value of 8081 corresponds to port number 8080.
+	// Port is the origin spec's port number (if any).
 	// 0 is used as a sentinel value marking the absence of an explicit port.
 	// -1 is used as a sentinel value to indicate that all ports are allowed.
-	PortP1 int
+	Port int
 }
 
 func (s *Spec) IsDeemedInsecure() bool {
@@ -111,7 +110,7 @@ func ParseSpec(s string) (*Spec, error) {
 		const tmpl = `scheme "https" incompatible with an IP address: %q`
 		return nil, util.Errorf(tmpl, full)
 	}
-	port := -1 // assume no port
+	var port int // assume no port
 	if len(s) > 0 {
 		s, ok = consume(string(hostPortSep), s)
 		if !ok {
@@ -122,7 +121,7 @@ func ParseSpec(s string) (*Spec, error) {
 			const tmpl = "invalid port pattern: %q"
 			return nil, util.Errorf(tmpl, full)
 		}
-		if port+1 == anyPortP1 && hostPattern.Kind.ArbitrarySubdomains() {
+		if port == anyPort && hostPattern.Kind.ArbitrarySubdomains() {
 			const tmpl = "specifying both arbitrary subdomains " +
 				"and arbitrary ports is prohibited: %q"
 			return nil, util.Errorf(tmpl, full)
@@ -136,7 +135,7 @@ func ParseSpec(s string) (*Spec, error) {
 	spec := Spec{
 		HostPattern: *hostPattern,
 		Scheme:      scheme,
-		PortP1:      port + 1,
+		Port:        port,
 	}
 	return &spec, nil
 }
@@ -234,7 +233,7 @@ func (hp *HostPattern) hostOnly() string {
 // success of failure.
 func parsePortPattern(s string) (port int, rest string, ok bool) {
 	if rest, ok = consume(portWildcard, s); ok {
-		return anyPortP1 - 1, rest, true
+		return anyPort, rest, true
 	}
 	return parsePort(s)
 }

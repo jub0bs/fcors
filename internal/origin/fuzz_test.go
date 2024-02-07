@@ -36,7 +36,7 @@ func FuzzParseSpec(f *testing.F) {
 			t.Skip()
 		}
 		if strings.HasSuffix(pattern, ":*") {
-			if spec.PortP1 != anyPortP1 {
+			if spec.Port != anyPort {
 				const tmpl = "pattern %q should but does not result" +
 					" in a spec that allows arbitrary ports"
 				t.Errorf(tmpl, pattern)
@@ -76,7 +76,7 @@ func FuzzCorpus(f *testing.F) {
 			}
 			return
 		}
-		if spec.PortP1 == anyPortP1 {
+		if spec.Port == anyPort {
 			if !strings.HasSuffix(longestCommonPrefix(pattern, orig), ":") {
 				t.Errorf(tmpl, pattern, orig)
 			}

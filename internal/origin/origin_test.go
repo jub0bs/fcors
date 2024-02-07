@@ -37,7 +37,7 @@ var parseCases = []struct {
 				Value:    "example",
 				AssumeIP: true,
 			},
-			PortP1: 90 + 1,
+			Port: 90,
 		},
 	}, {
 		desc:    "unmatched left bracket",
@@ -72,7 +72,7 @@ var parseCases = []struct {
 				Value:    "::1",
 				AssumeIP: true,
 			},
-			PortP1: 90 + 1,
+			Port: 90,
 		},
 	}, {
 		desc:    "valid compressed IPv6 followed by a trailing full stop",
@@ -108,7 +108,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "https",
 			Host:   Host{Value: "example.com"},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc:  "ipv4 port",
@@ -116,7 +116,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "http",
 			Host:   Host{Value: "127.0.0.1", AssumeIP: true},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc:  "ipv4 with trailing full stop",
@@ -145,7 +145,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "http",
 			Host:   Host{Value: "127.0.0.1.", AssumeIP: true},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc:  "invalid TLD",
@@ -153,7 +153,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "http",
 			Host:   Host{Value: "foo.bar.255", AssumeIP: true},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc:  "longer invalid TLD",
@@ -161,7 +161,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "http",
 			Host:   Host{Value: "foo.bar.baz.012345678901234567890123456789", AssumeIP: true},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc:  "valid domain with all-numeric label in the middle",
@@ -169,7 +169,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "http",
 			Host:   Host{Value: "foo.bar.baz.012345678901234567890123456789.ab"},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc:  "ipv6 with port",
@@ -177,7 +177,7 @@ var parseCases = []struct {
 		want: Origin{
 			Scheme: "http",
 			Host:   Host{Value: "2001:0db8:85a3:0000:0000:8a2e:0370:7334", AssumeIP: true},
-			PortP1: 6060 + 1,
+			Port:   6060,
 		},
 	}, {
 		desc: "deep_subdomain",
