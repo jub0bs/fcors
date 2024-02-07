@@ -73,7 +73,7 @@ func (c Corpus) Add(spec *Spec) {
 	for rest, found := spec.Value, true; found; edges = v.edges {
 		var label string
 		rest, label, found = cutRightmostLabel(rest)
-		if !found || label == oneOrMoreLabels {
+		if !found || label == subdomainWildcard {
 			v = edges[label]
 			if done := v.add(spec.PortP1); done {
 				return
@@ -110,7 +110,7 @@ func (c Corpus) Contains(o *Origin) bool {
 	// the origin's host is a domain (not an IP address)
 	for rest, found := o.Host.Value, true; found; edges = v.edges {
 		// check whether arbitrarily deep subdomains are allowed here
-		if v, ok := edges[oneOrMoreLabels]; ok && v.contains(o.PortP1) {
+		if v, ok := edges[subdomainWildcard]; ok && v.contains(o.PortP1) {
 			return true
 		}
 		var label string
@@ -149,7 +149,7 @@ func (v *Vertex) size() (int, bool) {
 	}
 	total := len(v.portP1s)
 	for label, child := range v.edges {
-		if label == oneOrMoreLabels {
+		if label == subdomainWildcard {
 			return 0, false
 		}
 		size, finite := child.size()

@@ -18,9 +18,9 @@ const (
 
 const (
 	// marks one or more period-separated arbitrary DNS labels
-	oneOrMoreLabels = "*"
+	subdomainWildcard = "*"
 	// marks an arbitrary (possibly implicit) port number
-	anyPort = "*"
+	portWildcard = "*"
 	// sentinel value indicating that arbitrary port number are allowed
 	anyPortP1 int = -1
 )
@@ -48,7 +48,7 @@ func (k SpecKind) ArbitrarySubdomains() bool {
 // wildcardCharSeqLen returns the length of a wildcard character sequence.
 func (k SpecKind) wildcardCharSeqLen() int {
 	if k == SpecKindSubdomains {
-		return len(oneOrMoreLabels) + 1 // 1 for label separator
+		return len(subdomainWildcard) + 1 // 1 for label separator
 	}
 	return 0
 }
@@ -224,7 +224,7 @@ var profile = idna.New(
 func (hp *HostPattern) hostOnly() string {
 	if hp.Kind == SpecKindSubdomains {
 		// *.example[.]com => example[.]com
-		return hp.Value[len(oneOrMoreLabels)+1:]
+		return hp.Value[len(subdomainWildcard)+1:]
 	}
 	return hp.Value
 }
@@ -233,7 +233,7 @@ func (hp *HostPattern) hostOnly() string {
 // the unconsumed part of the input string, and a bool that indicates
 // success of failure.
 func parsePortPattern(s string) (port int, rest string, ok bool) {
-	if rest, ok = consume(anyPort, s); ok {
+	if rest, ok = consume(portWildcard, s); ok {
 		return anyPortP1 - 1, rest, true
 	}
 	return parsePort(s)
@@ -255,7 +255,7 @@ func isDefaultPortForScheme(scheme string, port int) bool {
 // In the absence of any wildcard character sequence, it defaults to
 // [SpecKindDomain].
 func peekKind(s string) SpecKind {
-	const wildcardSeq = oneOrMoreLabels + string(fullStop)
+	const wildcardSeq = subdomainWildcard + string(fullStop)
 	if strings.HasPrefix(s, wildcardSeq) {
 		return SpecKindSubdomains
 	}
