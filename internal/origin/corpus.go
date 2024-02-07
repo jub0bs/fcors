@@ -189,8 +189,8 @@ func (v *Vertex) add(port int) (done bool) {
 	return false
 }
 
-// contains returns true if set contains at least of i
-// and sentinel value anyPort, and false otherwise.
+// contains returns true if set contains i or anyPort or both,
+// and false otherwise.
 func (v *Vertex) contains(port int) bool {
 	return v.ports.Contains(port) || v.ports.Contains(anyPort)
 }
