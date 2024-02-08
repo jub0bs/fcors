@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] (2024-02-08)
+
+### Changed
+
+- **Dependencies**: update to `golang.org/x/net` v0.20.0
+- **API**: A single leading asterisk (followed by a period) preceding the host
+  part of an origin pattern now denotes, not exactly one, but one or more
+  arbitrary DNS labels.
+- **Behavior**: Duplicate origin patterns are now tolerated.
+- **Behavior**: Duplicate HTTP methods are now tolerated.
+- **Behavior**: Duplicate request-header names are now tolerated.
+- **Behavior**: Duplicate response-header names are now tolerated.
+- **Behavior**: Exposing preflight response-header names is now prohibited.
+- **Performance**: Middleware initialization incurs fewer allocations.
+- **Performance**: Origin matching is overall faster, even in cases that used
+  to be pathological in earlier versions.
+- **Documentation**: various improvements
+
+### Removed
+
+- **API** (breaking change): Two consecutive asterisks (**) are no longer
+  supported in origin patterns.
+
 ## [0.7.0] (2023-11-18)
 
 ### Changed
@@ -165,6 +188,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] (2023-02-08)
 
+[0.8.0]: https://github.com/jub0bs/fcors/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/jub0bs/fcors/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/jub0bs/fcors/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/jub0bs/fcors/compare/v0.5.0...v0.5.1
