@@ -148,6 +148,14 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //	http://[0:0:0:0:0:0:0:0001]:9090                      // prohibited
 //	http://[0000:0000:0000:0000:0000:0000:0000:0001]:9090 // prohibited
 //
+// Valid port values range from 1 to 65,535 (inclusive):
+//
+//	https://example.com       // permitted (no port)
+//	https://example.com:1     // permitted
+//	https://example.com:65535 // permitted
+//	https://example.com:0     // prohibited
+//	https://example.com:65536 // prohibited
+//
 // Default ports (80 for http, 443 for https) must be elided:
 //
 //	http://example.com      // permitted
