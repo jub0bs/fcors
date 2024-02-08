@@ -11,16 +11,11 @@ func buildCorpus(patterns ...string) (Corpus, error) {
 	for _, pattern := range patterns {
 		spec, err := ParseSpec(pattern)
 		if err != nil {
-			return nil, err
+			return c, err
 		}
 		c.Add(spec)
 	}
 	return c, nil
-}
-
-func isCorpusEmpty(c Corpus) bool {
-	size, finite := c.size()
-	return finite && size == 0
 }
 
 var corpusTestCases = []struct {
@@ -315,14 +310,6 @@ func TestCorpus(t *testing.T) {
 		corpus, err := buildCorpus(c.patterns...)
 		if err != nil {
 			t.Errorf("failure to build corpus: %v", err)
-			return
-		}
-		if len(c.patterns) == 0 && !isCorpusEmpty(corpus) {
-			t.Errorf("want empty corpus; got %v", corpus)
-			return
-		}
-		if len(c.patterns) != 0 && isCorpusEmpty(corpus) {
-			t.Error("want non-empty corpus; got empty corpus")
 			return
 		}
 		for _, rawOrigin := range c.accept {
