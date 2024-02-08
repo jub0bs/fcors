@@ -160,7 +160,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // that encompass multiple origins.
 // A leading asterisk (followed by a full stop) in a host pattern
 // denotes exactly one arbitrary DNS label
-// or several period-delimited arbitrary DNS labels.
+// or several period-separated arbitrary DNS labels.
 // For instance, the pattern
 //
 //	https://*.example.com

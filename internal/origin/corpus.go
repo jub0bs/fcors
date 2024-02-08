@@ -19,7 +19,7 @@ import (
 //
 // A trailing full stop in the origin's host results in an edge labeled with
 // the empty string.
-// One or more period-delimited arbitrary DNS labels are marked by a * label.
+// One or more period-separated arbitrary DNS labels are marked by a * label.
 //
 // The absence of a port is marked by sentinel value 0.
 // An arbitrary port is marked by sentinel value -1.

@@ -466,7 +466,7 @@ func first(headers http.Header, name string) ([]string, bool) {
 }
 
 func sortCombineWithComma(set util.Set[string]) string {
-	// The elements of a header-field value may be delimited simply by commas;
+	// The elements of a header-field value may be separated simply by commas;
 	// since whitespace is optional, let's not use any.
 	// See https://httpwg.org/http-core/draft-ietf-httpbis-semantics-latest.html#abnf.extension.recipient
 	return util.SortCombine(set, string(comma))
