@@ -265,9 +265,6 @@ func processOneRequestHeader(name string, allowedHeaders util.Set[string]) error
 	if prohibitedRequestHeaderNames.Contains(name) {
 		return util.Errorf("prohibited request-header name %q", name)
 	}
-	if allowedHeaders.Contains(name) {
-		return util.Errorf("request-header name %q specified multiple times", name)
-	}
 	allowedHeaders.Add(name)
 	return nil
 }

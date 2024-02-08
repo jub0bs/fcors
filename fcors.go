@@ -301,9 +301,6 @@ func WithAnyMethod() Option {
 // corresponding middleware.
 //
 // Header names are case-insensitive.
-// Specifying the same header name multiple times
-// (possibly using different cases)
-// results in a failure to build the corresponding middleware.
 //
 // The CORS protocol defines a number of so-called
 // "[forbidden request-header names]", which are never allowed

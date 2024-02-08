@@ -248,13 +248,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: forbidden request-header name "proxy-foo"`,
 		}, {
-			desc: "same request-header name specified multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
-				fcors.WithRequestHeaders("Foo", "Foo"),
-			},
-			errorMsg: `fcors: request-header name "foo" specified multiple times`,
-		}, {
 			desc: "prohibited request-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
@@ -810,13 +803,6 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.WithRequestHeaders("Proxy-Foo"),
 			},
 			errorMsg: `fcors: forbidden request-header name "proxy-foo"`,
-		}, {
-			desc: "same request-header name specified multiple times",
-			options: []fcors.Option{
-				fcors.FromOrigins("https://example.com"),
-				fcors.WithRequestHeaders("Foo", "Foo"),
-			},
-			errorMsg: `fcors: request-header name "foo" specified multiple times`,
 		}, {
 			desc: "prohibited request-header name",
 			options: []fcors.Option{
