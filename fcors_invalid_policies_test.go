@@ -199,13 +199,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: forbidden method name "` + http.MethodConnect + `"`,
 		}, {
-			desc: "same method name specified multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
-				fcors.WithMethods(http.MethodGet, http.MethodGet),
-			},
-			errorMsg: `fcors: method name "` + http.MethodGet + `" specified multiple times`,
-		}, {
 			desc: "empty request-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),

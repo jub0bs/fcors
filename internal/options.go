@@ -208,9 +208,6 @@ func processOneMethod(name string, allowedMethods util.Set[string]) error {
 	if byteLowercasedForbiddenMethods.Contains(byteLowercase(name)) {
 		return util.Errorf("forbidden method name %q", name)
 	}
-	if allowedMethods.Contains(name) {
-		return util.Errorf("method name %q specified multiple times", name)
-	}
 	allowedMethods.Add(name)
 	return nil
 }
