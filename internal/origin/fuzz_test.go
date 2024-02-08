@@ -14,7 +14,7 @@ func FuzzConsistencyBetweenParseSpecAndParse(f *testing.F) {
 	}
 	f.Fuzz(func(t *testing.T, pattern string) {
 		spec, err := ParseSpec(pattern)
-		if err != nil || spec.Kind.ArbitrarySubdomains() {
+		if err != nil || spec.Kind == SpecKindSubdomains {
 			t.Skip()
 		}
 		if _, ok := Parse(pattern); !ok {
@@ -43,7 +43,7 @@ func FuzzParseSpec(f *testing.F) {
 			}
 			return
 		}
-		if strings.Contains(pattern, "*") != spec.Kind.ArbitrarySubdomains() {
+		if strings.Contains(pattern, "*") != (spec.Kind == SpecKindSubdomains) {
 			const tmpl = "pattern %q should but does not result" +
 				" in a spec that allows arbitrary subdomains"
 			t.Errorf(tmpl, pattern)
@@ -70,7 +70,7 @@ func FuzzCorpus(f *testing.F) {
 			t.Skip()
 		}
 		const tmpl = "corpus built with pattern %q contains origin %q"
-		if spec.Kind.ArbitrarySubdomains() {
+		if spec.Kind == SpecKindSubdomains {
 			if !strings.HasPrefix(longestCommonSuffix(pattern, orig), ".") {
 				t.Errorf(tmpl, pattern, orig)
 			}

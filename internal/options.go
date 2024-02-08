@@ -104,10 +104,10 @@ func FromOrigins(one string, others ...string) Option {
 				"insecure scheme %q are by default prohibited"
 			insecureOriginPatternError = util.Errorf(tmpl, pattern, spec.Scheme)
 		}
-		if !spec.Kind.ArbitrarySubdomains() && nonWildcardOrigin == "" {
+		if spec.Kind != origin.SpecKindSubdomains && nonWildcardOrigin == "" {
 			nonWildcardOrigin = pattern
 		}
-		if spec.Kind.ArbitrarySubdomains() {
+		if spec.Kind == origin.SpecKindSubdomains {
 			eTLD, isEffectiveTLD := spec.HostIsEffectiveTLD()
 			if isEffectiveTLD && publicSuffixError == nil {
 				const tmpl = "origin patterns like %q that allow arbitrary " +

@@ -39,12 +39,6 @@ const (
 	SpecKindSubdomains
 )
 
-// ArbitrarySubdomains returns true if k is one of [SpecKindDomainAnySub]
-// or [SpecKindDomainAnySubOfAnyDepth].
-func (k SpecKind) ArbitrarySubdomains() bool {
-	return k == SpecKindSubdomains
-}
-
 // wildcardCharSeqLen returns the length of a wildcard character sequence.
 func (k SpecKind) wildcardCharSeqLen() int {
 	if k == SpecKindSubdomains {
@@ -121,7 +115,7 @@ func ParseSpec(s string) (*Spec, error) {
 			const tmpl = "invalid port pattern: %q"
 			return nil, util.Errorf(tmpl, full)
 		}
-		if port == anyPort && hostPattern.Kind.ArbitrarySubdomains() {
+		if port == anyPort && hostPattern.Kind == SpecKindSubdomains {
 			const tmpl = "specifying both arbitrary subdomains " +
 				"and arbitrary ports is prohibited: %q"
 			return nil, util.Errorf(tmpl, full)
@@ -159,7 +153,7 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 	if !ok {
 		return nil, s, util.InvalidOriginPatternErr(full)
 	}
-	if pattern.Kind.ArbitrarySubdomains() {
+	if pattern.Kind == SpecKindSubdomains {
 		// At least two bytes (e.g. "a.") are required for the part
 		// corresponding to the wildcard character sequence in a valid origin,
 		// hence the subtraction in the following expression.
