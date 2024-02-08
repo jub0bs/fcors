@@ -39,14 +39,6 @@ const (
 	SpecKindSubdomains
 )
 
-// wildcardCharSeqLen returns the length of a wildcard character sequence.
-func (k SpecKind) wildcardCharSeqLen() int {
-	if k == SpecKindSubdomains {
-		return len(subdomainWildcard) + 1 // 1 for label separator
-	}
-	return 0
-}
-
 type Spec struct {
 	// Scheme is the origin spec's scheme.
 	Scheme string
@@ -165,7 +157,10 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 		}
 	}
 	// trim accordingly
-	end := pattern.Kind.wildcardCharSeqLen() + len(host.Value)
+	end := len(host.Value)
+	if pattern.Kind == SpecKindSubdomains {
+		end += len(subdomainWildcard) + 1 // 1 for label separator
+	}
 	pattern.Value = pattern.Value[:end]
 	if host.AssumeIP {
 		ip, err := netip.ParseAddr(host.Value)
