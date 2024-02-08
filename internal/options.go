@@ -350,9 +350,6 @@ func processOneResponseHeader(name string, exposedHeaders util.Set[string]) erro
 		const tmpl = "response-header name %q needs not be explicitly exposed"
 		return util.Errorf(tmpl, name)
 	}
-	if exposedHeaders.Contains(name) {
-		return util.Errorf("response-header name %q specified multiple times", name)
-	}
 	exposedHeaders.Add(name)
 	return nil
 }

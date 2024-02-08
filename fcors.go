@@ -368,9 +368,6 @@ func MaxAgeInSeconds(delta uint) Option {
 // corresponding middleware.
 //
 // Header names are case-insensitive.
-// Specifying the same header name multiple times
-// (possibly using different cases)
-// results in a failure to build the corresponding middleware.
 //
 // The CORS protocol defines a number of so-called
 // "[CORS-safelisted response-header names]", which are always accessible

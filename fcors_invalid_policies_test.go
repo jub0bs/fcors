@@ -304,13 +304,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: forbidden response-header name "set-cookie"`,
 		}, {
-			desc: "same response-header name specified multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromAnyOrigin(),
-				fcors.ExposeResponseHeaders("Foo", "Foo"),
-			},
-			errorMsg: `fcors: response-header name "foo" specified multiple times`,
-		}, {
 			desc: "prohibited response-header name",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
@@ -859,13 +852,6 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.ExposeResponseHeaders("set-cookie"),
 			},
 			errorMsg: `fcors: forbidden response-header name "set-cookie"`,
-		}, {
-			desc: "same response-header name specified multiple times",
-			options: []fcors.Option{
-				fcors.FromOrigins("https://example.com"),
-				fcors.ExposeResponseHeaders("Foo", "Foo"),
-			},
-			errorMsg: `fcors: response-header name "foo" specified multiple times`,
 		}, {
 			desc: "prohibited response-header name",
 			options: []fcors.Option{
