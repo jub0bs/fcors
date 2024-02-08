@@ -88,11 +88,10 @@ func NewMiddleware[A applier](cred bool, one A, others ...A) (Middleware, error)
 
 func FromOrigins(one string, others ...string) Option {
 	var (
-		setOfSpecs                         = make(util.Set[origin.Spec])
-		publicSuffixError                  error
-		insecureOriginPatternError         error
-		firstPatternSpecifiedMultipleTimes string
-		nonWildcardOrigin                  string
+		setOfSpecs                 = make(util.Set[origin.Spec])
+		publicSuffixError          error
+		insecureOriginPatternError error
+		nonWildcardOrigin          string
 	)
 	processOnePattern := func(pattern string) error {
 		spec, err := origin.ParseSpec(pattern)
@@ -115,10 +114,6 @@ func FromOrigins(one string, others ...string) Option {
 				publicSuffixError = util.Errorf(tmpl, pattern, eTLD)
 			}
 		}
-		if setOfSpecs.Contains(*spec) {
-			firstPatternSpecifiedMultipleTimes = pattern
-			return nil
-		}
 		setOfSpecs.Add(*spec)
 		return nil
 	}
@@ -137,11 +132,6 @@ func FromOrigins(one string, others ...string) Option {
 			errs = append(errs, err)
 		}
 		cfg.tmp.FromOriginsCalled = true
-		if firstPatternSpecifiedMultipleTimes != "" {
-			const tmpl = "origin pattern %q specified multiple times"
-			err := util.Errorf(tmpl, firstPatternSpecifiedMultipleTimes)
-			errs = append(errs, err)
-		}
 		cfg.tmp.InsecureOriginPatternError = insecureOriginPatternError
 		cfg.tmp.PublicSuffixError = publicSuffixError
 		if len(errs) != 0 {

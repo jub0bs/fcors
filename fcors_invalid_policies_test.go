@@ -79,15 +79,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com..")},
 			errorMsg: `fcors: invalid origin pattern: "https://example.com.."`,
 		}, {
-			desc: "an origin is specified multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromOrigins(
-					"https://example.com:6060",
-					"https://example.com:6060",
-				),
-			},
-			errorMsg: `fcors: origin pattern "https://example.com:6060" specified multiple times`,
-		}, {
 			desc:     "misplaced subdomain pattern",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://foo.*.example.com:6060")},
 			errorMsg: `fcors: invalid origin pattern: "http://foo.*.example.com:6060"`,
@@ -148,15 +139,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			desc:     "specified base origin's host contains two trailing full stops",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com..")},
 			errorMsg: `fcors: invalid origin pattern: "https://*.example.com.."`,
-		}, {
-			desc: "a base origin is specified multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromOrigins(
-					"https://*.example.com:6060",
-					"https://*.example.com:6060",
-				),
-			},
-			errorMsg: `fcors: origin pattern "https://*.example.com:6060" specified multiple times`,
 		}, {
 			desc: "invalid second origin pattern",
 			options: []fcors.OptionAnon{
@@ -680,15 +662,6 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com..")},
 			errorMsg: `fcors: invalid origin pattern: "https://example.com.."`,
 		}, {
-			desc: "an origin is specified multiple times",
-			options: []fcors.Option{
-				fcors.FromOrigins(
-					"https://example.com:6060",
-					"https://example.com:6060",
-				),
-			},
-			errorMsg: `fcors: origin pattern "https://example.com:6060" specified multiple times`,
-		}, {
 			desc:     "misplaced subdomain pattern",
 			options:  []fcors.Option{fcors.FromOrigins("http://foo.*.example.com:6060")},
 			errorMsg: `fcors: invalid origin pattern: "http://foo.*.example.com:6060"`,
@@ -749,15 +722,6 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			desc:     "specified base origin's host contains two trailing full stops",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com..")},
 			errorMsg: `fcors: invalid origin pattern: "https://*.example.com.."`,
-		}, {
-			desc: "a base origin is specified multiple times",
-			options: []fcors.Option{
-				fcors.FromOrigins(
-					"https://*.example.com:6060",
-					"https://*.example.com:6060",
-				),
-			},
-			errorMsg: `fcors: origin pattern "https://*.example.com:6060" specified multiple times`,
 		}, {
 			desc: "invalid second origin pattern",
 			options: []fcors.Option{
