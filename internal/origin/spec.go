@@ -22,7 +22,7 @@ const (
 	subdomainWildcard = "*"
 	// marks an arbitrary (possibly implicit) port number
 	portWildcard = "*"
-	// sentinel value indicating that arbitrary port number are allowed
+	// sentinel value indicating that arbitrary port numbers are allowed
 	anyPort int = radix.WildcardElem
 )
 
