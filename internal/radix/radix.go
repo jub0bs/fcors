@@ -140,15 +140,21 @@ func (n *node) add(elem int, wildcardPattern bool) {
 	} else {
 		set = &n.set
 	}
+	if elem == wildcardElem {
+		*set = wildcardSingleton
+		return
+	}
 	if *set == nil {
 		*set = util.NewSet(elem)
 		return
 	}
-	if elem != wildcardElem && set.Contains(wildcardElem) {
+	if set.Contains(wildcardElem) { // nothing to do
 		return
 	}
 	set.Add(elem)
 }
+
+var wildcardSingleton = util.NewSet(wildcardElem)
 
 func (n *node) insertEdge(label byte, child *node) {
 	if n.edges == nil {
