@@ -4,6 +4,7 @@ import (
 	"net/netip"
 	"strings"
 
+	"github.com/jub0bs/fcors/internal/radix"
 	"github.com/jub0bs/fcors/internal/util"
 	"golang.org/x/net/idna"
 	"golang.org/x/net/publicsuffix"
@@ -22,7 +23,7 @@ const (
 	// marks an arbitrary (possibly implicit) port number
 	portWildcard = "*"
 	// sentinel value indicating that arbitrary port number are allowed
-	anyPort int = -1
+	anyPort int = radix.WildcardElem
 )
 
 // SpecKind represents the kind of a host pattern.

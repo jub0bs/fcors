@@ -83,12 +83,12 @@ func (t *Tree) Contains(k string, v int) bool {
 	for {
 		if len(search) == 0 {
 			return n.set.Contains(v) ||
-				n.set.Contains(wildcardElem)
+				n.set.Contains(WildcardElem)
 		}
 
 		// search is not empty; check wildcard edge
 		if n.wildcardSet.Contains(v) ||
-			n.wildcardSet.Contains(wildcardElem) { // nothing more to check
+			n.wildcardSet.Contains(WildcardElem) { // nothing more to check
 			return true
 		}
 
@@ -116,7 +116,7 @@ func splitRight(s string, length int) (start, end string) {
 	return s[:j], s[j:]
 }
 
-const wildcardElem = -1
+const WildcardElem = -1
 
 // A node represents a regular node
 // (i.e. a node that does not stem from a wildcard edge)
@@ -140,7 +140,7 @@ func (n *node) add(elem int, wildcardPattern bool) {
 	} else {
 		set = &n.set
 	}
-	if elem == wildcardElem {
+	if elem == WildcardElem {
 		*set = wildcardSingleton
 		return
 	}
@@ -148,13 +148,13 @@ func (n *node) add(elem int, wildcardPattern bool) {
 		*set = util.NewSet(elem)
 		return
 	}
-	if set.Contains(wildcardElem) { // nothing to do
+	if set.Contains(WildcardElem) { // nothing to do
 		return
 	}
 	set.Add(elem)
 }
 
-var wildcardSingleton = util.NewSet(wildcardElem)
+var wildcardSingleton = util.NewSet(WildcardElem)
 
 func (n *node) insertEdge(label byte, child *node) {
 	if n.edges == nil {
