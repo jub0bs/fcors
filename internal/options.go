@@ -99,9 +99,8 @@ func FromOrigins(one string, others ...string) Option {
 			return err
 		}
 		if spec.IsDeemedInsecure() && insecureOriginPatternError == nil {
-			const tmpl = "most origin patterns like %q that use " +
-				"insecure scheme %q are by default prohibited"
-			insecureOriginPatternError = util.Errorf(tmpl, pattern, spec.Scheme)
+			const tmpl = "insecure origin pattern %q requires option risky." + optSIOC
+			insecureOriginPatternError = util.Errorf(tmpl, pattern)
 		}
 		if spec.Kind != origin.SpecKindSubdomains && nonWildcardOrigin == "" {
 			nonWildcardOrigin = pattern

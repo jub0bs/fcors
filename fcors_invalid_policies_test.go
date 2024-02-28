@@ -20,16 +20,15 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		{
 			desc:     "specified origin contains whitespace",
 			options:  []fcors.OptionAnon{fcors.FromOrigins(" http://example.com:6060 ")},
-			errorMsg: `fcors: invalid or prohibited scheme: " http://example.com:6060 "`,
+			errorMsg: `fcors: invalid origin pattern " http://example.com:6060 "`,
 		}, {
-			desc:    "specified origin is insecure",
-			options: []fcors.OptionAnon{fcors.FromOrigins("http://example.com:6060")},
-			errorMsg: `fcors: most origin patterns like "http://example.com:6060" that use ` +
-				`insecure scheme "http" are by default prohibited`,
+			desc:     "specified origin is insecure",
+			options:  []fcors.OptionAnon{fcors.FromOrigins("http://example.com:6060")},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option risky.TolerateInsecureOrigins`,
 		}, {
 			desc:     "specified origin's host is an invalid IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://[::1]1:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://[::1]1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://[::1]1:6060"`,
 		}, {
 			desc:     "specified origin's scheme is https but its host is an IP address ",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://[::1]:6060")},
@@ -41,104 +40,103 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc:     "specified origin contains an invalid scheme",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("httpsfoo://example.com:6060")},
-			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "httpsfoo://example.com:6060"`,
 		}, {
 			desc:     "specified origin contains a userinfo",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://user:password@example.com:6060")},
-			errorMsg: `fcors: invalid port pattern: "https://user:password@example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://user:password@example.com:6060"`,
 		}, {
 			desc:     "specified origin contains a path",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:6060/foo")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060/foo"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060/foo"`,
 		}, {
 			desc:     "specified origin contains a querystring delimiter",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:6060?")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060?"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060?"`,
 		}, {
 			desc:     "specified origin contains a querystring",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:6060?foo=bar")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060?foo=bar"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060?foo=bar"`,
 		}, {
 			desc:     "specified origin contains a fragment",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:6060#index")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060#index"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060#index"`,
 		}, {
 			desc:     "specified origin contains an invalid port",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:66536")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:66536"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:66536"`,
 		}, {
 			desc:     "specified origin contains a 5-digit port that starts with a nonzero digit",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:06060")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:06060"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:06060"`,
 		}, {
 			desc:     "specified origin contains a colon but no port",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com:")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:"`,
 		}, {
 			desc:     "specified origin's host contains two trailing full stops",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://example.com..")},
-			errorMsg: `fcors: invalid origin pattern: "https://example.com.."`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com.."`,
 		}, {
 			desc:     "misplaced subdomain pattern",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://foo.*.example.com:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://foo.*.example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://foo.*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains whitespace",
 			options:  []fcors.OptionAnon{fcors.FromOrigins(" http://*.example.com:6060 ")},
-			errorMsg: `fcors: invalid or prohibited scheme: " http://*.example.com:6060 "`,
+			errorMsg: `fcors: invalid origin pattern " http://*.example.com:6060 "`,
 		}, {
-			desc:    "specified base origin is insecure",
-			options: []fcors.OptionAnon{fcors.FromOrigins("http://*.example.com:6060")},
-			errorMsg: `fcors: most origin patterns like "http://*.example.com:6060" that use ` +
-				`insecure scheme "http" are by default prohibited`,
+			desc:     "specified base origin is insecure",
+			options:  []fcors.OptionAnon{fcors.FromOrigins("http://*.example.com:6060")},
+			errorMsg: `fcors: insecure origin pattern "http://*.example.com:6060" requires option risky.TolerateInsecureOrigins`,
 		}, {
 			desc:     "specified base origin's host is an invalid IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://*.[::1]1:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://*.[::1]1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://*.[::1]1:6060"`,
 		}, {
 			desc:     "specified base origin's scheme is https but its host is an IP address ",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.[::1]:6060")},
-			errorMsg: `fcors: invalid origin pattern: "https://*.[::1]:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.[::1]:6060"`,
 		}, {
 			desc:     "specified base origin's host is an IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://*.127.0.0.1:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://*.127.0.0.1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://*.127.0.0.1:6060"`,
 		}, {
 			desc:     "specified base origin contains an invalid scheme",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("httpsfoo://*.example.com:6060")},
-			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://*.example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "httpsfoo://*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains a userinfo",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://user:password@*.example.com:6060")},
-			errorMsg: `fcors: invalid port pattern: "https://user:password@*.example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://user:password@*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains a path",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com:6060/foo")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060/foo"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060/foo"`,
 		}, {
 			desc:     "specified base origin contains a querystring",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com:6060?foo=bar")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060?foo=bar"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060?foo=bar"`,
 		}, {
 			desc:     "specified origin contains a querystring delimiter",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com:6060?")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060?"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060?"`,
 		}, {
 			desc:     "specified base origin contains a fragment",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com:6060#index")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060#index"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060#index"`,
 		}, {
 			desc:     "specified base origin contains an invalid port",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com:66536")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:66536"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:66536"`,
 		}, {
 			desc:     "specified base origin contains a colon but no port",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com:")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:"`,
 		}, {
 			desc:     "specified base origin's host contains two trailing full stops",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("https://*.example.com..")},
-			errorMsg: `fcors: invalid origin pattern: "https://*.example.com.."`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com.."`,
 		}, {
 			desc: "invalid second origin pattern",
 			options: []fcors.OptionAnon{
@@ -147,7 +145,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 					"https://*.127.0.0.1:6060",
 				),
 			},
-			errorMsg: `fcors: invalid origin pattern: "https://*.127.0.0.1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.127.0.0.1:6060"`,
 		}, {
 			desc:    "specified base origin's host is a public suffix",
 			options: []fcors.OptionAnon{fcors.FromOrigins("https://*.github.io")},
@@ -540,7 +538,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: strings.Join(
 				[]string{
-					`fcors: invalid origin pattern: "https://example.com/"`,
+					`fcors: invalid origin pattern "https://example.com/"`,
 					`fcors: forbidden method name "CONNECT"`,
 					`fcors: invalid method name "not a valid method"`,
 					`fcors: option WithMethods used multiple times`,
@@ -549,7 +547,7 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,
-					`fcors: most origin patterns like "http://example.com" that use insecure scheme "http" are by default prohibited`,
+					`fcors: insecure origin pattern "http://example.com" requires option risky.TolerateInsecureOrigins`,
 				}, "\n"),
 		},
 	}
@@ -582,16 +580,15 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		{
 			desc:     "specified origin contains whitespace",
 			options:  []fcors.Option{fcors.FromOrigins(" http://example.com:6060 ")},
-			errorMsg: `fcors: invalid or prohibited scheme: " http://example.com:6060 "`,
+			errorMsg: `fcors: invalid origin pattern " http://example.com:6060 "`,
 		}, {
-			desc:    "specified origin is insecure",
-			options: []fcors.Option{fcors.FromOrigins("http://example.com:6060")},
-			errorMsg: `fcors: most origin patterns like "http://example.com:6060" that use ` +
-				`insecure scheme "http" are by default prohibited`,
+			desc:     "specified origin is insecure",
+			options:  []fcors.Option{fcors.FromOrigins("http://example.com:6060")},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option risky.TolerateInsecureOrigins`,
 		}, {
 			desc:     "specified origin's host is an invalid IP address",
 			options:  []fcors.Option{fcors.FromOrigins("http://[::1]1:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://[::1]1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://[::1]1:6060"`,
 		}, {
 			desc:     "specified origin's scheme is https but its host is an IP address ",
 			options:  []fcors.Option{fcors.FromOrigins("https://[::1]:6060")},
@@ -603,104 +600,103 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:     "specified origin contains an invalid scheme",
 			options:  []fcors.Option{fcors.FromOrigins("httpsfoo://example.com:6060")},
-			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "httpsfoo://example.com:6060"`,
 		}, {
 			desc:     "specified origin contains a userinfo",
 			options:  []fcors.Option{fcors.FromOrigins("https://user:password@example.com:6060")},
-			errorMsg: `fcors: invalid port pattern: "https://user:password@example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://user:password@example.com:6060"`,
 		}, {
 			desc:     "specified origin contains a path",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:6060/foo")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060/foo"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060/foo"`,
 		}, {
 			desc:     "specified origin contains a querystring delimiter",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:6060?")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060?"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060?"`,
 		}, {
 			desc:     "specified origin contains a querystring",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:6060?foo=bar")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060?foo=bar"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060?foo=bar"`,
 		}, {
 			desc:     "specified origin contains a fragment",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:6060#index")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:6060#index"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:6060#index"`,
 		}, {
 			desc:     "specified origin contains an invalid port",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:66536")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:66536"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:66536"`,
 		}, {
 			desc:     "specified origin contains a 5-digit port that starts with a nonzero digit",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:06060")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:06060"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:06060"`,
 		}, {
 			desc:     "specified origin contains a colon but no port",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com:")},
-			errorMsg: `fcors: invalid port pattern: "https://example.com:"`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com:"`,
 		}, {
 			desc:     "specified origin's host contains two trailing full stops",
 			options:  []fcors.Option{fcors.FromOrigins("https://example.com..")},
-			errorMsg: `fcors: invalid origin pattern: "https://example.com.."`,
+			errorMsg: `fcors: invalid origin pattern "https://example.com.."`,
 		}, {
 			desc:     "misplaced subdomain pattern",
 			options:  []fcors.Option{fcors.FromOrigins("http://foo.*.example.com:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://foo.*.example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://foo.*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains whitespace",
 			options:  []fcors.Option{fcors.FromOrigins(" http://*.example.com:6060 ")},
-			errorMsg: `fcors: invalid or prohibited scheme: " http://*.example.com:6060 "`,
+			errorMsg: `fcors: invalid origin pattern " http://*.example.com:6060 "`,
 		}, {
-			desc:    "specified base origin is insecure",
-			options: []fcors.Option{fcors.FromOrigins("http://*.example.com:6060")},
-			errorMsg: `fcors: most origin patterns like "http://*.example.com:6060" that use ` +
-				`insecure scheme "http" are by default prohibited`,
+			desc:     "specified base origin is insecure",
+			options:  []fcors.Option{fcors.FromOrigins("http://*.example.com:6060")},
+			errorMsg: `fcors: insecure origin pattern "http://*.example.com:6060" requires option risky.TolerateInsecureOrigins`,
 		}, {
 			desc:     "specified base origin's host is an invalid IP address",
 			options:  []fcors.Option{fcors.FromOrigins("http://*.[::1]1:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://*.[::1]1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://*.[::1]1:6060"`,
 		}, {
 			desc:     "specified base origin's scheme is https but its host is an IP address ",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.[::1]:6060")},
-			errorMsg: `fcors: invalid origin pattern: "https://*.[::1]:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.[::1]:6060"`,
 		}, {
 			desc:     "specified base origin's host is an IP address",
 			options:  []fcors.Option{fcors.FromOrigins("http://*.127.0.0.1:6060")},
-			errorMsg: `fcors: invalid origin pattern: "http://*.127.0.0.1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "http://*.127.0.0.1:6060"`,
 		}, {
 			desc:     "specified base origin contains an invalid scheme",
 			options:  []fcors.Option{fcors.FromOrigins("httpsfoo://*.example.com:6060")},
-			errorMsg: `fcors: invalid or prohibited scheme: "httpsfoo://*.example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "httpsfoo://*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains a userinfo",
 			options:  []fcors.Option{fcors.FromOrigins("https://user:password@*.example.com:6060")},
-			errorMsg: `fcors: invalid port pattern: "https://user:password@*.example.com:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://user:password@*.example.com:6060"`,
 		}, {
 			desc:     "specified base origin contains a path",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com:6060/foo")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060/foo"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060/foo"`,
 		}, {
 			desc:     "specified base origin contains a querystring",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com:6060?foo=bar")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060?foo=bar"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060?foo=bar"`,
 		}, {
 			desc:     "specified origin contains a querystring delimiter",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com:6060?")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060?"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060?"`,
 		}, {
 			desc:     "specified base origin contains a fragment",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com:6060#index")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:6060#index"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:6060#index"`,
 		}, {
 			desc:     "specified base origin contains an invalid port",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com:66536")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:66536"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:66536"`,
 		}, {
 			desc:     "specified base origin contains a colon but no port",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com:")},
-			errorMsg: `fcors: invalid port pattern: "https://*.example.com:"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com:"`,
 		}, {
 			desc:     "specified base origin's host contains two trailing full stops",
 			options:  []fcors.Option{fcors.FromOrigins("https://*.example.com..")},
-			errorMsg: `fcors: invalid origin pattern: "https://*.example.com.."`,
+			errorMsg: `fcors: invalid origin pattern "https://*.example.com.."`,
 		}, {
 			desc: "invalid second origin pattern",
 			options: []fcors.Option{
@@ -709,7 +705,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 					"https://*.127.0.0.1:6060",
 				),
 			},
-			errorMsg: `fcors: invalid origin pattern: "https://*.127.0.0.1:6060"`,
+			errorMsg: `fcors: invalid origin pattern "https://*.127.0.0.1:6060"`,
 		}, {
 			desc:    "specified base origin's host is a public suffix",
 			options: []fcors.Option{fcors.FromOrigins("https://*.github.io")},
@@ -1029,7 +1025,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: strings.Join(
 				[]string{
-					`fcors: invalid origin pattern: "https://example.com/"`,
+					`fcors: invalid origin pattern "https://example.com/"`,
 					`fcors: forbidden method name "CONNECT"`,
 					`fcors: invalid method name "not a valid method"`,
 					`fcors: option WithMethods used multiple times`,
@@ -1038,7 +1034,7 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,
-					`fcors: most origin patterns like "http://example.com" that use insecure scheme "http" are by default prohibited`,
+					`fcors: insecure origin pattern "http://example.com" requires option risky.TolerateInsecureOrigins`,
 				}, "\n"),
 		},
 	}

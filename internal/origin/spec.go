@@ -81,13 +81,11 @@ func ParseSpec(s string) (*Spec, error) {
 	full := s
 	scheme, s, ok := scanHttpScheme(s)
 	if !ok {
-		const tmpl = "invalid or prohibited scheme: %q"
-		return nil, util.Errorf(tmpl, full)
+		return nil, util.InvalidOriginPatternErr(full)
 	}
 	s, ok = consume(schemeHostSep, s)
 	if !ok {
-		const tmpl = "invalid or prohibited scheme: %q"
-		return nil, util.Errorf(tmpl, full)
+		return nil, util.InvalidOriginPatternErr(full)
 	}
 	hostPattern, s, err := parseHostPattern(s, full)
 	if err != nil {
@@ -105,8 +103,7 @@ func ParseSpec(s string) (*Spec, error) {
 		}
 		port, s, ok = parsePortPattern(s)
 		if !ok || s != "" {
-			const tmpl = "invalid port pattern: %q"
-			return nil, util.Errorf(tmpl, full)
+			return nil, util.InvalidOriginPatternErr(full)
 		}
 		if port == anyPort && hostPattern.Kind == SpecKindSubdomains {
 			const tmpl = "specifying both arbitrary subdomains " +

@@ -33,5 +33,5 @@ func NewErrorRisky(text string) error {
 
 // InvalidOriginPatternErr returns an error about invalid origin pattern s.
 func InvalidOriginPatternErr(s string) error {
-	return Errorf("invalid origin pattern: %q", s)
+	return Errorf("invalid origin pattern %q", s)
 }
