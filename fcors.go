@@ -258,7 +258,7 @@ func FromAnyOrigin() OptionAnon {
 //
 // Method names are case-sensitive.
 //
-// The three so-called "[CORS-safelisted methods]"" ([GET], [HEAD], and [POST])
+// The three so-called "[CORS-safelisted methods]" ([GET], [HEAD], and [POST])
 // are by default allowed by the CORS protocol.
 // As such, allowing them explicitly in your CORS configuration is
 // harmless but never actually necessary.
