@@ -226,7 +226,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //
 //	https://*.com          // prohibited (by default): com is a public suffix
 //	https://*.github.io    // prohibited (by default): github.io is a public suffix
-//	https://*.example.com  // ok
+//	https://*.example.com  // permitted: example.com is not a public suffix
 //
 // If you need to deliberately allow arbitrary subdomains of a
 // public suffix (danger!), you must also activate option
