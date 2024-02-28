@@ -166,8 +166,8 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // Default ports (80 for http, 443 for https) must be elided:
 //
 //	http://example.com      // permitted
-//	http://example.com:80   // prohibited
 //	https://example.com     // permitted
+//	http://example.com:80   // prohibited
 //	https://example.com:443 // prohibited
 //
 // In addition to support for exact origins,
@@ -201,10 +201,10 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // Specifying both arbitrary subdomains and arbitrary ports
 // in a given origin pattern is prohibited:
 //
-//	https://*.example.com:*     // prohibited
 //	https://*.example.com       // permitted
 //	https://*.example.com:9090  // permitted
 //	https://example.com:*       // permitted
+//	https://*.example.com:*     // prohibited
 //
 // No other types of origin patterns are supported. In particular,
 // an origin pattern consisting of a single asterisk is prohibited.
@@ -224,9 +224,9 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // Also for security reasons, allowing arbitrary subdomains of a base domain
 // that happens to be a [public suffix] is by default prohibited:
 //
+//	https://*.example.com  // permitted: example.com is not a public suffix
 //	https://*.com          // prohibited (by default): com is a public suffix
 //	https://*.github.io    // prohibited (by default): github.io is a public suffix
-//	https://*.example.com  // permitted: example.com is not a public suffix
 //
 // If you need to deliberately allow arbitrary subdomains of a
 // public suffix (danger!), you must also activate option
