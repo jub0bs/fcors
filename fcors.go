@@ -8,17 +8,23 @@ To create a CORS middleware that allows both anonymous access and
 [credentialed access] (e.g. with [cookies]),
 use the [AllowAccessWithCredentials] function.
 
-Note that, for things to work properly, fcors users must follow certain rules;
-the key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" below
-are to be interpreted as described in [RFC 2119]:
+To avoid negative interference from reverse proxies,
+other middleware in the chain, or from the handler at the end of the chain,
+follow the rules listed below.
+The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" used below
+are to be interpreted as described in [RFC 2119].
 
   - Because [CORS-preflight requests] use [OPTIONS] as their method,
-    the resources to which you apply a CORS middleware
-    SHOULD accept OPTIONS requests.
-  - Because CORS-preflight requests are not authenticated,
-    a CORS middleware SHOULD be stacked on top of any authentication middleware.
-  - Multiple CORS middleware MUST NOT be stacked; in other words,
-    no more than one CORS middleware MUST be used per resource.
+    you SHOULD NOT prevent OPTIONS requests from reaching your CORS middleware.
+    Otherwise, preflight requests will not get properly handled
+    and browser-based clients will likely experience CORS-related errors.
+    The examples provided by this package contain further guidance for avoiding
+    such pitfalls.
+  - Because [CORS-preflight requests are not authenticated], authentication
+    SHOULD NOT take place "ahead of" a CORS middleware
+    (e.g. in a reverse proxy or an earlier middleware).
+    However, a CORS middleware MAY wrap an authentication middleware.
+  - Multiple CORS middleware MUST NOT be stacked.
   - Other middleware (if any) in the chain MUST NOT alter any
     [CORS response headers] that are set by this library's middleware
     and MUST NOT add more [CORS response headers].
@@ -31,6 +37,7 @@ but more advanced (and potentially dangerous) options can be found in the
 [github.com/jub0bs/fcors/risky] package.
 
 [CORS response headers]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#the_http_response_headers
+[CORS-preflight requests are not authenticated]: https://fetch.spec.whatwg.org/#cors-protocol-and-credentials
 [CORS-preflight requests]: https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
 [Cross-Origin Resource Sharing (CORS)]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [OPTIONS]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS
