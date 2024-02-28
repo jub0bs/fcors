@@ -26,38 +26,38 @@ const (
 	anyPort int = radix.WildcardElem
 )
 
-// SpecKind represents the kind of a host pattern.
-type SpecKind uint8
+// PatternKind represents the kind of a host pattern.
+type PatternKind uint8
 
 const (
 	// domain
-	SpecKindDomain SpecKind = iota
+	PatternKindDomain PatternKind = iota
 	// non-loopback IP address
-	SpecKindNonLoopbackIP
+	PatternKindNonLoopbackIP
 	// loopback IP address
-	SpecKindLoopbackIP
+	PatternKindLoopbackIP
 	// arbitrary subdomains of depth one or more
-	SpecKindSubdomains
+	PatternKindSubdomains
 )
 
-type Spec struct {
-	// Scheme is the origin spec's scheme.
+type Pattern struct {
+	// Scheme is the origin pattern's scheme.
 	Scheme string
-	// Scheme is the origin spec's host pattern.
+	// Scheme is the origin pattern's host pattern.
 	HostPattern
-	// Port is the origin spec's port number (if any).
+	// Port is the origin pattern's port number (if any).
 	// 0 is used as a sentinel value marking the absence of an explicit port.
 	// -1 is used as a sentinel value to indicate that all ports are allowed.
 	Port int
 }
 
-func (s *Spec) IsDeemedInsecure() bool {
+func (s *Pattern) IsDeemedInsecure() bool {
 	return s.Scheme != schemeHTTPS &&
-		s.Kind != SpecKindLoopbackIP &&
+		s.Kind != PatternKindLoopbackIP &&
 		s.hostOnly() != "localhost"
 }
 
-func (s *Spec) HostIsEffectiveTLD() (string, bool) {
+func (s *Pattern) HostIsEffectiveTLD() (string, bool) {
 	host := s.HostPattern.hostOnly()
 	// For cases like of a Web origin that ends with a full stop,
 	// we need to trim the latter for this check.
@@ -71,7 +71,7 @@ func (s *Spec) HostIsEffectiveTLD() (string, bool) {
 	return "", false
 }
 
-func ParseSpec(s string) (*Spec, error) {
+func ParsePattern(s string) (*Pattern, error) {
 	if s == "*" {
 		return nil, util.Errorf(`prohibited origin %q`, s)
 	}
@@ -105,7 +105,7 @@ func ParseSpec(s string) (*Spec, error) {
 		if !ok || s != "" {
 			return nil, util.InvalidOriginPatternErr(full)
 		}
-		if port == anyPort && hostPattern.Kind == SpecKindSubdomains {
+		if port == anyPort && hostPattern.Kind == PatternKindSubdomains {
 			const tmpl = "specifying both arbitrary subdomains " +
 				"and arbitrary ports is prohibited: %q"
 			return nil, util.Errorf(tmpl, full)
@@ -116,19 +116,19 @@ func ParseSpec(s string) (*Spec, error) {
 			return nil, util.Errorf(tmpl, port, scheme, full)
 		}
 	}
-	spec := Spec{
+	pattern := Pattern{
 		HostPattern: *hostPattern,
 		Scheme:      scheme,
 		Port:        port,
 	}
-	return &spec, nil
+	return &pattern, nil
 }
 
 type HostPattern struct {
 	// Value is the host pattern's raw value.
 	Value string
 	// Kind is the host pattern's kind.
-	Kind SpecKind
+	Kind PatternKind
 }
 
 // parseHostPattern parses a raw host pattern into an [HostPattern] structure.
@@ -143,7 +143,7 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 	if !ok {
 		return nil, s, util.InvalidOriginPatternErr(full)
 	}
-	if pattern.Kind == SpecKindSubdomains {
+	if pattern.Kind == PatternKindSubdomains {
 		// At least two bytes (e.g. "a.") are required for the part
 		// corresponding to the wildcard character sequence in a valid origin,
 		// hence the subtraction in the following expression.
@@ -156,7 +156,7 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 	}
 	// trim accordingly
 	end := len(host.Value)
-	if pattern.Kind == SpecKindSubdomains {
+	if pattern.Kind == PatternKindSubdomains {
 		end += len(subdomainWildcard) + 1 // 1 for label separator
 	}
 	pattern.Value = pattern.Value[:end]
@@ -179,9 +179,9 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 		}
 
 		if ip.IsLoopback() {
-			pattern.Kind = SpecKindLoopbackIP
+			pattern.Kind = PatternKindLoopbackIP
 		} else {
-			pattern.Kind = SpecKindNonLoopbackIP
+			pattern.Kind = PatternKindNonLoopbackIP
 		}
 		pattern.Value = ipStr
 		return &pattern, s, nil
@@ -195,7 +195,7 @@ func parseHostPattern(s, full string) (*HostPattern, string, error) {
 }
 
 func (p *HostPattern) IsIP() bool {
-	return p.Kind == SpecKindLoopbackIP || p.Kind == SpecKindNonLoopbackIP
+	return p.Kind == PatternKindLoopbackIP || p.Kind == PatternKindNonLoopbackIP
 }
 
 var profile = idna.New(
@@ -208,7 +208,7 @@ var profile = idna.New(
 // hostOnly returns strictly the host part of the pattern,
 // without any leading wildcard character sequence.
 func (hp *HostPattern) hostOnly() string {
-	if hp.Kind == SpecKindSubdomains {
+	if hp.Kind == PatternKindSubdomains {
 		// *.example[.]com => example[.]com
 		return hp.Value[len(subdomainWildcard)+1:]
 	}
@@ -237,13 +237,13 @@ func isDefaultPortForScheme(scheme string, port int) bool {
 }
 
 // peekKind checks for the presence of a wildcard character sequence
-// in s and returns the associated spec kind.
+// in s and returns the associated pattern kind.
 // In the absence of any wildcard character sequence, it defaults to
-// [SpecKindDomain].
-func peekKind(s string) SpecKind {
+// [PatternKindDomain].
+func peekKind(s string) PatternKind {
 	const wildcardSeq = subdomainWildcard + string(fullStop)
 	if strings.HasPrefix(s, wildcardSeq) {
-		return SpecKindSubdomains
+		return PatternKindSubdomains
 	}
-	return SpecKindDomain
+	return PatternKindDomain
 }

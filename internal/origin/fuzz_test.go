@@ -5,85 +5,85 @@ import (
 	"testing"
 )
 
-func FuzzConsistencyBetweenParseSpecAndParse(f *testing.F) {
-	for _, c := range parseSpecCases {
+func FuzzConsistencyBetweenParsePatternAndParse(f *testing.F) {
+	for _, c := range parsePatternCases {
 		f.Add(c.input)
 	}
 	for _, c := range parseCases {
 		f.Add(c.input)
 	}
-	f.Fuzz(func(t *testing.T, pattern string) {
-		spec, err := ParseSpec(pattern)
-		if err != nil || spec.Kind == SpecKindSubdomains {
+	f.Fuzz(func(t *testing.T, raw string) {
+		pattern, err := ParsePattern(raw)
+		if err != nil || pattern.Kind == PatternKindSubdomains {
 			t.Skip()
 		}
-		if _, ok := Parse(pattern); !ok {
-			t.Errorf("pattern without wildcard %q fails to parse as an origin", pattern)
+		if _, ok := Parse(raw); !ok {
+			t.Errorf("pattern without wildcard %q fails to parse as an origin", raw)
 		}
 	})
 }
 
-func FuzzParseSpec(f *testing.F) {
-	for _, c := range parseSpecCases {
+func FuzzParsePattern(f *testing.F) {
+	for _, c := range parsePatternCases {
 		f.Add(c.input)
 	}
 	for _, c := range parseCases {
 		f.Add(c.input)
 	}
-	f.Fuzz(func(t *testing.T, pattern string) {
-		spec, err := ParseSpec(pattern)
+	f.Fuzz(func(t *testing.T, raw string) {
+		pattern, err := ParsePattern(raw)
 		if err != nil {
 			t.Skip()
 		}
-		if strings.HasSuffix(pattern, ":*") {
-			if spec.Port != anyPort {
+		if strings.HasSuffix(raw, ":*") {
+			if pattern.Port != anyPort {
 				const tmpl = "pattern %q should but does not result" +
-					" in a spec that allows arbitrary ports"
-				t.Errorf(tmpl, pattern)
+					" in a Pattern that allows arbitrary ports"
+				t.Errorf(tmpl, raw)
 			}
 			return
 		}
-		if strings.Contains(pattern, "*") != (spec.Kind == SpecKindSubdomains) {
+		if strings.Contains(raw, "*") != (pattern.Kind == PatternKindSubdomains) {
 			const tmpl = "pattern %q should but does not result" +
-				" in a spec that allows arbitrary subdomains"
-			t.Errorf(tmpl, pattern)
+				" in a Pattern that allows arbitrary subdomains"
+			t.Errorf(tmpl, raw)
 		}
 	})
 }
 
 func FuzzCorpus(f *testing.F) {
-	for _, c := range parseSpecCases {
+	for _, c := range parsePatternCases {
 		f.Add(c.input, c.input)
 	}
 	for _, c := range parseCases {
 		f.Add(c.input, c.input)
 	}
-	f.Fuzz(func(t *testing.T, pattern, orig string) {
-		spec, err := ParseSpec(pattern)
+	f.Fuzz(func(t *testing.T, raw, orig string) {
+		pattern, err := ParsePattern(raw)
 		if err != nil {
 			t.Skip()
 		}
 		corpus := make(Corpus)
-		corpus.Add(spec)
+		corpus.Add(pattern)
 		o, ok := Parse(orig)
 		if !ok || !corpus.Contains(&o) {
 			t.Skip()
 		}
 		const tmpl = "corpus built with pattern %q contains origin %q"
-		if spec.Kind == SpecKindSubdomains {
-			if !strings.HasPrefix(longestCommonSuffix(pattern, orig), ".") {
-				t.Errorf(tmpl, pattern, orig)
+		if pattern.Kind == PatternKindSubdomains {
+			if !strings.HasPrefix(longestCommonSuffix(raw, orig), ".") {
+				t.Errorf(tmpl, raw, orig)
 			}
 			return
 		}
-		if spec.Port == anyPort {
-			if !strings.HasSuffix(longestCommonPrefix(pattern, orig), ":") {
-				t.Errorf(tmpl, pattern, orig)
+		if pattern.Port == anyPort {
+			if !strings.HasSuffix(longestCommonPrefix(raw, orig), ":") {
+				t.Errorf(tmpl, raw, orig)
 			}
 			return
 		}
-		if orig != pattern {
-			t.Errorf(tmpl, pattern, orig)
+		if orig != raw {
+			t.Errorf(tmpl, raw, orig)
 		}
 	})
 }

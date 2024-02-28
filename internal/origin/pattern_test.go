@@ -7,7 +7,7 @@ import (
 type TestCase struct {
 	name    string
 	input   string
-	want    Spec
+	want    Pattern
 	failure bool
 }
 
@@ -17,7 +17,7 @@ const validHostOf251chars = "a2345678901234567890123456789012345678901234567890"
 	"1234567890.a2345678901234567890123456789012345678901234567890" +
 	"1234567890.a234567"
 
-var parseSpecCases = []TestCase{
+var parsePatternCases = []TestCase{
 	{
 		name:    "wildcard character sequence followed by 252 chars",
 		input:   "https://*.a" + validHostOf251chars,
@@ -25,11 +25,11 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:  "wildcard character sequence followed by 251 chars",
 		input: "https://*." + validHostOf251chars,
-		want: Spec{
+		want: Pattern{
 			Scheme: "https",
 			HostPattern: HostPattern{
 				Value: "*." + validHostOf251chars,
-				Kind:  SpecKindSubdomains,
+				Kind:  PatternKindSubdomains,
 			},
 		},
 	}, {
@@ -131,21 +131,21 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:  "non-loopback IPv4",
 		input: "http://69.254.169.254",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "69.254.169.254",
-				Kind:  SpecKindNonLoopbackIP,
+				Kind:  PatternKindNonLoopbackIP,
 			},
 		},
 	}, {
 		name:  "loopback IPv4",
 		input: "http://127.0.0.1:90",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "127.0.0.1",
-				Kind:  SpecKindLoopbackIP,
+				Kind:  PatternKindLoopbackIP,
 			},
 			Port: 90,
 		},
@@ -180,22 +180,22 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:  "non-loopback IPv6 with hexadecimal chars",
 		input: "http://[2001:db8:aaaa:1111::100]:9090",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "2001:db8:aaaa:1111::100",
-				Kind:  SpecKindNonLoopbackIP,
+				Kind:  PatternKindNonLoopbackIP,
 			},
 			Port: 9090,
 		},
 	}, {
 		name:  "loopback IPv6 address with port",
 		input: "http://[::1]:90",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "::1",
-				Kind:  SpecKindLoopbackIP,
+				Kind:  PatternKindLoopbackIP,
 			},
 			Port: 90,
 		},
@@ -226,7 +226,7 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:  "host contains underscores and hyphens",
 		input: "http://ex_am-ple.com:3999",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "ex_am-ple.com",
@@ -236,7 +236,7 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:  "trailing full stop in host",
 		input: "http://example.com.:3999",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "example.com.",
@@ -258,11 +258,11 @@ var parseSpecCases = []TestCase{
 	}, {
 		name:  "arbitrary subdomains of depth one or more",
 		input: "http://*.example.com:3999",
-		want: Spec{
+		want: Pattern{
 			Scheme: "http",
 			HostPattern: HostPattern{
 				Value: "*.example.com",
-				Kind:  SpecKindSubdomains,
+				Kind:  PatternKindSubdomains,
 			},
 			Port: 3999,
 		},
@@ -294,9 +294,9 @@ var parseSpecCases = []TestCase{
 }
 
 func TestParseSpec(t *testing.T) {
-	for _, c := range parseSpecCases {
+	for _, c := range parsePatternCases {
 		f := func(t *testing.T) {
-			o, err := ParseSpec(c.input)
+			o, err := ParsePattern(c.input)
 			if err != nil && !c.failure {
 				t.Errorf("%q: want nil error; got %v", c.input, err)
 				return
@@ -350,7 +350,7 @@ func TestIsDeemedInsecure(t *testing.T) {
 	}
 	for _, c := range cases {
 		f := func(t *testing.T) {
-			spec, err := ParseSpec(c.pattern)
+			spec, err := ParsePattern(c.pattern)
 			if err != nil {
 				t.Errorf("want non-nil error; got %v", err)
 				return
@@ -389,7 +389,7 @@ func TestHostIsEffectiveTLD(t *testing.T) {
 	}
 	for _, c := range cases {
 		f := func(t *testing.T) {
-			spec, err := ParseSpec(c.pattern)
+			spec, err := ParsePattern(c.pattern)
 			if err != nil {
 				t.Errorf("want non-nil error; got %v", err)
 				return

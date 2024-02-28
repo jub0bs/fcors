@@ -88,32 +88,32 @@ func NewMiddleware[A applier](cred bool, one A, others ...A) (Middleware, error)
 
 func FromOrigins(one string, others ...string) Option {
 	var (
-		setOfSpecs                 = make(util.Set[origin.Spec])
+		setOfPatterns              = make(util.Set[origin.Pattern])
 		publicSuffixError          error
 		insecureOriginPatternError error
 		nonWildcardOrigin          string
 	)
-	processOnePattern := func(pattern string) error {
-		spec, err := origin.ParseSpec(pattern)
+	processOnePattern := func(raw string) error {
+		pattern, err := origin.ParsePattern(raw)
 		if err != nil {
 			return err
 		}
-		if spec.IsDeemedInsecure() && insecureOriginPatternError == nil {
+		if pattern.IsDeemedInsecure() && insecureOriginPatternError == nil {
 			const tmpl = "insecure origin pattern %q requires option risky." + optSIOC
-			insecureOriginPatternError = util.Errorf(tmpl, pattern)
+			insecureOriginPatternError = util.Errorf(tmpl, raw)
 		}
-		if spec.Kind != origin.SpecKindSubdomains && nonWildcardOrigin == "" {
-			nonWildcardOrigin = pattern
+		if pattern.Kind != origin.PatternKindSubdomains && nonWildcardOrigin == "" {
+			nonWildcardOrigin = raw
 		}
-		if spec.Kind == origin.SpecKindSubdomains {
-			eTLD, isEffectiveTLD := spec.HostIsEffectiveTLD()
+		if pattern.Kind == origin.PatternKindSubdomains {
+			eTLD, isEffectiveTLD := pattern.HostIsEffectiveTLD()
 			if isEffectiveTLD && publicSuffixError == nil {
 				const tmpl = "origin patterns like %q that allow arbitrary " +
 					"subdomains of public suffix %q are by default prohibited"
-				publicSuffixError = util.Errorf(tmpl, pattern, eTLD)
+				publicSuffixError = util.Errorf(tmpl, raw, eTLD)
 			}
 		}
-		setOfSpecs.Add(*spec)
+		setOfPatterns.Add(*pattern)
 		return nil
 	}
 	f := func(cfg *Config) error {
@@ -136,14 +136,14 @@ func FromOrigins(one string, others ...string) Option {
 		if len(errs) != 0 {
 			return errors.Join(errs...)
 		}
-		if len(setOfSpecs) == 1 && nonWildcardOrigin != "" {
+		if len(setOfPatterns) == 1 && nonWildcardOrigin != "" {
 			// special case in which we don't need a corpus at all
 			cfg.tmp.SingleNonWildcardOrigin = nonWildcardOrigin
 			return nil
 		}
 		corpus := make(origin.Corpus)
-		for spec := range setOfSpecs {
-			corpus.Add(&spec)
+		for pattern := range setOfPatterns {
+			corpus.Add(&pattern)
 		}
 		cfg.Corpus = corpus
 		return nil

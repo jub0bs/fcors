@@ -8,10 +8,10 @@ import (
 // The keys in this map correspond to origin schemes.
 type Corpus map[string]radix.Tree
 
-func (c Corpus) Add(spec *Spec) {
-	tree := c[spec.Scheme]
-	tree.Insert(spec.Value, spec.Port)
-	c[spec.Scheme] = tree
+func (c Corpus) Add(pattern *Pattern) {
+	tree := c[pattern.Scheme]
+	tree.Insert(pattern.Value, pattern.Port)
+	c[pattern.Scheme] = tree
 }
 
 func (c Corpus) Contains(o *Origin) bool {
