@@ -213,7 +213,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //
 // Origins whose scheme is http and whose host is neither localhost
 // nor a [loopback IP address] are deemed insecure;
-// as such, they are by default prohibited.
+// as such, for [security reasons], they are by default prohibited.
 // If you need to deliberately allow insecure origins (danger!),
 // you must also activate option
 // [github.com/jub0bs/fcors/risky.TolerateInsecureOrigins].
