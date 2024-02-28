@@ -271,13 +271,14 @@ func FromAnyOrigin() OptionAnon {
 // to allow all methods, use option [WithAnyMethod]
 // instead of this one.
 //
-// Note that, contrary to popular belief, configuring a CORS middleware
-// to allow the OPTIONS method is only required if some clients actually
-// make explicit use of that method, e.g.
+// Note that, contrary to popular belief, listing OPTIONS as an allowed method
+// in your CORS configuration is only required if you wish to allow clients
+// to make explicit use of that method, e.g. via the following client code:
 //
 //	fetch('https://example.com', {method: 'OPTIONS'})
 //
-// In the great majority of cases, allowing the OPTIONS method is unnecessary.
+// In the great majority of cases, listing OPTIONS as an allowed method
+// in your CORS configuration is unnecessary.
 //
 // [CORS-safelisted methods]: https://fetch.spec.whatwg.org/#cors-safelisted-method
 // [GET]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET
