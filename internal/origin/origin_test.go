@@ -12,6 +12,10 @@ var parseCases = []struct {
 	failure bool
 }{
 	{
+		desc:    "null origin",
+		input:   "null",
+		failure: true,
+	}, {
 		desc:  "domain without port",
 		input: "https://example.com",
 		want: Origin{
