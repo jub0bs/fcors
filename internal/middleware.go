@@ -58,7 +58,7 @@ func init() {
 
 type TempConfig struct {
 	PublicSuffixError               error
-	InsecureOriginPatternError      error
+	InsecureOriginPatterns          []string
 	SingleNonWildcardOrigin         string
 	AllowedMethods                  util.Set[string]
 	AllowedRequestHeaders           util.Set[string]
@@ -107,9 +107,45 @@ func newConfig(creds bool) *Config {
 
 func (cfg *Config) validate() error {
 	var errs []error
-	if cfg.tmp.InsecureOriginPatternError != nil &&
+	if len(cfg.tmp.InsecureOriginPatterns) > 0 &&
+		(cfg.AllowCredentials || cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCorsModeOnly) &&
 		!cfg.tmp.TolerateInsecureOrigins {
-		errs = append(errs, cfg.tmp.InsecureOriginPatternError)
+		// Note: We don't require risky.TolerateInsecureOrigins
+		// when users specify one or more insecure origin patterns
+		// in anonymous-only mode and without PNA;
+		// in such cases, insecure origins like http://example.com
+		// are indeed no less insecure than * is,
+		// which itself doesn't require risky.TolerateInsecureOrigins.
+		var errorMsg strings.Builder
+		var patterns = cfg.tmp.InsecureOriginPatterns
+		if len(cfg.tmp.InsecureOriginPatterns) == 1 {
+			errorMsg.WriteString("insecure origin pattern ")
+			errorMsg.WriteByte('"')
+			errorMsg.WriteString(patterns[0])
+			errorMsg.WriteString(`" requires `)
+		} else {
+			errorMsg.WriteString("insecure origin patterns ")
+			for i := 0; i < len(patterns)-1; i++ {
+				errorMsg.WriteByte('"')
+				errorMsg.WriteString(patterns[i])
+				errorMsg.WriteString(`", `)
+			}
+			errorMsg.WriteByte('"')
+			errorMsg.WriteString(patterns[len(patterns)-1])
+			errorMsg.WriteString(`" require `)
+		}
+		errorMsg.WriteString("option risky." + optSIOC + " when ")
+		if cfg.AllowCredentials {
+			errorMsg.WriteString("credentialed access is enabled")
+		}
+		if cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCorsModeOnly {
+			if cfg.AllowCredentials {
+				errorMsg.WriteString(" and/or ")
+			}
+			errorMsg.WriteString("Private Network Access is enabled")
+		}
+		err := util.NewError(errorMsg.String())
+		errs = append(errs, err)
 	}
 	if cfg.tmp.PublicSuffixError != nil &&
 		!cfg.tmp.SkipPublicSuffixCheck {

@@ -88,19 +88,18 @@ func NewMiddleware[A applier](cred bool, one A, others ...A) (Middleware, error)
 
 func FromOrigins(one string, others ...string) Option {
 	var (
-		setOfPatterns              = make(util.Set[origin.Pattern])
-		publicSuffixError          error
-		insecureOriginPatternError error
-		nonWildcardOrigin          string
+		setOfPatterns          = make(util.Set[origin.Pattern])
+		publicSuffixError      error
+		insecureOriginPatterns []string
+		nonWildcardOrigin      string
 	)
 	processOnePattern := func(raw string) error {
 		pattern, err := origin.ParsePattern(raw)
 		if err != nil {
 			return err
 		}
-		if pattern.IsDeemedInsecure() && insecureOriginPatternError == nil {
-			const tmpl = "insecure origin pattern %q requires option risky." + optSIOC
-			insecureOriginPatternError = util.Errorf(tmpl, raw)
+		if pattern.IsDeemedInsecure() {
+			insecureOriginPatterns = append(insecureOriginPatterns, raw)
 		}
 		if pattern.Kind != origin.PatternKindSubdomains && nonWildcardOrigin == "" {
 			nonWildcardOrigin = raw
@@ -131,7 +130,7 @@ func FromOrigins(one string, others ...string) Option {
 			errs = append(errs, err)
 		}
 		cfg.tmp.FromOriginsCalled = true
-		cfg.tmp.InsecureOriginPatternError = insecureOriginPatternError
+		cfg.tmp.InsecureOriginPatterns = insecureOriginPatterns
 		cfg.tmp.PublicSuffixError = publicSuffixError
 		if len(errs) != 0 {
 			return errors.Join(errs...)

@@ -211,13 +211,16 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // If you want to allow (anonymous) access from all origins,
 // use option [FromAnyOrigin] instead of this one.
 //
-// Origins whose scheme is http and whose host is neither localhost
+// Origin patterns whose scheme is http and whose host is neither localhost
 // nor a [loopback IP address] are deemed insecure;
-// as such, for [security reasons], they are by default prohibited.
-// If you need to deliberately allow insecure origins (danger!),
+// as such, for [security reasons], they are by default prohibited
+// when credentialed access and/or
+// some form of [Private Network Access] is enabled.
+// If, even in such cases,
+// you wish to deliberately tolerate insecure origins anyway,
 // you must also activate option
 // [github.com/jub0bs/fcors/risky.TolerateInsecureOrigins].
-// Any occurrence of an insecure origin without activating option
+// Otherwise, any occurence of an insecure origin without activating option
 // [github.com/jub0bs/fcors/risky.TolerateInsecureOrigins]
 // results in a failure to build the corresponding middleware.
 //
@@ -236,6 +239,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // results in a failure to build the corresponding middleware.
 //
 // [ASCII serialized form]: https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin
+// [Private Network Access]: https://wicg.github.io/private-network-access/
 // [Web origins]: https://developer.mozilla.org/en-US/docs/Glossary/Origin
 // [compressed form]: https://datatracker.ietf.org/doc/html/rfc5952
 // [dotted-quad notation]: https://en.wikipedia.org/wiki/Dot-decimal_notation

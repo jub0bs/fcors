@@ -94,13 +94,16 @@ func AssumeNoWebCachingOfPreflightResponses() fcors.Option {
 	return internal.AssumeNoWebCachingOfPreflightResponses()
 }
 
-// TolerateInsecureOrigins enables you to allow insecure origins
+// TolerateInsecureOrigins enables you to tolerate insecure origins
 // (i.e. origins whose scheme is http),
-// which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits.
+// which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits
+// when credentialed access is enabled and/or
+// some form of [Private Network Access] is enabled.
 // Be aware that allowing insecure origins exposes your clients to
 // [active network attacks] that can lead to exfiltration of sensitive data,
 // as described by James Kettle in [the talk he gave at AppSec EU 2017].
 //
+// [Private Network Access]: https://wicg.github.io/private-network-access/
 // [active network attacks]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 // [the talk he gave at AppSec EU 2017]: https://www.youtube.com/watch?v=wgkj4ZgxI4c&t=1305s
 func TolerateInsecureOrigins() fcors.Option {

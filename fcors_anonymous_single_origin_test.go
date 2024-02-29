@@ -1677,7 +1677,6 @@ func Test_AllowAccess_From_Single_Insecure_Origin_With_Method_And_Header_And_Exp
 		fcors.ExposeResponseHeaders(exposedResponseHeader),
 		fcors.PreflightSuccessStatus(dummyPreflightSuccessStatus),
 		fcors.MaxAgeInSeconds(dummyMaxAge),
-		risky.TolerateInsecureOrigins(),
 	)
 	if err != nil {
 		t.Errorf("got error with message %q; want nil error", err.Error())

@@ -22,9 +22,21 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			options:  []fcors.OptionAnon{fcors.FromOrigins(" http://example.com:6060 ")},
 			errorMsg: `fcors: invalid origin pattern " http://example.com:6060 "`,
 		}, {
-			desc:     "specified origin is insecure",
-			options:  []fcors.OptionAnon{fcors.FromOrigins("http://example.com:6060")},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option risky.TolerateInsecureOrigins`,
+			desc: "option PrivateNetworkAccess is used and specified origin is insecure",
+			options: []fcors.OptionAnon{
+				fcors.FromOrigins("http://example.com:6060"),
+				risky.PrivateNetworkAccess(),
+			},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
+				`risky.TolerateInsecureOrigins when Private Network Access is enabled`,
+		}, {
+			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and specified origin is insecure",
+			options: []fcors.OptionAnon{
+				fcors.FromOrigins("http://example.com:6060"),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+			},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
+				`risky.TolerateInsecureOrigins when Private Network Access is enabled`,
 		}, {
 			desc:     "specified origin's host is an invalid IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://[::1]1:6060")},
@@ -86,9 +98,27 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			options:  []fcors.OptionAnon{fcors.FromOrigins(" http://*.example.com:6060 ")},
 			errorMsg: `fcors: invalid origin pattern " http://*.example.com:6060 "`,
 		}, {
-			desc:     "specified base origin is insecure",
-			options:  []fcors.OptionAnon{fcors.FromOrigins("http://*.example.com:6060")},
-			errorMsg: `fcors: insecure origin pattern "http://*.example.com:6060" requires option risky.TolerateInsecureOrigins`,
+			desc: "option PrivateNetworkAccess is used and some origin patterns are insecure",
+			options: []fcors.OptionAnon{
+				fcors.FromOrigins(
+					"http://example.com:6060",
+					"http://*.example.com:6060",
+				),
+				risky.PrivateNetworkAccess(),
+			},
+			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
+				`require option risky.TolerateInsecureOrigins when Private Network Access is enabled`,
+		}, {
+			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and some origin patterns are insecure",
+			options: []fcors.OptionAnon{
+				fcors.FromOrigins(
+					"http://example.com:6060",
+					"http://*.example.com:6060",
+				),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+			},
+			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
+				`require option risky.TolerateInsecureOrigins when Private Network Access is enabled`,
 		}, {
 			desc:     "specified base origin's host is an invalid IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://*.[::1]1:6060")},
@@ -547,7 +577,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,
-					`fcors: insecure origin pattern "http://example.com" requires option risky.TolerateInsecureOrigins`,
 				}, "\n"),
 		},
 	}
@@ -582,9 +611,28 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			options:  []fcors.Option{fcors.FromOrigins(" http://example.com:6060 ")},
 			errorMsg: `fcors: invalid origin pattern " http://example.com:6060 "`,
 		}, {
-			desc:     "specified origin is insecure",
-			options:  []fcors.Option{fcors.FromOrigins("http://example.com:6060")},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option risky.TolerateInsecureOrigins`,
+			desc:    "specified origin is insecure",
+			options: []fcors.Option{fcors.FromOrigins("http://example.com:6060")},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires ` +
+				`option risky.TolerateInsecureOrigins when credentialed access is enabled`,
+		}, {
+			desc: "option PrivateNetworkAccess is used and specified origin is insecure",
+			options: []fcors.Option{
+				fcors.FromOrigins("http://example.com:6060"),
+				risky.PrivateNetworkAccess(),
+			},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
+				`risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+				`Private Network Access is enabled`,
+		}, {
+			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and specified origin is insecure",
+			options: []fcors.Option{
+				fcors.FromOrigins("http://example.com:6060"),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+			},
+			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
+				`risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+				`Private Network Access is enabled`,
 		}, {
 			desc:     "specified origin's host is an invalid IP address",
 			options:  []fcors.Option{fcors.FromOrigins("http://[::1]1:6060")},
@@ -646,9 +694,34 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			options:  []fcors.Option{fcors.FromOrigins(" http://*.example.com:6060 ")},
 			errorMsg: `fcors: invalid origin pattern " http://*.example.com:6060 "`,
 		}, {
-			desc:     "specified base origin is insecure",
-			options:  []fcors.Option{fcors.FromOrigins("http://*.example.com:6060")},
-			errorMsg: `fcors: insecure origin pattern "http://*.example.com:6060" requires option risky.TolerateInsecureOrigins`,
+			desc:    "specified base origin is insecure",
+			options: []fcors.Option{fcors.FromOrigins("http://*.example.com:6060")},
+			errorMsg: `fcors: insecure origin pattern "http://*.example.com:6060" requires option ` +
+				`risky.TolerateInsecureOrigins when credentialed access is enabled`,
+		}, {
+			desc: "option PrivateNetworkAccess is used and some origin patterns are insecure",
+			options: []fcors.Option{
+				fcors.FromOrigins(
+					"http://example.com:6060",
+					"http://*.example.com:6060",
+				),
+				risky.PrivateNetworkAccess(),
+			},
+			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
+				`require option risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+				`Private Network Access is enabled`,
+		}, {
+			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and some origin patterns are insecure",
+			options: []fcors.Option{
+				fcors.FromOrigins(
+					"http://example.com:6060",
+					"http://*.example.com:6060",
+				),
+				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+			},
+			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
+				`require option risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+				`Private Network Access is enabled`,
 		}, {
 			desc:     "specified base origin's host is an invalid IP address",
 			options:  []fcors.Option{fcors.FromOrigins("http://*.[::1]1:6060")},
@@ -1034,7 +1107,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,
-					`fcors: insecure origin pattern "http://example.com" requires option risky.TolerateInsecureOrigins`,
+					`fcors: insecure origin pattern "http://example.com" requires option ` +
+						`risky.TolerateInsecureOrigins when credentialed access is enabled`,
 				}, "\n"),
 		},
 	}
