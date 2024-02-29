@@ -10,7 +10,7 @@ import (
 )
 
 // PrivateNetworkAccess configures a CORS middleware to enable
-// [Private Network Access], which is a W3C initiative that
+// [Private-Network Access], which is a W3C initiative that
 // strengthens the [Same-Origin Policy] by denying clients
 // in more public networks (e.g. the public Internet) access
 // to less public networks (e.g. localhost)
@@ -25,16 +25,16 @@ import (
 // [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
 //
-// [Private Network Access]: https://wicg.github.io/private-network-access/
+// [Private-Network Access]: https://wicg.github.io/private-network-access/
 // [Same-Origin Policy]: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
 func PrivateNetworkAccess() fcors.Option {
 	return internal.PrivateNetworkAccess()
 }
 
 // PrivateNetworkAccessInNoCorsModeOnly configures a CORS middleware to
-// enable [Private Network Access] but in [no-cors mode] only.
+// enable [Private-Network Access] but in [no-cors mode] only.
 // One use case for this option is given by the
-// [link-shortening-service example] in the Private Network Access draft.
+// [link-shortening-service example] in the Private-Network Access draft.
 //
 // This option applies to all the origins allowed in the configuration
 // of the corresponding middleware.
@@ -44,7 +44,7 @@ func PrivateNetworkAccess() fcors.Option {
 // or [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
 //
-// [Private Network Access]: https://wicg.github.io/private-network-access/
+// [Private-Network Access]: https://wicg.github.io/private-network-access/
 // [link-shortening-service example]: https://wicg.github.io/private-network-access/#shortlinks
 // [no-cors mode]: https://fetch.spec.whatwg.org/#concept-request-mode
 func PrivateNetworkAccessInNoCorsModeOnly() fcors.Option {
@@ -98,12 +98,12 @@ func AssumeNoWebCachingOfPreflightResponses() fcors.Option {
 // (i.e. origins whose scheme is http),
 // which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits
 // when credentialed access is enabled and/or
-// some form of [Private Network Access] is enabled.
+// some form of [Private-Network Access] is enabled.
 // Be aware that allowing insecure origins exposes your clients to
 // [active network attacks] that can lead to exfiltration of sensitive data,
 // as described by James Kettle in [the talk he gave at AppSec EU 2017].
 //
-// [Private Network Access]: https://wicg.github.io/private-network-access/
+// [Private-Network Access]: https://wicg.github.io/private-network-access/
 // [active network attacks]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 // [the talk he gave at AppSec EU 2017]: https://www.youtube.com/watch?v=wgkj4ZgxI4c&t=1305s
 func TolerateInsecureOrigins() fcors.Option {

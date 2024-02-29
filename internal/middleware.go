@@ -142,7 +142,7 @@ func (cfg *Config) validate() error {
 			if cfg.AllowCredentials {
 				errorMsg.WriteString(" and/or ")
 			}
-			errorMsg.WriteString("Private Network Access is enabled")
+			errorMsg.WriteString("Private-Network Access is enabled")
 		}
 		err := util.NewError(errorMsg.String())
 		errs = append(errs, err)
@@ -393,7 +393,7 @@ func (cfg *Config) processOriginForPreflight(
 // https://wicg.github.io/private-network-access/#cors-preflight, item 4.2.
 func (cfg *Config) processACRPN(respHeaders, reqHeaders http.Header) bool {
 	acrpn, found := first(reqHeaders, headerRequestPrivateNetwork)
-	if !found || acrpn[0] != headerValueTrue { // no request for private network access
+	if !found || acrpn[0] != headerValueTrue { // no request for private-network access
 		return true
 	}
 	if !cfg.PrivateNetworkAccess && !cfg.PrivateNetworkAccessInNoCorsModeOnly {

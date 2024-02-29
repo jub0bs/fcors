@@ -215,7 +215,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // nor a [loopback IP address] are deemed insecure;
 // as such, for [security reasons], they are by default prohibited
 // when credentialed access and/or
-// some form of [Private Network Access] is enabled.
+// some form of [Private-Network Access] is enabled.
 // If, even in such cases,
 // you wish to deliberately tolerate insecure origins anyway,
 // you must also activate option
@@ -239,7 +239,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // results in a failure to build the corresponding middleware.
 //
 // [ASCII serialized form]: https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin
-// [Private Network Access]: https://wicg.github.io/private-network-access/
+// [Private-Network Access]: https://wicg.github.io/private-network-access/
 // [Web origins]: https://developer.mozilla.org/en-US/docs/Glossary/Origin
 // [compressed form]: https://datatracker.ietf.org/doc/html/rfc5952
 // [dotted-quad notation]: https://en.wikipedia.org/wiki/Dot-decimal_notation
