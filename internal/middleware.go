@@ -57,7 +57,7 @@ func init() {
 }
 
 type TempConfig struct {
-	PublicSuffixError               error
+	PublicSuffixes                  []string
 	InsecureOriginPatterns          []string
 	SingleNonWildcardOrigin         string
 	AllowedMethods                  util.Set[string]
@@ -118,23 +118,9 @@ func (cfg *Config) validate() error {
 		// which itself doesn't require risky.TolerateInsecureOrigins.
 		var errorMsg strings.Builder
 		var patterns = cfg.tmp.InsecureOriginPatterns
-		if len(cfg.tmp.InsecureOriginPatterns) == 1 {
-			errorMsg.WriteString("insecure origin pattern ")
-			errorMsg.WriteByte('"')
-			errorMsg.WriteString(patterns[0])
-			errorMsg.WriteString(`" requires `)
-		} else {
-			errorMsg.WriteString("insecure origin patterns ")
-			for i := 0; i < len(patterns)-1; i++ {
-				errorMsg.WriteByte('"')
-				errorMsg.WriteString(patterns[i])
-				errorMsg.WriteString(`", `)
-			}
-			errorMsg.WriteByte('"')
-			errorMsg.WriteString(patterns[len(patterns)-1])
-			errorMsg.WriteString(`" require `)
-		}
-		errorMsg.WriteString("option risky." + optTIO + " when ")
+		errorMsg.WriteString(`insecure origin patterns like "`)
+		errorMsg.WriteString(strings.Join(patterns, `", "`))
+		errorMsg.WriteString(`" are by default prohibited when `)
 		if cfg.AllowCredentials {
 			errorMsg.WriteString("credentialed access is enabled")
 		}
@@ -147,9 +133,14 @@ func (cfg *Config) validate() error {
 		err := util.NewError(errorMsg.String())
 		errs = append(errs, err)
 	}
-	if cfg.tmp.PublicSuffixError != nil &&
-		!cfg.tmp.SkipPublicSuffixCheck {
-		errs = append(errs, cfg.tmp.PublicSuffixError)
+	if len(cfg.tmp.PublicSuffixes) > 0 && !cfg.tmp.SkipPublicSuffixCheck {
+		var errorMsg strings.Builder
+		errorMsg.WriteString(`origin patterns like "`)
+		errorMsg.WriteString(strings.Join(cfg.tmp.PublicSuffixes, `", "`))
+		errorMsg.WriteString(`" that encompass subdomains of a public suffix`)
+		errorMsg.WriteString(" are by default prohibited")
+		err := util.NewError(errorMsg.String())
+		errs = append(errs, err)
 	}
 	if cfg.tmp.FromOriginsCalled && cfg.AllowAnyOrigin {
 		const msg = "incompatible options " + optFO + " and " + optFAO

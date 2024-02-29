@@ -27,16 +27,16 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				fcors.FromOrigins("http://example.com:6060"),
 				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
-				`risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060" ` +
+				`are by default prohibited when Private-Network Access is enabled`,
 		}, {
 			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and specified origin is insecure",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("http://example.com:6060"),
 				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
-				`risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060" ` +
+				`are by default prohibited when Private-Network Access is enabled`,
 		}, {
 			desc:     "specified origin's host is an invalid IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://[::1]1:6060")},
@@ -106,8 +106,8 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				),
 				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
-				`require option risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060", "http://*.example.com:6060" ` +
+				`are by default prohibited when Private-Network Access is enabled`,
 		}, {
 			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and some origin patterns are insecure",
 			options: []fcors.OptionAnon{
@@ -117,8 +117,8 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				),
 				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
-				`require option risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060", "http://*.example.com:6060" ` +
+				`are by default prohibited when Private-Network Access is enabled`,
 		}, {
 			desc:     "specified base origin's host is an invalid IP address",
 			options:  []fcors.OptionAnon{fcors.FromOrigins("http://*.[::1]1:6060")},
@@ -179,8 +179,8 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 		}, {
 			desc:    "specified base origin's host is a public suffix",
 			options: []fcors.OptionAnon{fcors.FromOrigins("https://*.github.io")},
-			errorMsg: `fcors: origin patterns like "https://*.github.io" that allow arbitrary ` +
-				`subdomains of public suffix "github.io" are by default prohibited`,
+			errorMsg: `fcors: origin patterns like "https://*.github.io" that encompass ` +
+				`subdomains of a public suffix are by default prohibited`,
 		}, {
 			desc:     "missing call to FromOrigins or FromAnyOrigin",
 			options:  []fcors.OptionAnon{fcors.WithAnyMethod()},
@@ -613,16 +613,16 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:    "specified origin is insecure",
 			options: []fcors.Option{fcors.FromOrigins("http://example.com:6060")},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires ` +
-				`option risky.TolerateInsecureOrigins when credentialed access is enabled`,
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060" ` +
+				`are by default prohibited when credentialed access is enabled`,
 		}, {
 			desc: "option PrivateNetworkAccess is used and specified origin is insecure",
 			options: []fcors.Option{
 				fcors.FromOrigins("http://example.com:6060"),
 				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
-				`risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060" ` +
+				`are by default prohibited when credentialed access is enabled and/or ` +
 				`Private-Network Access is enabled`,
 		}, {
 			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and specified origin is insecure",
@@ -630,8 +630,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.FromOrigins("http://example.com:6060"),
 				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
-				`risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060" ` +
+				`are by default prohibited when credentialed access is enabled and/or ` +
 				`Private-Network Access is enabled`,
 		}, {
 			desc:     "specified origin's host is an invalid IP address",
@@ -696,8 +696,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:    "specified base origin is insecure",
 			options: []fcors.Option{fcors.FromOrigins("http://*.example.com:6060")},
-			errorMsg: `fcors: insecure origin pattern "http://*.example.com:6060" requires option ` +
-				`risky.TolerateInsecureOrigins when credentialed access is enabled`,
+			errorMsg: `fcors: insecure origin patterns like "http://*.example.com:6060" ` +
+				`are by default prohibited when credentialed access is enabled`,
 		}, {
 			desc: "option PrivateNetworkAccess is used and some origin patterns are insecure",
 			options: []fcors.Option{
@@ -707,8 +707,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				),
 				risky.PrivateNetworkAccess(),
 			},
-			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
-				`require option risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060", "http://*.example.com:6060" ` +
+				`are by default prohibited when credentialed access is enabled and/or ` +
 				`Private-Network Access is enabled`,
 		}, {
 			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and some origin patterns are insecure",
@@ -719,8 +719,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				),
 				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
-				`require option risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
+			errorMsg: `fcors: insecure origin patterns like "http://example.com:6060", "http://*.example.com:6060" ` +
+				`are by default prohibited when credentialed access is enabled and/or ` +
 				`Private-Network Access is enabled`,
 		}, {
 			desc:     "specified base origin's host is an invalid IP address",
@@ -782,8 +782,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 		}, {
 			desc:    "specified base origin's host is a public suffix",
 			options: []fcors.Option{fcors.FromOrigins("https://*.github.io")},
-			errorMsg: `fcors: origin patterns like "https://*.github.io" that allow arbitrary ` +
-				`subdomains of public suffix "github.io" are by default prohibited`,
+			errorMsg: `fcors: origin patterns like "https://*.github.io" that encompass ` +
+				`subdomains of a public suffix are by default prohibited`,
 		}, {
 			desc:     "missing call to FromOrigins",
 			options:  []fcors.Option{fcors.WithAnyMethod()},
@@ -1107,8 +1107,8 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 					`fcors: option WithRequestHeaders used multiple times`,
 					`fcors: specified max-age value 86401 exceeds upper bound 86400`,
 					`fcors: option MaxAgeInSeconds used multiple times`,
-					`fcors: insecure origin pattern "http://example.com" requires option ` +
-						`risky.TolerateInsecureOrigins when credentialed access is enabled`,
+					`fcors: insecure origin patterns like "http://example.com" ` +
+						`are by default prohibited when credentialed access is enabled`,
 				}, "\n"),
 		},
 	}

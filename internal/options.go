@@ -89,7 +89,7 @@ func NewMiddleware[A applier](cred bool, one A, others ...A) (Middleware, error)
 func FromOrigins(one string, others ...string) Option {
 	var (
 		setOfPatterns          = make(util.Set[origin.Pattern])
-		publicSuffixError      error
+		publicSuffixes         []string
 		insecureOriginPatterns []string
 		nonWildcardOrigin      string
 	)
@@ -105,11 +105,8 @@ func FromOrigins(one string, others ...string) Option {
 			nonWildcardOrigin = raw
 		}
 		if pattern.Kind == origin.PatternKindSubdomains {
-			eTLD, isEffectiveTLD := pattern.HostIsEffectiveTLD()
-			if isEffectiveTLD && publicSuffixError == nil {
-				const tmpl = "origin patterns like %q that allow arbitrary " +
-					"subdomains of public suffix %q are by default prohibited"
-				publicSuffixError = util.Errorf(tmpl, raw, eTLD)
+			if _, isEffectiveTLD := pattern.HostIsEffectiveTLD(); isEffectiveTLD {
+				publicSuffixes = append(publicSuffixes, raw)
 			}
 		}
 		setOfPatterns.Add(*pattern)
@@ -131,7 +128,7 @@ func FromOrigins(one string, others ...string) Option {
 		}
 		cfg.tmp.FromOriginsCalled = true
 		cfg.tmp.InsecureOriginPatterns = insecureOriginPatterns
-		cfg.tmp.PublicSuffixError = publicSuffixError
+		cfg.tmp.PublicSuffixes = publicSuffixes
 		if len(errs) != 0 {
 			return errors.Join(errs...)
 		}
