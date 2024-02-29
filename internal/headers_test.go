@@ -29,9 +29,9 @@ func TestThatAllSafelistedResponseHeaderNamesAreByteLowercase(t *testing.T) {
 	}
 }
 
+// This is important because, otherwise, directly indexing the values
+// in http.Header maps would not work as expected.
 func TestThatAllRelevantHeaderNamesAreInCanonicalFormat(t *testing.T) {
-	// This is important because, otherwise, directly indexing the values
-	// in http.Header maps would not work as expected.
 	headerNames := []string{
 		headerOrigin,
 		headerRequestMethod,

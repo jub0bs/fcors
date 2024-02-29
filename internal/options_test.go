@@ -4,9 +4,9 @@ import (
 	"testing"
 )
 
+// important property that prevents users from subverting
+// fcors's compile-time guarantees
 func TestThatNoneOfTheOptionAnonsImplementsOption(t *testing.T) {
-	// important property that prevents users from subverting
-	// fcors's compile-time guarantees
 	cases := []struct {
 		desc string
 		opt  OptionAnon
