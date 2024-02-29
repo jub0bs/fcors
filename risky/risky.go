@@ -20,7 +20,7 @@ import (
 // of the corresponding middleware.
 //
 // Using this option in conjunction with option
-// [PrivateNetworkAccessInNoCorsModeOnly] in a call to
+// [PrivateNetworkAccessInNoCORSModeOnly] in a call to
 // [github.com/jub0bs/fcors.AllowAccess] or
 // [github.com/jub0bs/fcors.AllowAccessWithCredentials] results in
 // a failure to build the corresponding middleware.
@@ -31,7 +31,7 @@ func PrivateNetworkAccess() fcors.Option {
 	return internal.PrivateNetworkAccess()
 }
 
-// PrivateNetworkAccessInNoCorsModeOnly configures a CORS middleware to
+// PrivateNetworkAccessInNoCORSModeOnly configures a CORS middleware to
 // enable [Private-Network Access] but in [no-cors mode] only.
 // One use case for this option is given by the
 // [link-shortening-service example] in the Private-Network Access draft.
@@ -47,8 +47,8 @@ func PrivateNetworkAccess() fcors.Option {
 // [Private-Network Access]: https://wicg.github.io/private-network-access/
 // [link-shortening-service example]: https://wicg.github.io/private-network-access/#shortlinks
 // [no-cors mode]: https://fetch.spec.whatwg.org/#concept-request-mode
-func PrivateNetworkAccessInNoCorsModeOnly() fcors.Option {
-	return internal.PrivateNetworkAccessInNoCorsModeOnly()
+func PrivateNetworkAccessInNoCORSModeOnly() fcors.Option {
+	return internal.PrivateNetworkAccessInNoCORSModeOnly()
 }
 
 // AssumeNoExtendedWildcardSupport configures a CORS middleware to

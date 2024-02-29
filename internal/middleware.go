@@ -89,7 +89,7 @@ type Config struct {
 	AllowCredentials                       bool
 	ExposeAllResponseHeaders               bool
 	PrivateNetworkAccess                   bool
-	PrivateNetworkAccessInNoCorsModeOnly   bool
+	PrivateNetworkAccessInNoCORSModeOnly   bool
 	AssumeNoWebCachingOfPreflightResponses bool
 	ACEH                                   []string
 	//lint:ignore U1000 because we pad to the end of the 3rd cache line
@@ -108,7 +108,7 @@ func newConfig(creds bool) *Config {
 func (cfg *Config) validate() error {
 	var errs []error
 	if len(cfg.tmp.InsecureOriginPatterns) > 0 &&
-		(cfg.AllowCredentials || cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCorsModeOnly) &&
+		(cfg.AllowCredentials || cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCORSModeOnly) &&
 		!cfg.tmp.TolerateInsecureOrigins {
 		// Note: We don't require risky.TolerateInsecureOrigins
 		// when users specify one or more insecure origin patterns
@@ -138,7 +138,7 @@ func (cfg *Config) validate() error {
 		if cfg.AllowCredentials {
 			errorMsg.WriteString("credentialed access is enabled")
 		}
-		if cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCorsModeOnly {
+		if cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCORSModeOnly {
 			if cfg.AllowCredentials {
 				errorMsg.WriteString(" and/or ")
 			}
@@ -172,7 +172,7 @@ func (cfg *Config) validate() error {
 		const msg = "incompatible options " + optWRH + " and " + optWARH
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.PrivateNetworkAccess && cfg.PrivateNetworkAccessInNoCorsModeOnly {
+	if cfg.PrivateNetworkAccess && cfg.PrivateNetworkAccessInNoCORSModeOnly {
 		const msg = "incompatible options " + optPNA + " and " + optPNANC
 		errs = append(errs, util.NewError(msg))
 	}
@@ -182,7 +182,7 @@ func (cfg *Config) validate() error {
 		const msg = "incompatible options " + optFAO + " and " + optPNA
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.AllowAnyOrigin && cfg.PrivateNetworkAccessInNoCorsModeOnly {
+	if cfg.AllowAnyOrigin && cfg.PrivateNetworkAccessInNoCORSModeOnly {
 		// see note in
 		// https://developer.chrome.com/blog/private-network-access-preflight/#no-cors-mode
 		const msg = "incompatible options " + optFAO + " and " + optPNANC
@@ -284,7 +284,7 @@ func (cfg *Config) middleware() Middleware {
 
 func (cfg *Config) handleNonCORSRequest(respHeaders http.Header, isOptionsReq bool) {
 	// see https://wicg.github.io/private-network-access/#shortlinks
-	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
+	if cfg.PrivateNetworkAccessInNoCORSModeOnly {
 		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
 			fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		}
@@ -396,7 +396,7 @@ func (cfg *Config) processACRPN(respHeaders, reqHeaders http.Header) bool {
 	if !found || acrpn[0] != headerValueTrue { // no request for private-network access
 		return true
 	}
-	if !cfg.PrivateNetworkAccess && !cfg.PrivateNetworkAccessInNoCorsModeOnly {
+	if !cfg.PrivateNetworkAccess && !cfg.PrivateNetworkAccessInNoCORSModeOnly {
 		return false
 	}
 	respHeaders[headerAllowPrivateNetwork] = precomputedTrue
@@ -411,7 +411,7 @@ func (cfg *Config) handleNonPreflightCORSRequest(
 ) {
 	respHeaders := w.Header()
 	// see https://wicg.github.io/private-network-access/#shortlinks
-	if cfg.PrivateNetworkAccessInNoCorsModeOnly {
+	if cfg.PrivateNetworkAccessInNoCORSModeOnly {
 		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
 			fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		}

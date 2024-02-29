@@ -830,7 +830,7 @@ func Test_AllowAccess_From_Single_Origin_With_Any_Method_And_Headers_And_Expose_
 	process(t, cors(dummyHandler), cases)
 }
 
-func Test_AllowAccess_From_Single_Origin_With_PrivateNetworkAccessInNoCorsModeOnly(t *testing.T) {
+func Test_AllowAccess_From_Single_Origin_With_PrivateNetworkAccessInNoCORSModeOnly(t *testing.T) {
 	const (
 		dummyVaryValue  = "whatever"
 		dummyStatusCode = 299
@@ -850,7 +850,7 @@ func Test_AllowAccess_From_Single_Origin_With_PrivateNetworkAccessInNoCorsModeOn
 		fcors.FromOrigins(allowedOrigin),
 		fcors.PreflightSuccessStatus(dummyPreflightSuccessStatus),
 		fcors.MaxAgeInSeconds(dummyMaxAge),
-		risky.PrivateNetworkAccessInNoCorsModeOnly(),
+		risky.PrivateNetworkAccessInNoCORSModeOnly(),
 	)
 	if err != nil {
 		t.Errorf("got error with message %q; want nil error", err.Error())

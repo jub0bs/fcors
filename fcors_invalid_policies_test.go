@@ -30,10 +30,10 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
 				`risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
 		}, {
-			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and specified origin is insecure",
+			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and specified origin is insecure",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("http://example.com:6060"),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
 			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
 				`risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
@@ -109,13 +109,13 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
 				`require option risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
 		}, {
-			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and some origin patterns are insecure",
+			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and some origin patterns are insecure",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins(
 					"http://example.com:6060",
 					"http://*.example.com:6060",
 				),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
 			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
 				`require option risky.TolerateInsecureOrigins when Private-Network Access is enabled`,
@@ -455,13 +455,13 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors/risky: option PrivateNetworkAccess used multiple times`,
 		}, {
-			desc: "option PrivateNetworkAccessInNoCorsModeOnly used multiple times",
+			desc: "option PrivateNetworkAccessInNoCORSModeOnly used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCorsModeOnly used multiple times`,
+			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCORSModeOnly used multiple times`,
 		}, {
 			desc: "option TolerateInsecureOrigins used multiple times",
 			options: []fcors.OptionAnon{
@@ -502,13 +502,13 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: incompatible options WithRequestHeaders and WithAnyRequestHeaders`,
 		}, {
-			desc: "conjunct use of options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly",
+			desc: "conjunct use of options PrivateNetworkAccess and PrivateNetworkAccessInNoCORSModeOnly",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
 				risky.PrivateNetworkAccess(),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: incompatible options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly`,
+			errorMsg: `fcors: incompatible options PrivateNetworkAccess and PrivateNetworkAccessInNoCORSModeOnly`,
 		}, {
 			desc: "conjunct use of options FromAnyOrigin and PrivateNetworkAccess",
 			options: []fcors.OptionAnon{
@@ -517,12 +517,12 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: incompatible options FromAnyOrigin and PrivateNetworkAccess`,
 		}, {
-			desc: "conjunct use of options FromAnyOrigin and PrivateNetworkAccessInNoCorsModeOnly",
+			desc: "conjunct use of options FromAnyOrigin and PrivateNetworkAccessInNoCORSModeOnly",
 			options: []fcors.OptionAnon{
 				fcors.FromAnyOrigin(),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: incompatible options FromAnyOrigin and PrivateNetworkAccessInNoCorsModeOnly`,
+			errorMsg: `fcors: incompatible options FromAnyOrigin and PrivateNetworkAccessInNoCORSModeOnly`,
 		}, {
 			desc: "conjunct use of options ExposeResponseHeaders and ExposeAllResponseHeaders",
 			options: []fcors.OptionAnon{
@@ -625,10 +625,10 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				`risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
 				`Private-Network Access is enabled`,
 		}, {
-			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and specified origin is insecure",
+			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and specified origin is insecure",
 			options: []fcors.Option{
 				fcors.FromOrigins("http://example.com:6060"),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
 			errorMsg: `fcors: insecure origin pattern "http://example.com:6060" requires option ` +
 				`risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
@@ -711,13 +711,13 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				`require option risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
 				`Private-Network Access is enabled`,
 		}, {
-			desc: "option PrivateNetworkAccessInNoCorsModeOnly is used and some origin patterns are insecure",
+			desc: "option PrivateNetworkAccessInNoCORSModeOnly is used and some origin patterns are insecure",
 			options: []fcors.Option{
 				fcors.FromOrigins(
 					"http://example.com:6060",
 					"http://*.example.com:6060",
 				),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
 			errorMsg: `fcors: insecure origin patterns "http://example.com:6060", "http://*.example.com:6060" ` +
 				`require option risky.TolerateInsecureOrigins when credentialed access is enabled and/or ` +
@@ -1022,13 +1022,13 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors/risky: option PrivateNetworkAccess used multiple times`,
 		}, {
-			desc: "option PrivateNetworkAccessInNoCorsModeOnly used multiple times",
+			desc: "option PrivateNetworkAccessInNoCORSModeOnly used multiple times",
 			options: []fcors.Option{
 				fcors.FromOrigins("https://example.com"),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCorsModeOnly used multiple times`,
+			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCORSModeOnly used multiple times`,
 		}, {
 			desc: "option TolerateInsecureOrigins used multiple times",
 			options: []fcors.Option{
@@ -1062,13 +1062,13 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors: incompatible options WithRequestHeaders and WithAnyRequestHeaders`,
 		}, {
-			desc: "conjunct use of options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly",
+			desc: "conjunct use of options PrivateNetworkAccess and PrivateNetworkAccessInNoCORSModeOnly",
 			options: []fcors.Option{
 				fcors.FromOrigins("https://example.com"),
 				risky.PrivateNetworkAccess(),
-				risky.PrivateNetworkAccessInNoCorsModeOnly(),
+				risky.PrivateNetworkAccessInNoCORSModeOnly(),
 			},
-			errorMsg: `fcors: incompatible options PrivateNetworkAccess and PrivateNetworkAccessInNoCorsModeOnly`,
+			errorMsg: `fcors: incompatible options PrivateNetworkAccess and PrivateNetworkAccessInNoCORSModeOnly`,
 		}, {
 			desc: "preflight success status outside the 2xx range",
 			options: []fcors.Option{

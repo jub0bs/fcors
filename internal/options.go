@@ -17,7 +17,7 @@ const (
 	optFAO     = "FromAnyOrigin"
 	optFO      = "FromOrigins"
 	optPNA     = "PrivateNetworkAccess"
-	optPNANC   = "PrivateNetworkAccessInNoCorsModeOnly"
+	optPNANC   = "PrivateNetworkAccessInNoCORSModeOnly"
 	optTIO     = "TolerateInsecureOrigins"
 	optSPSC    = "SkipPublicSuffixCheck"
 	optWAM     = "WithAnyMethod"
@@ -421,12 +421,12 @@ func PrivateNetworkAccess() Option {
 	return option(f)
 }
 
-func PrivateNetworkAccessInNoCorsModeOnly() Option {
+func PrivateNetworkAccessInNoCORSModeOnly() Option {
 	f := func(cfg *Config) error {
-		if cfg.PrivateNetworkAccessInNoCorsModeOnly {
+		if cfg.PrivateNetworkAccessInNoCORSModeOnly {
 			return util.NewErrorRisky("option " + optPNANC + " used multiple times")
 		}
-		cfg.PrivateNetworkAccessInNoCorsModeOnly = true
+		cfg.PrivateNetworkAccessInNoCORSModeOnly = true
 		return nil
 	}
 	return option(f)
