@@ -134,7 +134,7 @@ func (cfg *Config) validate() error {
 			errorMsg.WriteString(patterns[len(patterns)-1])
 			errorMsg.WriteString(`" require `)
 		}
-		errorMsg.WriteString("option risky." + optSIOC + " when ")
+		errorMsg.WriteString("option risky." + optTIO + " when ")
 		if cfg.AllowCredentials {
 			errorMsg.WriteString("credentialed access is enabled")
 		}
