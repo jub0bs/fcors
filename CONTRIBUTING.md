@@ -1,4 +1,4 @@
-# Contributing to fcors
+# Contributing to jub0bs/fcors
 
 fcors is an open-source project
 but currently does not accept external contributions.
