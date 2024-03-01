@@ -24,7 +24,7 @@ func NewError(text string) error {
 	return errors.New(text)
 }
 
-// NewError works the same way as [errors.New] does, but
+// NewErrorRisky works the same way as [errors.New] does, but
 // prefixes the resulting error message with "fcors/risky: ".
 func NewErrorRisky(text string) error {
 	text = fmt.Sprintf("%s/%s: %s", pkgFcors, pkgRisky, text)
