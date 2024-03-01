@@ -378,7 +378,7 @@ func MaxAgeInSeconds(delta uint) Option {
 }
 
 // ExposeResponseHeaders configures a CORS middleware to expose the specified
-// response headers to the client.
+// response headers to clients.
 //
 // Using this option in conjunction with option [ExposeAllResponseHeaders]
 // in a call to [AllowAccess] results in a failure to build the corresponding
@@ -390,13 +390,13 @@ func MaxAgeInSeconds(delta uint) Option {
 // Header names are case-insensitive.
 //
 // The CORS protocol defines a number of so-called
-// "[CORS-safelisted response-header names]", which are always accessible
-// to the client.
+// "[CORS-safelisted response-header names]",
+// which need not be explicitly specified as exposed.
 // The CORS protocol also defines a number of so-called
-// "[forbidden response-header names]", which are never accessible to the
-// client.
-// Specifying one or more safelisted or forbidden response-header
-// name(s) results in a failure to build the corresponding middleware.
+// "[forbidden response-header names]",
+// which cannot be exposed to clients.
+// Accordingly, specifying one or more safelisted or forbidden response-header
+// name(s) results in a failure to build the desired middleware.
 //
 // Finally, some header names that have no place in a response are prohibited:
 //
@@ -417,7 +417,7 @@ func ExposeResponseHeaders(one string, others ...string) Option {
 }
 
 // ExposeAllResponseHeaders configures a CORS middleware to expose all
-// response headers to the client.
+// response headers to clients.
 //
 // Using this option in conjunction with option [ExposeResponseHeaders]
 // in a call to [AllowAccess] results in a failure to build the
