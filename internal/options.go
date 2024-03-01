@@ -325,7 +325,7 @@ func ExposeResponseHeaders(one string, others ...string) Option {
 		if len(errs) != 0 {
 			return errors.Join(errs...)
 		}
-		cfg.ACEH = []string{util.SortCombine(exposedHeaders, string(comma))}
+		cfg.ACEH = []string{sortCombineWithComma(exposedHeaders)}
 		return nil
 	}
 	return option(f)
