@@ -306,7 +306,8 @@ func MaxAgeInSeconds(delta uint) Option {
 
 func ExposeResponseHeaders(one string, others ...string) Option {
 	f := func(cfg *Config) error {
-		exposedHeaders := make(util.Set[string], len(others))
+		sizeHint := 1 + len(others) // there may be dupes, but that's the user's fault
+		exposedHeaders := make(util.Set[string], sizeHint)
 		var errs []error
 		if err := processOneResponseHeader(one, exposedHeaders); err != nil {
 			errs = append(errs, err)
