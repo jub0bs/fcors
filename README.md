@@ -6,7 +6,10 @@
 [![codecov](https://codecov.io/gh/jub0bs/fcors/branch/main/graph/badge.svg?token=N208BHWQTM)](https://codecov.io/gh/jub0bs/fcors)
 [![goreport](https://goreportcard.com/badge/jub0bs/fcors)](https://goreportcard.com/report/jub0bs/fcors)
 
-A principled CORS middleware library for Go.
+An experimental CORS middleware library for Go.
+
+Unless you're a big fan of [functional options][funcopts],
+you should use [github.com/jub0bs/cors][jub0bs-cors] instead.
 
 - [About CORS](https://github.com/jub0bs/fcors/#about-cors)
 - [Design philosophy](https://github.com/jub0bs/fcors/#design-philosophy)
@@ -140,6 +143,7 @@ All source code is covered by the [MIT License][license].
 [fcors-examples]: https://github.com/jub0bs/fcors-examples
 [fearless-cors]: https://jub0bs.com/posts/2023-02-08-fearless-cors/
 [funcopts]: https://www.youtube.com/watch?v=5uM6z7RnReE
+[jub0bs-cors]: https://github.com/jub0bs/cors
 [license]: https://github.com/jub0bs/fcors/blob/main/LICENSE
 [mdn-cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [mdn-sop]: https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy
