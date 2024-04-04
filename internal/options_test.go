@@ -17,9 +17,6 @@ func TestThatNoneOfTheOptionAnonsImplementsOption(t *testing.T) {
 		}, {
 			desc: optEARH,
 			opt:  ExposeAllResponseHeaders(),
-		}, {
-			desc: optANEWS,
-			opt:  AssumeNoExtendedWildcardSupport(),
 		},
 	}
 	for _, c := range cases {

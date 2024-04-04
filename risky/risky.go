@@ -51,25 +51,6 @@ func PrivateNetworkAccessInNoCORSModeOnly() fcors.Option {
 	return internal.PrivateNetworkAccessInNoCORSModeOnly()
 }
 
-// AssumeNoExtendedWildcardSupport configures a CORS middleware to
-// eschew the use of the wildcard (*) in the following headers:
-//
-//   - Access-Control-Allow-Headers
-//   - Access-Control-Allow-Methods
-//   - Access-Control-Expose-Headers
-//
-// Use this option to maximize compatibility of your CORS policy
-// with older browsers. Be aware that, all other things being equal,
-// using this option leads to comparatively larger responses.
-//
-// Using this option in conjunction with option
-// [github.com/jub0bs/fcors.ExposeAllResponseHeaders]
-// in a call to [github.com/jub0bs/fcors.AllowAccess]
-// results in a failure to build the corresponding middleware.
-func AssumeNoExtendedWildcardSupport() fcors.OptionAnon {
-	return internal.AssumeNoExtendedWildcardSupport()
-}
-
 // AssumeNoWebCachingOfPreflightResponses configures a CORS middleware
 // to eschew the use of the [Vary header] in preflight responses.
 // Responses to OPTIONS requests are [not meant to be cached] but,

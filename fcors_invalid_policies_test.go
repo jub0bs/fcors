@@ -423,14 +423,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: option ExposeAllResponseHeaders used multiple times`,
 		}, {
-			desc: "option AssumeNoExtendedWildcardSupport used multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromOrigins("https://example.com"),
-				risky.AssumeNoExtendedWildcardSupport(),
-				risky.AssumeNoExtendedWildcardSupport(),
-			},
-			errorMsg: `fcors/risky: option AssumeNoExtendedWildcardSupport used multiple times`,
-		}, {
 			desc: "option PreflightSuccessStatus used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
@@ -531,14 +523,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 				fcors.ExposeAllResponseHeaders(),
 			},
 			errorMsg: `fcors: incompatible options ExposeResponseHeaders and ExposeAllResponseHeaders`,
-		}, {
-			desc: "conjunct use of options ExposeAllResponseHeaders and AssumeNoExtendedWildcardSupport",
-			options: []fcors.OptionAnon{
-				fcors.FromOrigins("https://example.com"),
-				fcors.ExposeAllResponseHeaders(),
-				risky.AssumeNoExtendedWildcardSupport(),
-			},
-			errorMsg: `fcors: incompatible options ExposeAllResponseHeaders and AssumeNoExtendedWildcardSupport`,
 		}, {
 			desc: "preflight success status outside the 2xx range",
 			options: []fcors.OptionAnon{

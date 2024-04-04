@@ -57,20 +57,19 @@ func init() {
 }
 
 type TempConfig struct {
-	PublicSuffixes                  []string
-	InsecureOriginPatterns          []string
-	SingleNonWildcardOrigin         string
-	AllowedMethods                  util.Set[string]
-	AllowedRequestHeaders           util.Set[string]
-	CustomPreflightSuccessStatus    bool
-	AssumeNoExtendedWildcardSupport bool
-	SkipPublicSuffixCheck           bool
-	TolerateInsecureOrigins         bool
-	FromOriginsCalled               bool
-	WithMethodsCalled               bool
-	WithRequestHeadersCalled        bool
-	MaxAgeInSecondsCalled           bool
-	ExposeResponseHeadersCalled     bool
+	PublicSuffixes               []string
+	InsecureOriginPatterns       []string
+	SingleNonWildcardOrigin      string
+	AllowedMethods               util.Set[string]
+	AllowedRequestHeaders        util.Set[string]
+	CustomPreflightSuccessStatus bool
+	SkipPublicSuffixCheck        bool
+	TolerateInsecureOrigins      bool
+	FromOriginsCalled            bool
+	WithMethodsCalled            bool
+	WithRequestHeadersCalled     bool
+	MaxAgeInSecondsCalled        bool
+	ExposeResponseHeadersCalled  bool
 }
 
 type Config struct {
@@ -183,10 +182,6 @@ func (cfg *Config) validate() error {
 		const msg = "incompatible options " + optERH + " and " + optEARH
 		errs = append(errs, util.NewError(msg))
 	}
-	if cfg.ExposeAllResponseHeaders && cfg.tmp.AssumeNoExtendedWildcardSupport {
-		const msg = "incompatible options " + optEARH + " and " + optANEWS
-		errs = append(errs, util.NewError(msg))
-	}
 	if len(errs) != 0 {
 		return errors.Join(errs...)
 	}
@@ -205,9 +200,7 @@ func (cfg *Config) precomputeStuff() {
 
 	// precompute ACAM if it can be static
 	switch {
-	case !cfg.AllowCredentials &&
-		cfg.AllowAnyMethod &&
-		!cfg.tmp.AssumeNoExtendedWildcardSupport:
+	case !cfg.AllowCredentials && cfg.AllowAnyMethod:
 		cfg.ACAM = precomputedWildcard
 	case len(cfg.tmp.AllowedMethods) != 0:
 		acam := sortCombineWithComma(cfg.tmp.AllowedMethods)
@@ -216,9 +209,7 @@ func (cfg *Config) precomputeStuff() {
 
 	// precompute ACAH if it can be static
 	switch {
-	case !cfg.AllowCredentials &&
-		cfg.AllowAnyRequestHeaders &&
-		!cfg.tmp.AssumeNoExtendedWildcardSupport:
+	case !cfg.AllowCredentials && cfg.AllowAnyRequestHeaders:
 		var b strings.Builder
 		b.WriteString(wildcard)
 		b.WriteByte(comma)
@@ -230,9 +221,7 @@ func (cfg *Config) precomputeStuff() {
 	}
 
 	// possibly overwrite precomputed ACEH (can always be static)
-	if !cfg.AllowCredentials &&
-		cfg.ExposeAllResponseHeaders &&
-		!cfg.tmp.AssumeNoExtendedWildcardSupport {
+	if !cfg.AllowCredentials && cfg.ExposeAllResponseHeaders {
 		cfg.ACEH = precomputedWildcard
 	}
 	cfg.tmp = nil // no longer needed; let's make it eligible to GC

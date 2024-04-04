@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	optANEWS   = "AssumeNoExtendedWildcardSupport"
 	optANWCOPR = "AssumeNoWebCachingOfPreflightResponses"
 	optEARH    = "ExposeAllResponseHeaders"
 	optERH     = "ExposeResponseHeaders"
@@ -356,17 +355,6 @@ func ExposeAllResponseHeaders() OptionAnon {
 			return util.NewError("option " + optEARH + " used multiple times")
 		}
 		cfg.ExposeAllResponseHeaders = true
-		return nil
-	}
-	return optionAnon(f)
-}
-
-func AssumeNoExtendedWildcardSupport() OptionAnon {
-	f := func(cfg *Config) error {
-		if cfg.tmp.AssumeNoExtendedWildcardSupport {
-			return util.NewErrorRisky("option " + optANEWS + " used multiple times")
-		}
-		cfg.tmp.AssumeNoExtendedWildcardSupport = true
 		return nil
 	}
 	return optionAnon(f)
