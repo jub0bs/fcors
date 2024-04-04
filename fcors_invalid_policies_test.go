@@ -431,14 +431,6 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors: option PreflightSuccessStatus used multiple times`,
 		}, {
-			desc: "option AssumeNoWebCachingOfPreflightResponses used multiple times",
-			options: []fcors.OptionAnon{
-				fcors.FromOrigins("https://example.com"),
-				risky.AssumeNoWebCachingOfPreflightResponses(),
-				risky.AssumeNoWebCachingOfPreflightResponses(),
-			},
-			errorMsg: `fcors/risky: option AssumeNoWebCachingOfPreflightResponses used multiple times`,
-		}, {
 			desc: "option PrivateNetworkAccess used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
@@ -989,14 +981,6 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 				fcors.PreflightSuccessStatus(202),
 			},
 			errorMsg: `fcors: option PreflightSuccessStatus used multiple times`,
-		}, {
-			desc: "option AssumeNoWebCachingOfPreflightResponses used multiple times",
-			options: []fcors.Option{
-				fcors.FromOrigins("https://example.com"),
-				risky.AssumeNoWebCachingOfPreflightResponses(),
-				risky.AssumeNoWebCachingOfPreflightResponses(),
-			},
-			errorMsg: `fcors/risky: option AssumeNoWebCachingOfPreflightResponses used multiple times`,
 		}, {
 			desc: "option PrivateNetworkAccess used multiple times",
 			options: []fcors.Option{

@@ -75,22 +75,21 @@ type TempConfig struct {
 type Config struct {
 	// A nil ACAO indicates that the corresponding header
 	// is set dynamically.
-	ACAO                                   []string
-	ACAM                                   []string
-	Corpus                                 origin.Corpus
-	tmp                                    *TempConfig
-	ACAH                                   []string
-	ACMA                                   []string
-	PreflightSuccessStatus                 int
-	AllowAnyMethod                         bool
-	AllowAnyRequestHeaders                 bool
-	AllowAnyOrigin                         bool
-	AllowCredentials                       bool
-	ExposeAllResponseHeaders               bool
-	PrivateNetworkAccess                   bool
-	PrivateNetworkAccessInNoCORSModeOnly   bool
-	AssumeNoWebCachingOfPreflightResponses bool
-	ACEH                                   []string
+	ACAO                                 []string
+	ACAM                                 []string
+	Corpus                               origin.Corpus
+	tmp                                  *TempConfig
+	ACAH                                 []string
+	ACMA                                 []string
+	PreflightSuccessStatus               int
+	AllowAnyMethod                       bool
+	AllowAnyRequestHeaders               bool
+	AllowAnyOrigin                       bool
+	AllowCredentials                     bool
+	ExposeAllResponseHeaders             bool
+	PrivateNetworkAccess                 bool
+	PrivateNetworkAccessInNoCORSModeOnly bool
+	ACEH                                 []string
 	//lint:ignore U1000 because we pad to the end of the 3rd cache line
 	_padding40 [40]bool
 }
@@ -265,13 +264,13 @@ func (cfg *Config) middleware() Middleware {
 func (cfg *Config) handleNonCORSRequest(respHeaders http.Header, isOptionsReq bool) {
 	// see https://wicg.github.io/private-network-access/#shortlinks
 	if cfg.PrivateNetworkAccessInNoCORSModeOnly {
-		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
+		if isOptionsReq {
 			fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		}
 		return
 	}
 	var varyHeaderAdded bool
-	if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
+	if isOptionsReq {
 		fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		varyHeaderAdded = true
 	}
@@ -304,9 +303,7 @@ func (cfg *Config) handleCORSPreflightRequest(
 	acrm []string, // assumed non-empty
 ) {
 	respHeaders := w.Header()
-	if !cfg.AssumeNoWebCachingOfPreflightResponses {
-		fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
-	}
+	fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 	if !cfg.processOriginForPreflight(respHeaders, origins) {
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -392,13 +389,13 @@ func (cfg *Config) handleNonPreflightCORSRequest(
 	respHeaders := w.Header()
 	// see https://wicg.github.io/private-network-access/#shortlinks
 	if cfg.PrivateNetworkAccessInNoCORSModeOnly {
-		if isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses {
+		if isOptionsReq {
 			fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 		}
 		return
 	}
 	switch {
-	case isOptionsReq && !cfg.AssumeNoWebCachingOfPreflightResponses:
+	case isOptionsReq:
 		fastAdd(respHeaders, headerVary, precomputedPreflightVaryValue)
 	case cfg.ACAO == nil:
 		fastAdd(respHeaders, headerVary, precomputedHeaderOrigin)

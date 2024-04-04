@@ -51,30 +51,6 @@ func PrivateNetworkAccessInNoCORSModeOnly() fcors.Option {
 	return internal.PrivateNetworkAccessInNoCORSModeOnly()
 }
 
-// AssumeNoWebCachingOfPreflightResponses configures a CORS middleware
-// to eschew the use of the [Vary header] in preflight responses.
-// Responses to OPTIONS requests are [not meant to be cached] but,
-// for better or worse, some caching intermediaries can nevertheless be
-// configured to cache such responses.
-// To avoid poisoning such caches with inadequate preflight responses,
-// [github.com/jub0bs/fcors] by default lists the following header names
-// in the Vary header of preflight responses:
-//
-//   - Access-Control-Request-Headers
-//   - Access-Control-Request-Methods
-//   - Access-Control-Request-Private-Network
-//   - Origin
-//
-// Use this option if you are absolutely sure that no caching intermediaries
-// cache your responses to OPTIONS requests and you want to minimize the size
-// of preflight responses.
-//
-// [Vary header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary
-// [not meant to be cached]: https://www.rfc-editor.org/rfc/rfc7231#section-4.3.7
-func AssumeNoWebCachingOfPreflightResponses() fcors.Option {
-	return internal.AssumeNoWebCachingOfPreflightResponses()
-}
-
 // TolerateInsecureOrigins enables you to tolerate insecure origins
 // (i.e. origins whose scheme is http),
 // which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits

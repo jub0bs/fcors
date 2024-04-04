@@ -10,21 +10,20 @@ import (
 )
 
 const (
-	optANWCOPR = "AssumeNoWebCachingOfPreflightResponses"
-	optEARH    = "ExposeAllResponseHeaders"
-	optERH     = "ExposeResponseHeaders"
-	optFAO     = "FromAnyOrigin"
-	optFO      = "FromOrigins"
-	optPNA     = "PrivateNetworkAccess"
-	optPNANC   = "PrivateNetworkAccessInNoCORSModeOnly"
-	optTIO     = "TolerateInsecureOrigins"
-	optSPSC    = "SkipPublicSuffixCheck"
-	optWAM     = "WithAnyMethod"
-	optWARH    = "WithAnyRequestHeaders"
-	optWM      = "WithMethods"
-	optWMAIS   = "MaxAgeInSeconds"
-	optWPSS    = "PreflightSuccessStatus"
-	optWRH     = "WithRequestHeaders"
+	optEARH  = "ExposeAllResponseHeaders"
+	optERH   = "ExposeResponseHeaders"
+	optFAO   = "FromAnyOrigin"
+	optFO    = "FromOrigins"
+	optPNA   = "PrivateNetworkAccess"
+	optPNANC = "PrivateNetworkAccessInNoCORSModeOnly"
+	optTIO   = "TolerateInsecureOrigins"
+	optSPSC  = "SkipPublicSuffixCheck"
+	optWAM   = "WithAnyMethod"
+	optWARH  = "WithAnyRequestHeaders"
+	optWM    = "WithMethods"
+	optWMAIS = "MaxAgeInSeconds"
+	optWPSS  = "PreflightSuccessStatus"
+	optWRH   = "WithRequestHeaders"
 )
 
 type Option interface {
@@ -378,17 +377,6 @@ func PreflightSuccessStatus(status uint) Option {
 		}
 		s := int(status) // this conversion is safe because status < 300
 		cfg.PreflightSuccessStatus = s
-		return nil
-	}
-	return option(f)
-}
-
-func AssumeNoWebCachingOfPreflightResponses() Option {
-	f := func(cfg *Config) error {
-		if cfg.AssumeNoWebCachingOfPreflightResponses {
-			return util.NewErrorRisky("option " + optANWCOPR + " used multiple times")
-		}
-		cfg.AssumeNoWebCachingOfPreflightResponses = true
 		return nil
 	}
 	return option(f)
