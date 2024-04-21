@@ -13,7 +13,7 @@ you should use [github.com/jub0bs/cors][jub0bs-cors] instead.
 
 - [About CORS](https://github.com/jub0bs/fcors/#about-cors)
 - [Design philosophy](https://github.com/jub0bs/fcors/#design-philosophy)
-- [Praise for fcors](https://github.com/jub0bs/fcors/#praise-for-fcors)
+- [Praise for fcors](https://github.com/jub0bs/fcors/#praise-for-jub0bsfcors)
 - [Installation](https://github.com/jub0bs/fcors/#installation)
 - [Example](https://github.com/jub0bs/fcors/#example)
 - [Documentation](https://github.com/jub0bs/fcors/#documentation)
