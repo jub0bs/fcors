@@ -3,11 +3,7 @@
 // https://github.com/armon/go-radix.
 package radix
 
-import (
-	"strings"
-
-	"github.com/jub0bs/fcors/internal/util"
-)
+import "github.com/jub0bs/fcors/internal/util"
 
 // A Tree is radix tree whose edges are each labeled by a byte,
 // and whose conceptual leaf nodes each contain a set of ints.
@@ -16,127 +12,166 @@ type Tree struct {
 	root node
 }
 
-// Insert inserts elem in the tree according to keyPattern.
-// The key pattern is processed from right to left.
+// Insert inserts v in the tree according to keyPattern.
 // A leading * byte (0x2a) denotes a wildcard for any non-empty byte sequence.
 // A non-leading * has no special meaning and is treated as any other byte.
 // Sentinel value -1 represents a wildcard value that subsumes all others.
-func (t *Tree) Insert(keyPattern string, elem int) {
-	var wildcardPattern bool
-	if strings.HasPrefix(keyPattern, "*") {
-		wildcardPattern = true
-		keyPattern = keyPattern[1:]
+func (t *Tree) Insert(keyPattern string, v int) {
+	var hasLeadingAsterisk bool
+	// check for a leading asterisk
+	if b, rest, ok := splitAfterFirstByte(keyPattern); ok && b == '*' {
+		hasLeadingAsterisk = true
+		keyPattern = rest
 	}
-	var parent *node
 	n := &t.root
-	search := keyPattern
+	// The key pattern is processed from right to left.
+	s := keyPattern
 	for {
-		if len(search) == 0 {
-			n.add(elem, wildcardPattern)
+		label, ok := lastByte(s)
+		if !ok {
+			n.add(v, hasLeadingAsterisk)
 			return
 		}
-		if n.wildcardSet.Contains(elem) { // nothing more to do
+		if n.wSet.Contains(v) {
 			return
 		}
-		parent = n
-		n = n.edges[lastByteIn(search)]
-		if n == nil { // no matching edge found; create one
-			child := &node{suffix: search}
-			child.add(elem, wildcardPattern)
-			parent.insertEdge(lastByteIn(search), child)
+		child := n.edges[label]
+		if child == nil { // No matching edge found; create one.
+			child = &node{suf: s}
+			child.add(v, hasLeadingAsterisk)
+			n.insertEdge(label, child)
 			return
 		}
 
-		// matching edge found
-		suffixLen := lengthOfCommonSuffix(search, n.suffix)
-		if suffixLen == len(n.suffix) { // n.suffix is a suffix of search
-			search, _ = splitRight(search, suffixLen)
+		sPrefix, prefixOfChildSuf, suf := splitAtCommonSuffix(s, child.suf)
+		if len(prefixOfChildSuf) == 0 { // child.suf is a suffix of s
+			s = sPrefix
+			n = child
 			continue
 		}
 
-		// n.suffix is NOT a suffix of search; split the node
-		child := new(node)
-		_, child.suffix = splitRight(search, suffixLen)
-		parent.insertEdge(lastByteIn(search), child)
+		// child.suf is NOT a suffix of s; we need to split child.
+		//
+		// Before splitting:
+		//
+		//  child
+		//
+		// After splitting:
+		//
+		//  child' -- grandChild1
+		//
+		// or perhaps
+		//
+		//  child' -- grandChild1
+		//     \
+		//      grandChild2
 
-		// restore the existing node
-		byteBeforeSuffix := n.suffix[len(n.suffix)-1-suffixLen]
-		child.insertEdge(byteBeforeSuffix, n)
-		if len(search) == suffixLen { // search is a suffix of n.suffix
-			n.suffix, _ = splitRight(n.suffix, suffixLen)
-			child.add(elem, wildcardPattern)
+		// Create the first grandchild on the basis of the current child.
+		grandChild1 := child
+		grandChild1.suf = prefixOfChildSuf
+
+		// Replace child in n.
+		child = &node{suf: suf}
+		n.insertEdge(label, child)
+
+		// Add the first grandchild in child.
+		label, _ = lastByte(prefixOfChildSuf)
+		child.insertEdge(label, grandChild1)
+		if len(sPrefix) == 0 {
+			child.add(v, hasLeadingAsterisk)
 			return
 		}
-		// search is NOT a suffix of n.suffix
-		n.suffix, _ = splitRight(n.suffix, suffixLen)
-		search, _ = splitRight(search, suffixLen)
-		grandChild := &node{suffix: search}
-		grandChild.add(elem, wildcardPattern)
-		child.insertEdge(lastByteIn(search), grandChild)
+
+		// Add a second grandchild in child.
+		label, _ = lastByte(sPrefix)
+		grandChild2 := &node{suf: sPrefix}
+		grandChild2.add(v, hasLeadingAsterisk)
+		child.insertEdge(label, grandChild2)
 	}
 }
 
-// Contains reports whether t contains key-value pair (k,t).
+// Contains reports whether t contains key-value pair (k,v).
 func (t *Tree) Contains(k string, v int) bool {
 	n := &t.root
-	search := k
 	for {
-		if len(search) == 0 {
-			return n.set.Contains(v) ||
-				n.set.Contains(WildcardElem)
+		label, ok := lastByte(k)
+		if !ok {
+			return n.set.Contains(v) || n.set.Contains(WildcardElem)
 		}
 
-		// search is not empty; check wildcard edge
-		if n.wildcardSet.Contains(v) ||
-			n.wildcardSet.Contains(WildcardElem) { // nothing more to check
+		// k is not empty; check wildcard edge
+		if n.wSet.Contains(v) || n.wSet.Contains(WildcardElem) {
 			return true
 		}
 
 		// try regular edges
-		n = n.edges[lastByteIn(search)]
+		n = n.edges[label]
 		if n == nil {
 			return false
 		}
 
-		if !strings.HasSuffix(search, n.suffix) {
+		kPrefix, _, suf := splitAtCommonSuffix(k, n.suf)
+		if len(suf) != len(n.suf) { // n.suf is NOT a suffix of k
 			return false
 		}
-		search, _ = splitRight(search, len(n.suffix))
+		// n.suf is a suffix of k
+		k = kPrefix
 	}
 }
 
-// assumes s is non-empty
-func lastByteIn(s string) byte {
-	return s[len(s)-1]
+func splitAfterFirstByte(str string) (byte, string, bool) {
+	if len(str) == 0 {
+		return 0, str, false
+	}
+	return str[0], str[1:], true
 }
 
-// assumes len(s) >= length
-func splitRight(s string, length int) (start, end string) {
-	j := len(s) - length
-	return s[:j], s[j:]
+func lastByte(str string) (byte, bool) {
+	if len(str) == 0 {
+		return 0, false
+	}
+	return str[len(str)-1], true
 }
 
+// splitAtCommonSuffix finds the longest suffix common to a and b and returns
+// a and b both trimmed of that suffix along with the suffix itself.
+func splitAtCommonSuffix(a, b string) (string, string, string) {
+	s, l := a, b // s for short, l for long
+	if len(l) < len(s) {
+		s, l = l, s
+	}
+	l = l[len(l)-len(s):]
+	_ = l[:len(s)] // hoist bounds checks on l out of the loop
+	i := len(s) - 1
+	for ; 0 <= i && s[i] == l[i]; i-- {
+		// deliberately empty body
+	}
+	i++
+	return a[:len(a)-len(s)+i], b[:len(b)-len(s)+i], s[i:]
+}
+
+// WildcardElem is a sentinel value that subsumes all others.
 const WildcardElem = -1
 
 // A node represents a regular node
 // (i.e. a node that does not stem from a wildcard edge)
 // of a Tree.
 type node struct {
-	// suffix of this node (not restricted to ASCII or even valid UTF-8)
-	suffix string
+	// suf of this node (not restricted to ASCII or even valid UTF-8)
+	suf string
 	// edges to children of this node
 	edges edges
 	// values in this node
 	set util.Set[int]
 	// values in the "conceptual" child node down the wildcard edge
 	// that stems from this node
-	wildcardSet util.Set[int]
+	wSet util.Set[int]
 }
 
-func (n *node) add(elem int, wildcardPattern bool) {
+func (n *node) add(elem int, toWildcardSet bool) {
 	var set *util.Set[int]
-	if wildcardPattern {
-		set = &n.wildcardSet
+	if toWildcardSet {
+		set = &n.wSet
 	} else {
 		set = &n.set
 	}
@@ -165,16 +200,3 @@ func (n *node) insertEdge(label byte, child *node) {
 }
 
 type edges = map[byte]*node
-
-func lengthOfCommonSuffix(s1, s2 string) int {
-	l1 := len(s1) - 1
-	l2 := len(s2) - 1
-	l := min(l1, l2)
-	var i int
-	for ; i <= l; i++ {
-		if s1[l1-i] != s2[l2-i] {
-			break
-		}
-	}
-	return i
-}
