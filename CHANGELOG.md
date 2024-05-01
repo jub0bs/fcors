@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] (2024-05-02)
+
+### Fixed
+
+- **Vulnerability**: Some CORS middleware (more specifically those created
+  by specifying two or more origin patterns whose hosts share a proper suffix)
+  incorrectly allowed some untrusted origins, thereby opening the door to
+  cross-origin attacks from the untrusted origins in question.
+  For example, specifying origin patterns `https://foo.com` and
+  `https://bar.com` (in that order) would yield a middleware that would
+  incorrectly allow untrusted origin `https://barfoo.com`.
+  See https://github.com/jub0bs/fcors/security/advisories/GHSA-v84h-653v-4pq9.
+
+### Changed
+
+- **API** (breaking changes): option `PrivateNetworkAccessInNoCorsModeOnly`
+  has been renamed to `PrivateNetworkAccessInNoCORSModeOnly`.
+- **API** (breaking changes): option `SkipPublicSuffixCheck`
+  has been renamed to `DangerouslyTolerateSubdomainsOfPublicSuffixes`.
+  - **API** (breaking changes): option `TolerateInsecureOrigins`
+  has been renamed to `DangerouslyTolerateInsecureOrigins`.
+- **Dependencies**: update to `golang.org/x/net` v0.24.0
+- **Documentation**: recommend migration to [jub0bs/cors][cors] in README
+- **Documentation**: match examples from [jub0bs/cors][cors]
+- **Documentation**: various improvements
+- **Behavior**: improve error messages
+- **Behavior**: Relax the need to activate option
+  `DangerouslyTolerateInsecureOrigins`; it is now required only if you specify
+  insecure origin patterns and enable credentialed access and/or some form of
+  Private Network Access.
+- **Performance**: minor improvements
+
+### Removed
+
+- **API** (breaking change): option `AssumeNoWebCachingOfPreflightResponses`
+- **API** (breaking change): option `AssumeNoExtendedWildcardSupport`
+- **Documentation**: links to external examples and benchmarks in README
+
 ## [0.8.0] (2024-02-08)
 
 ### Changed
@@ -188,6 +226,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] (2023-02-08)
 
+[0.9.0]: https://github.com/jub0bs/fcors/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/jub0bs/fcors/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/jub0bs/fcors/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/jub0bs/fcors/compare/v0.5.1...v0.6.0
@@ -200,6 +239,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.1]: https://github.com/jub0bs/fcors/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/jub0bs/fcors/releases/tag/v0.1.0
 
+[cors]: https://github.com/jub0bs/cors
 [examples]: https://github.com/jub0bs/fcors-examples
 [pna-earlier]: https://github.com/WICG/private-network-access/pull/90
 [pna-rename]: https://github.com/WICG/private-network-access/issues/91
