@@ -16,8 +16,8 @@ const (
 	optFO    = "FromOrigins"
 	optPNA   = "PrivateNetworkAccess"
 	optPNANC = "PrivateNetworkAccessInNoCORSModeOnly"
-	optTIO   = "TolerateInsecureOrigins"
-	optSPSC  = "SkipPublicSuffixCheck"
+	optDTIO  = "DangerouslyTolerateInsecureOrigins"
+	optDTSPS = "DangerouslyTolerateSubdomainsOfPublicSuffixes"
 	optWAM   = "WithAnyMethod"
 	optWARH  = "WithAnyRequestHeaders"
 	optWM    = "WithMethods"
@@ -406,23 +406,23 @@ func PrivateNetworkAccessInNoCORSModeOnly() Option {
 	return option(f)
 }
 
-func TolerateInsecureOrigins() Option {
+func DangerouslyTolerateInsecureOrigins() Option {
 	f := func(cfg *Config) error {
-		if cfg.tmp.TolerateInsecureOrigins {
-			return util.NewErrorRisky("option " + optTIO + " used multiple times")
+		if cfg.tmp.DangerouslyTolerateInsecureOrigins {
+			return util.NewErrorRisky("option " + optDTIO + " used multiple times")
 		}
-		cfg.tmp.TolerateInsecureOrigins = true
+		cfg.tmp.DangerouslyTolerateInsecureOrigins = true
 		return nil
 	}
 	return option(f)
 }
 
-func SkipPublicSuffixCheck() Option {
+func DangerouslyTolerateSubdomainsOfPublicSuffixes() Option {
 	f := func(cfg *Config) error {
-		if cfg.tmp.SkipPublicSuffixCheck {
-			return util.NewErrorRisky("option " + optSPSC + " used multiple times")
+		if cfg.tmp.DangerouslyTolerateSubdomainsOfPublicSuffixes {
+			return util.NewErrorRisky("option " + optDTSPS + " used multiple times")
 		}
-		cfg.tmp.SkipPublicSuffixCheck = true
+		cfg.tmp.DangerouslyTolerateSubdomainsOfPublicSuffixes = true
 		return nil
 	}
 	return option(f)

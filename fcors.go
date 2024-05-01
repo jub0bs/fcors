@@ -219,9 +219,9 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // If, even in such cases,
 // you wish to deliberately tolerate insecure origins anyway,
 // you must also activate option
-// [github.com/jub0bs/fcors/risky.TolerateInsecureOrigins].
+// [github.com/jub0bs/fcors/risky.DangerouslyTolerateInsecureOrigins].
 // Otherwise, any occurence of an insecure origin without activating option
-// [github.com/jub0bs/fcors/risky.TolerateInsecureOrigins]
+// [github.com/jub0bs/fcors/risky.DangerouslyTolerateInsecureOrigins]
 // results in a failure to build the corresponding middleware.
 //
 // Also for security reasons, allowing arbitrary subdomains of a base domain
@@ -233,9 +233,9 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 //
 // If you need to deliberately allow arbitrary subdomains of a
 // public suffix (danger!), you must also activate option
-// [github.com/jub0bs/fcors/risky.SkipPublicSuffixCheck].
+// [github.com/jub0bs/fcors/risky.DangerouslyTolerateSubdomainsOfPublicSuffixes].
 // Any occurrence of such a prohibited origin pattern without activating option
-// [github.com/jub0bs/fcors/risky.SkipPublicSuffixCheck]
+// [github.com/jub0bs/fcors/risky.DangerouslyTolerateSubdomainsOfPublicSuffixes]
 // results in a failure to build the corresponding middleware.
 //
 // [ASCII serialized form]: https://html.spec.whatwg.org/multipage/browsers.html#ascii-serialisation-of-an-origin

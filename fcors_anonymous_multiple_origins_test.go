@@ -813,7 +813,7 @@ func Test_AllowAccess_From_Subdomains_Of_Public_Suffix(t *testing.T) {
 		fcors.FromOrigins("https://*.com"),
 		fcors.PreflightSuccessStatus(dummyPreflightSuccessStatus),
 		fcors.MaxAgeInSeconds(dummyMaxAge),
-		risky.SkipPublicSuffixCheck(),
+		risky.DangerouslyTolerateSubdomainsOfPublicSuffixes(),
 	)
 	if err != nil {
 		t.Errorf("got error with message %q; want nil error", err.Error())

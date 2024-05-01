@@ -447,21 +447,21 @@ func TestInvalidPoliciesForAllowAccess(t *testing.T) {
 			},
 			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCORSModeOnly used multiple times`,
 		}, {
-			desc: "option TolerateInsecureOrigins used multiple times",
+			desc: "option DangerouslyTolerateInsecureOrigins used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("http://example.com"),
-				risky.TolerateInsecureOrigins(),
-				risky.TolerateInsecureOrigins(),
+				risky.DangerouslyTolerateInsecureOrigins(),
+				risky.DangerouslyTolerateInsecureOrigins(),
 			},
-			errorMsg: `fcors/risky: option TolerateInsecureOrigins used multiple times`,
+			errorMsg: `fcors/risky: option DangerouslyTolerateInsecureOrigins used multiple times`,
 		}, {
-			desc: "option SkipPublicSuffixCheck used multiple times",
+			desc: "option DangerouslyTolerateSubdomainsOfPublicSuffixes used multiple times",
 			options: []fcors.OptionAnon{
 				fcors.FromOrigins("https://example.com"),
-				risky.SkipPublicSuffixCheck(),
-				risky.SkipPublicSuffixCheck(),
+				risky.DangerouslyTolerateSubdomainsOfPublicSuffixes(),
+				risky.DangerouslyTolerateSubdomainsOfPublicSuffixes(),
 			},
-			errorMsg: `fcors/risky: option SkipPublicSuffixCheck used multiple times`,
+			errorMsg: `fcors/risky: option DangerouslyTolerateSubdomainsOfPublicSuffixes used multiple times`,
 		}, {
 			desc: "conjunct use of options FromOrigins and FromAnyOrigin",
 			options: []fcors.OptionAnon{
@@ -998,21 +998,21 @@ func TestInvalidPoliciesForAllowAccessWithCredentials(t *testing.T) {
 			},
 			errorMsg: `fcors/risky: option PrivateNetworkAccessInNoCORSModeOnly used multiple times`,
 		}, {
-			desc: "option TolerateInsecureOrigins used multiple times",
+			desc: "option DangerouslyTolerateInsecureOrigins used multiple times",
 			options: []fcors.Option{
 				fcors.FromOrigins("http://example.com"),
-				risky.TolerateInsecureOrigins(),
-				risky.TolerateInsecureOrigins(),
+				risky.DangerouslyTolerateInsecureOrigins(),
+				risky.DangerouslyTolerateInsecureOrigins(),
 			},
-			errorMsg: `fcors/risky: option TolerateInsecureOrigins used multiple times`,
+			errorMsg: `fcors/risky: option DangerouslyTolerateInsecureOrigins used multiple times`,
 		}, {
-			desc: "option SkipPublicSuffixCheck used multiple times",
+			desc: "option DangerouslyTolerateSubdomainsOfPublicSuffixes used multiple times",
 			options: []fcors.Option{
 				fcors.FromOrigins("https://example.com"),
-				risky.SkipPublicSuffixCheck(),
-				risky.SkipPublicSuffixCheck(),
+				risky.DangerouslyTolerateSubdomainsOfPublicSuffixes(),
+				risky.DangerouslyTolerateSubdomainsOfPublicSuffixes(),
 			},
-			errorMsg: `fcors/risky: option SkipPublicSuffixCheck used multiple times`,
+			errorMsg: `fcors/risky: option DangerouslyTolerateSubdomainsOfPublicSuffixes used multiple times`,
 		}, {
 			desc: "conjunct use of options WithMethods and WithAnyMethod",
 			options: []fcors.Option{

@@ -57,19 +57,19 @@ func init() {
 }
 
 type TempConfig struct {
-	PublicSuffixes               []string
-	InsecureOriginPatterns       []string
-	SingleNonWildcardOrigin      string
-	AllowedMethods               util.Set[string]
-	AllowedRequestHeaders        util.Set[string]
-	CustomPreflightSuccessStatus bool
-	SkipPublicSuffixCheck        bool
-	TolerateInsecureOrigins      bool
-	FromOriginsCalled            bool
-	WithMethodsCalled            bool
-	WithRequestHeadersCalled     bool
-	MaxAgeInSecondsCalled        bool
-	ExposeResponseHeadersCalled  bool
+	PublicSuffixes                                []string
+	InsecureOriginPatterns                        []string
+	SingleNonWildcardOrigin                       string
+	AllowedMethods                                util.Set[string]
+	AllowedRequestHeaders                         util.Set[string]
+	CustomPreflightSuccessStatus                  bool
+	DangerouslyTolerateSubdomainsOfPublicSuffixes bool
+	DangerouslyTolerateInsecureOrigins            bool
+	FromOriginsCalled                             bool
+	WithMethodsCalled                             bool
+	WithRequestHeadersCalled                      bool
+	MaxAgeInSecondsCalled                         bool
+	ExposeResponseHeadersCalled                   bool
 }
 
 type Config struct {
@@ -107,13 +107,13 @@ func (cfg *Config) validate() error {
 	var errs []error
 	if len(cfg.tmp.InsecureOriginPatterns) > 0 &&
 		(cfg.AllowCredentials || cfg.PrivateNetworkAccess || cfg.PrivateNetworkAccessInNoCORSModeOnly) &&
-		!cfg.tmp.TolerateInsecureOrigins {
-		// Note: We don't require risky.TolerateInsecureOrigins
+		!cfg.tmp.DangerouslyTolerateInsecureOrigins {
+		// Note: We don't require risky.DangerouslyTolerateInsecureOrigins
 		// when users specify one or more insecure origin patterns
 		// in anonymous-only mode and without PNA;
 		// in such cases, insecure origins like http://example.com
 		// are indeed no less insecure than * is,
-		// which itself doesn't require risky.TolerateInsecureOrigins.
+		// which itself doesn't require risky.DangerouslyTolerateInsecureOrigins.
 		var errorMsg strings.Builder
 		var patterns = cfg.tmp.InsecureOriginPatterns
 		errorMsg.WriteString(`insecure origin patterns like "`)
@@ -131,7 +131,7 @@ func (cfg *Config) validate() error {
 		err := util.NewError(errorMsg.String())
 		errs = append(errs, err)
 	}
-	if len(cfg.tmp.PublicSuffixes) > 0 && !cfg.tmp.SkipPublicSuffixCheck {
+	if len(cfg.tmp.PublicSuffixes) > 0 && !cfg.tmp.DangerouslyTolerateSubdomainsOfPublicSuffixes {
 		var errorMsg strings.Builder
 		errorMsg.WriteString(`origin patterns like "`)
 		errorMsg.WriteString(strings.Join(cfg.tmp.PublicSuffixes, `", "`))

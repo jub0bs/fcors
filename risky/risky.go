@@ -51,7 +51,7 @@ func PrivateNetworkAccessInNoCORSModeOnly() fcors.Option {
 	return internal.PrivateNetworkAccessInNoCORSModeOnly()
 }
 
-// TolerateInsecureOrigins enables you to tolerate insecure origins
+// DangerouslyTolerateInsecureOrigins enables you to tolerate insecure origins
 // (i.e. origins whose scheme is http),
 // which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits
 // when credentialed access is enabled and/or
@@ -63,18 +63,18 @@ func PrivateNetworkAccessInNoCORSModeOnly() fcors.Option {
 // [Private-Network Access]: https://wicg.github.io/private-network-access/
 // [active network attacks]: https://en.wikipedia.org/wiki/Man-in-the-middle_attack
 // [the talk he gave at AppSec EU 2017]: https://www.youtube.com/watch?v=wgkj4ZgxI4c&t=1305s
-func TolerateInsecureOrigins() fcors.Option {
-	return internal.TolerateInsecureOrigins()
+func DangerouslyTolerateInsecureOrigins() fcors.Option {
+	return internal.DangerouslyTolerateInsecureOrigins()
 }
 
-// SkipPublicSuffixCheck enables you to allow all subdomains of some
-// [public suffix] (also known as "effective top-level domain"),
-// which option [github.com/jub0bs/fcors.FromOrigins] by default prohibits.
-// Be aware that allowing all subdomains of a public suffix (e.g. com)
-// is dangerous because such domains (e.g. jub0bs-attacker.com) are typically
-// registrable by anyone, including attackers.
+// DangerouslyTolerateSubdomainsOfPublicSuffixes enables you to allow all
+// subdomains of some [public suffix] (also known as "effective top-level
+// domain"), which option [github.com/jub0bs/fcors.FromOrigins] by default
+// prohibits. Be aware that allowing all subdomains of a public suffix
+// (e.g. com) is dangerous because such domains (e.g. jub0bs-attacker.com)
+// are typically registrable by anyone, including attackers.
 //
 // [public suffix]: https://publicsuffix.org/
-func SkipPublicSuffixCheck() fcors.Option {
-	return internal.SkipPublicSuffixCheck()
+func DangerouslyTolerateSubdomainsOfPublicSuffixes() fcors.Option {
+	return internal.DangerouslyTolerateSubdomainsOfPublicSuffixes()
 }

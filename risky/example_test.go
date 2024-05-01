@@ -10,14 +10,15 @@ import (
 	"github.com/jub0bs/fcors/risky"
 )
 
-func ExampleSkipPublicSuffixCheck() {
+func ExampleDangerouslyTolerateSubdomainsOfPublicSuffixes() {
 	cors, err := fcors.AllowAccessWithCredentials(
 		fcors.FromOrigins("https://*.com"),
-		risky.SkipPublicSuffixCheck(),
+		risky.DangerouslyTolerateSubdomainsOfPublicSuffixes(),
 	)
 	if err != nil {
 		// This branch would get executed if the call to
-		// risky.SkipPublicSuffixCheck were missing above.
+		// risky.DangerouslyTolerateSubdomainsOfPublicSuffixes were missing
+		// above.
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -28,14 +29,14 @@ func ExampleSkipPublicSuffixCheck() {
 	http.Handle("/hello_public_suffix", cors(helloHandler))
 }
 
-func ExampleTolerateInsecureOrigins() {
+func ExampleDangerouslyTolerateInsecureOrigins() {
 	cors, err := fcors.AllowAccessWithCredentials(
 		fcors.FromOrigins("http://example.com"),
-		risky.TolerateInsecureOrigins(),
+		risky.DangerouslyTolerateInsecureOrigins(),
 	)
 	if err != nil {
 		// This branch would get executed if the call to
-		// risky.TolerateInsecureOrigins were missing above.
+		// risky.DangerouslyTolerateInsecureOrigins were missing above.
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
