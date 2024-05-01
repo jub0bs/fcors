@@ -60,49 +60,58 @@ jub0bs/fcors requires Go 1.21 or above.
 
 ## Example
 
-The following program builds a CORS middleware
-that allows anonymous requests from Web origin `https://example.com`,
-with any HTTP method among `GET`, `POST`, `PUT`, or `DELETE`,
-and possibly with request header `Authorization`.
-The CORS middleware in question is then applied
-to a simple handler bound to the `/hello` endpoint.
+The following program demonstrates how to create a CORS middleware that
+
+- allows anonymous access from Web origin `https://example.com`,
+- with requests whose method is either `GET` or `POST`,
+- and (optionally) with request header `Authorization`,
+
+and how to apply the middleware in question to all the resources accessible
+under some `/api/` path:
 
 ```go
 package main
 
 import (
-  "fmt"
   "io"
+  "log"
   "net/http"
-  "os"
 
   "github.com/jub0bs/fcors"
 )
 
 func main() {
+  mux := http.NewServeMux()
+  mux.HandleFunc("GET /hello", handleHello) // note: not configured for CORS
+
+  // create CORS middleware
   cors, err := fcors.AllowAccess(
     fcors.FromOrigins("https://example.com"),
-    fcors.WithMethods(
-      http.MethodGet,
-      http.MethodPost,
-      http.MethodPut,
-      http.MethodDelete,
-    ),
+    fcors.WithMethods(http.MethodGet, http.MethodPost),
     fcors.WithRequestHeaders("Authorization"),
   )
   if err != nil {
-    fmt.Fprintln(os.Stderr, err)
-    os.Exit(1)
+    log.Fatal(err)
   }
-  http.Handle("/hello", cors(http.HandlerFunc(helloHandler)))
-  if err := http.ListenAndServe(":8080", nil); err != nil {
-    fmt.Fprintln(os.Stderr, err)
-    os.Exit(1)
-  }
+
+  api := http.NewServeMux()
+  api.HandleFunc("GET /users", handleUsersGet)
+  api.HandleFunc("POST /users", handleUsersPost)
+  mux.Handle("/api/", http.StripPrefix("/api", cors(api))) // note: method-less pattern here
+
+  log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
-func helloHandler(w http.ResponseWriter, _ *http.Request) {
-  io.WriteString(w, "Hello, world!\n")
+func handleHello(w http.ResponseWriter, _ *http.Request) {
+  io.WriteString(w, "Hello, World!")
+}
+
+func handleUsersGet(w http.ResponseWriter, _ *http.Request) {
+  // omitted
+}
+
+func handleUsersPost(w http.ResponseWriter, _ *http.Request) {
+  // omitted
 }
 ``` 
 
@@ -115,8 +124,9 @@ go build server.go
 ./server
 ```
 
-If no error occurred, the server is now running on `localhost:8080`
-and the `/hello` resource is now configured for CORS as desired.
+If no error occurred, the server is now running on `localhost:8080` and the
+various resources accessible under the `/api/` path are now configured for
+CORS as desired.
 
 ## Documentation
 

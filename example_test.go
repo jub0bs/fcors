@@ -1,69 +1,43 @@
 package fcors_test
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"os"
 
 	"github.com/jub0bs/fcors"
 )
 
 func ExampleAllowAccess() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /hello", handleHello) // note: not configured for CORS
+
+	// create CORS middleware
 	cors, err := fcors.AllowAccess(
-		fcors.FromAnyOrigin(),
-		fcors.WithMethods(
-			http.MethodGet,
-			http.MethodDelete,
-			http.MethodPost,
-			http.MethodPut,
-		),
-		fcors.WithRequestHeaders(
-			"Authorization",
-			"Content-Type",
-		),
-		fcors.MaxAgeInSeconds(30),
+		fcors.FromOrigins("https://example.com"),
+		fcors.WithMethods(http.MethodGet, http.MethodPost),
+		fcors.WithRequestHeaders("Authorization"),
 	)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
-	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
-	})
-	http.Handle("/hello", cors(helloHandler))
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+
+	api := http.NewServeMux()
+	api.HandleFunc("GET /users", handleUsersGet)
+	api.HandleFunc("POST /users", handleUsersPost)
+	mux.Handle("/api/", http.StripPrefix("/api", cors(api))) // note: method-less pattern here
+
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
-func ExampleAllowAccessWithCredentials() {
-	cors, err := fcors.AllowAccessWithCredentials(
-		fcors.FromOrigins(
-			"https://example.com",
-		),
-		fcors.WithMethods(
-			http.MethodGet,
-			http.MethodDelete,
-			http.MethodPost,
-			http.MethodPut,
-		),
-		fcors.WithRequestHeaders(
-			"Content-Type",
-		),
-		fcors.MaxAgeInSeconds(30),
-	)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	helloHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
-	})
-	http.Handle("/hello", cors(helloHandler))
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+func handleHello(w http.ResponseWriter, _ *http.Request) {
+	io.WriteString(w, "Hello, World!")
+}
+
+func handleUsersGet(w http.ResponseWriter, _ *http.Request) {
+	// omitted
+}
+
+func handleUsersPost(w http.ResponseWriter, _ *http.Request) {
+	// omitted
 }
