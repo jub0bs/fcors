@@ -220,7 +220,7 @@ func AllowAccessWithCredentials(one Option, others ...Option) (Middleware, error
 // you wish to deliberately tolerate insecure origins anyway,
 // you must also activate option
 // [github.com/jub0bs/fcors/risky.DangerouslyTolerateInsecureOrigins].
-// Otherwise, any occurence of an insecure origin without activating option
+// Otherwise, any occurrence of an insecure origin without activating option
 // [github.com/jub0bs/fcors/risky.DangerouslyTolerateInsecureOrigins]
 // results in a failure to build the corresponding middleware.
 //
