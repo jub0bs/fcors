@@ -12,9 +12,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
       - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v5.4.0
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -24,7 +24,7 @@ jobs:
         run: go test -v -coverpkg=./... -coverprofile=cover.out ./...
       - name: Upload coverage to Codecov
         if: success()
-        uses: codecov/codecov-action@v4.2.0
+        uses: codecov/codecov-action@v5.4.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code (new)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           path: new
           fetch-depth: '0' # fetch all history for all branches and tags
@@ -49,12 +49,12 @@ jobs:
           cd new
           echo "LATEST_TAG=$(git for-each-ref --sort=-version:refname --format='%(refname:lstrip=2)' --count=1 refs/tags)" >> "$GITHUB_OUTPUT"
       - name: Check out Code (previous)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           ref: ${{ steps.latest-tag.outputs.LATEST_TAG }}
           path: previous
       - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v5.4.0
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install benchstat
