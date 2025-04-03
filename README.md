@@ -56,7 +56,7 @@ Paul Carleton (Staff Software Engineer at [Stripe][stripe])
 go get github.com/jub0bs/fcors
 ```
 
-jub0bs/fcors requires Go 1.21 or above.
+jub0bs/fcors requires Go 1.23 or above.
 
 ## Example
 

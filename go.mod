@@ -1,6 +1,6 @@
 module github.com/jub0bs/fcors
 
-go 1.21
+go 1.23.0
 
 require golang.org/x/net v0.33.0
 
